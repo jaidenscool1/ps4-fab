@@ -1,0 +1,599 @@
+{
+ "markers": [
+  {
+   "body": [
+    0.27237,
+    0.43767,
+    0.02925,
+    0.04667
+   ],
+   "col": "#505151",
+   "h": 0.0467,
+   "id": "ifx-bbot-ics-1",
+   "label": "",
+   "layer": "ics",
+   "n": 1,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.27,
+   "y": 0.43
+  },
+  {
+   "body": [
+    0.3265,
+    0.43733,
+    0.0295,
+    0.04733
+   ],
+   "col": "#464747",
+   "h": 0.0467,
+   "id": "ifx-bbot-ics-2",
+   "label": "",
+   "layer": "ics",
+   "n": 2,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.33,
+   "y": 0.43
+  },
+  {
+   "body": [
+    0.38075,
+    0.43767,
+    0.0295,
+    0.046
+   ],
+   "col": "#434444",
+   "h": 0.049,
+   "id": "ifx-bbot-ics-3",
+   "label": "",
+   "layer": "ics",
+   "n": 3,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.0325,
+   "x": 0.3815,
+   "y": 0.4385
+  },
+  {
+   "body": [
+    0.2435,
+    0.53283,
+    0.0345,
+    0.039
+   ],
+   "col": "#535354",
+   "h": 0.04133,
+   "id": "ifx-bbot-ics-4",
+   "label": "",
+   "layer": "ics",
+   "n": 4,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03725,
+   "x": 0.24512,
+   "y": 0.53333
+  },
+  {
+   "body": [
+    0.2435,
+    0.60633,
+    0.0345,
+    0.03933
+   ],
+   "col": "#4d4e4f",
+   "h": 0.0467,
+   "id": "ifx-bbot-ics-5",
+   "label": "",
+   "layer": "ics",
+   "n": 5,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.24,
+   "y": 0.61
+  },
+  {
+   "body": [
+    0.27237,
+    0.701,
+    0.02925,
+    0.046
+   ],
+   "col": "#484949",
+   "h": 0.04233,
+   "id": "ifx-bbot-ics-6",
+   "label": "",
+   "layer": "ics",
+   "n": 6,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.02225,
+   "x": 0.26837,
+   "y": 0.69917
+  },
+  {
+   "body": [
+    0.32662,
+    0.7015,
+    0.02925,
+    0.04567
+   ],
+   "col": "#414243",
+   "h": 0.04733,
+   "id": "ifx-bbot-ics-7",
+   "label": "",
+   "layer": "ics",
+   "n": 7,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.0315,
+   "x": 0.3275,
+   "y": 0.702
+  },
+  {
+   "body": [
+    0.38025,
+    0.70133,
+    0.0295,
+    0.046
+   ],
+   "col": "#3e3e3f",
+   "h": 0.04633,
+   "id": "ifx-bbot-ics-8",
+   "label": "",
+   "layer": "ics",
+   "n": 8,
+   "note": "Source: iFixit step 20, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.0295,
+   "x": 0.38325,
+   "y": 0.7015
+  },
+  {
+   "body": [
+    0.516,
+    0.119,
+    0.0255,
+    0.033333
+   ],
+   "col": "#454647",
+   "h": 0.035,
+   "id": "ifx-bbot-ics-9",
+   "label": "",
+   "layer": "ics",
+   "n": 9,
+   "note": "Source: iFixit step 20, red box (iFixit colour key).",
+   "part": "usbhub",
+   "text": [
+    "GL3520",
+    "0V1CC02Y21",
+    "325GHK7831"
+   ],
+   "trot": 180,
+   "value": "Genesys Logic GL3520 USB 3.0 hub",
+   "verified": false,
+   "w": 0.0275,
+   "x": 0.5175,
+   "y": 0.12
+  },
+  {
+   "body": [
+    0.51113,
+    0.411,
+    0.01775,
+    0.02333
+   ],
+   "col": "#363536",
+   "h": 0.02367,
+   "id": "ifx-bbot-ics-10",
+   "label": "",
+   "layer": "ics",
+   "n": 10,
+   "note": "Source: iFixit step 20, yellow box (iFixit colour key). Marking reads \"IOR 35858 N326P IC2X\". iFixit gives no description; the PS4 Dev Wiki Regulators page reads this marking as IR 3585B and lists it on SAA-001.",
+   "part": "vrmctl",
+   "text": [
+    "IOR",
+    "35858"
+   ],
+   "trot": 270,
+   "value": "IR 3585B (iFixit: 35858) N326P IC2X",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.511,
+   "y": 0.4105
+  },
+  {
+   "body": [
+    0.69975,
+    0.56267,
+    0.0115,
+    0.01333
+   ],
+   "col": "#41413f",
+   "h": 0.01433,
+   "id": "ifx-bbot-ics-11",
+   "label": "",
+   "layer": "ics",
+   "n": 11,
+   "note": "Source: iFixit step 20, green box (iFixit colour key).",
+   "part": "flash2",
+   "value": "Macronix 25L1006E serial flash",
+   "verified": false,
+   "w": 0.0145,
+   "x": 0.6985,
+   "y": 0.56417
+  },
+  {
+   "body": [
+    0.75475,
+    0.60033,
+    0.0195,
+    0.01733
+   ],
+   "col": "#3b3d3c",
+   "h": 0.025,
+   "id": "ifx-bbot-ics-12",
+   "label": "",
+   "layer": "ics",
+   "n": 12,
+   "note": "Source: iFixit step 20, blue box (iFixit colour key). Not identified by iFixit.",
+   "part": "x39",
+   "value": "39A207 1328 E1 3FU",
+   "verified": false,
+   "w": 0.0325,
+   "x": 0.7575,
+   "y": 0.6
+  },
+  {
+   "band": "right",
+   "col": "#3b3b3c",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-1",
+   "label": "",
+   "layer": "capacitors",
+   "n": 1,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.3263,
+   "y": 0.3367
+  },
+  {
+   "band": "right",
+   "col": "#3a3b39",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-2",
+   "label": "",
+   "layer": "capacitors",
+   "n": 2,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.3475,
+   "y": 0.3367
+  },
+  {
+   "band": "right",
+   "col": "#3a3a39",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-3",
+   "label": "",
+   "layer": "capacitors",
+   "n": 3,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.3675,
+   "y": 0.3367
+  },
+  {
+   "band": "right",
+   "col": "#2d2e2c",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-4",
+   "label": "",
+   "layer": "capacitors",
+   "n": 4,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.3888,
+   "y": 0.3367
+  },
+  {
+   "band": "right",
+   "col": "#343631",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-5",
+   "label": "",
+   "layer": "capacitors",
+   "n": 5,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.4663,
+   "y": 0.33
+  },
+  {
+   "band": "right",
+   "col": "#2f3330",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-6",
+   "label": "",
+   "layer": "capacitors",
+   "n": 6,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.4875,
+   "y": 0.33
+  },
+  {
+   "band": "right",
+   "col": "#2d2f2a",
+   "h": 0.015,
+   "id": "ifx-bbot-capacitors-7",
+   "label": "",
+   "layer": "capacitors",
+   "n": 7,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Under the VRM area.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "37900",
+    "p"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.51,
+   "y": 0.33
+  },
+  {
+   "h": 0.0267,
+   "id": "ifx-bbot-connectors-1",
+   "label": "",
+   "layer": "connectors",
+   "n": 1,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board. Purpose not identified.",
+   "part": "conn",
+   "value": "Small connector",
+   "verified": false,
+   "w": 0.0125,
+   "x": 0.22,
+   "y": 0.2667
+  },
+  {
+   "h": 0.0233,
+   "id": "ifx-bbot-other-1",
+   "label": "SAA-001 1-889-352-11",
+   "layer": "other",
+   "n": 1,
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Confirm on your board.",
+   "part": "silk",
+   "value": "Board silkscreen",
+   "verified": false,
+   "w": 0.15,
+   "x": 0.375,
+   "y": 0.2733
+  },
+  {
+   "body": [
+    0.373125,
+    0.87,
+    0.05625,
+    0.073333
+   ],
+   "col": "#8f9398",
+   "h": 0.077,
+   "id": "ifx-bbot-ics-hdmienc",
+   "label": "",
+   "layer": "ics",
+   "n": 13,
+   "notch": [
+    0,
+    0.795,
+    0.23,
+    1
+   ],
+   "note": "My reading of the iFixit step 20 photo, not stated by iFixit. Step 21 shows the MN86471A 'behind door number one'; this notched shield sits directly behind the HDMI port, with a ~10-trace bus running into it. Confirm by lifting the shield.",
+   "part": "hdmienc",
+   "value": "Shield can over the HDMI chip (MN86471A)",
+   "verified": false,
+   "w": 0.052,
+   "x": 0.3765,
+   "y": 0.8745
+  },
+  {
+   "body": [
+    0.243525,
+    0.4769,
+    0.015075,
+    0.0201
+   ],
+   "col": "#e9b0c2",
+   "h": 0.0201,
+   "id": "ifx-bbot-other-14",
+   "label": "",
+   "layer": "other",
+   "n": 14,
+   "note": "Seen on the iFixit underside photo; purpose not documented.",
+   "part": "pinkpad",
+   "shape": "cyl",
+   "value": "Pink disc over a hole",
+   "verified": false,
+   "w": 0.015075,
+   "x": 0.24352500000000002,
+   "y": 0.4769
+  },
+  {
+   "body": [
+    0.6542,
+    0.570973,
+    0.004,
+    0.005333
+   ],
+   "h": 0.005333333333333333,
+   "id": "ifx-bbot-testpoints-15",
+   "label": "UART TX",
+   "layer": "testpoints",
+   "n": 15,
+   "note": "Position from the BetterWayElectronics UART pinout (SAA/SAB panel), matched onto the iFixit underside photo.",
+   "part": "uarttx",
+   "value": "UART TX",
+   "verified": false,
+   "w": 0.004,
+   "x": 0.6542003623188406,
+   "y": 0.5709734299516909
+  },
+  {
+   "body": [
+    0.649398,
+    0.55956,
+    0.004,
+    0.005333
+   ],
+   "h": 0.005333333333333333,
+   "id": "ifx-bbot-testpoints-16",
+   "label": "UART RX",
+   "layer": "testpoints",
+   "n": 16,
+   "note": "Position from the BetterWayElectronics UART pinout (SAA/SAB panel), matched onto the iFixit underside photo.",
+   "part": "uartrx",
+   "value": "UART RX",
+   "verified": false,
+   "w": 0.004,
+   "x": 0.6493984693877551,
+   "y": 0.5595596371882087
+  },
+  {
+   "body": [
+    0.644574,
+    0.54763,
+    0.00275,
+    0.003667
+   ],
+   "h": 0.0036666666666666666,
+   "id": "ifx-bbot-testpoints-17",
+   "label": "GND",
+   "layer": "testpoints",
+   "n": 17,
+   "note": "Position from the BetterWayElectronics UART pinout (SAA/SAB panel), matched onto the iFixit underside photo.",
+   "part": "uartgnd",
+   "value": "GND",
+   "verified": false,
+   "w": 0.00275,
+   "x": 0.6445741803278688,
+   "y": 0.5476300546448087
+  },
+  {
+   "body": [
+    0.634385,
+    0.570756,
+    0.00325,
+    0.004333
+   ],
+   "h": 0.004333333333333333,
+   "id": "ifx-bbot-testpoints-18",
+   "label": "SB TX",
+   "layer": "testpoints",
+   "n": 18,
+   "note": "Position from the BetterWayElectronics UART pinout (SAA/SAB panel), matched onto the iFixit underside photo.",
+   "part": "sbtx",
+   "value": "SB TX",
+   "verified": false,
+   "w": 0.00325,
+   "x": 0.6343851351351351,
+   "y": 0.5707558558558559
+  },
+  {
+   "body": [
+    0.638962,
+    0.582828,
+    0.004,
+    0.005333
+   ],
+   "h": 0.005333333333333333,
+   "id": "ifx-bbot-testpoints-19",
+   "label": "SB RX",
+   "layer": "testpoints",
+   "n": 19,
+   "note": "Position from the BetterWayElectronics UART pinout (SAA/SAB panel), matched onto the iFixit underside photo.",
+   "part": "sbrx",
+   "value": "SB RX",
+   "verified": false,
+   "w": 0.004,
+   "x": 0.6389620253164556,
+   "y": 0.5828282700421941
+  }
+ ],
+ "photo": "d3073e6d4de3b1333fb26383ac5f9a71"
+}

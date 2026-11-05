@@ -1,0 +1,61 @@
+{
+ "markers": [
+  {
+   "h": 0.63,
+   "id": "ifx-apu-ics-1",
+   "label": "",
+   "layer": "ics",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Die marking reads \"SONY COMPUTER ENTERTAINMENT INC. / CXD90026G / D61000F6F84HT / DIFFUSED IN TAIWAN / MADE IN MALAYSIA\". Step 19 text names it.",
+   "part": "apu",
+   "value": "SCEI CXD90026G",
+   "verified": false,
+   "w": 0.52,
+   "x": 0.52,
+   "y": 0.47
+  },
+  {
+   "h": 0.02,
+   "id": "ifx-apu-capacitors-1",
+   "label": "",
+   "layer": "capacitors",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Tiny caps on the APU substrate all round the die. Easy to knock off during reball cleanup.",
+   "part": "pkgcap",
+   "value": "Package capacitors around the die",
+   "verified": false,
+   "w": 0.075,
+   "x": 0.4,
+   "y": 0.29
+  },
+  {
+   "h": 0.22,
+   "id": "ifx-apu-ics-2",
+   "label": "",
+   "layer": "ics",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Same chips iFixit boxed orange in the full-board photo.",
+   "part": "gddr5",
+   "value": "GDDR5",
+   "verified": false,
+   "w": 0.17,
+   "x": 0.1,
+   "y": 0.36
+  },
+  {
+   "h": 0.22,
+   "id": "ifx-apu-ics-3",
+   "label": "",
+   "layer": "ics",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Same chips iFixit boxed orange in the full-board photo.",
+   "part": "gddr5",
+   "value": "GDDR5",
+   "verified": false,
+   "w": 0.17,
+   "x": 0.13,
+   "y": 0.74
+  }
+ ],
+ "photo": "1389f345e96f87436bc0f0ecd6b9b524"
+}

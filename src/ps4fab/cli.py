@@ -18,6 +18,11 @@ def main(argv=None):
     p = sub.add_parser('build', help='build printable STLs'); p.add_argument('parts', nargs='*', help='part names (default: all)')
     p.add_argument('-o', default='out')
     sub.add_parser('list', help='list parts and what they were measured from')
+    p = sub.add_parser('serve', help='run the Teardown Tracer app (open the printed address in a browser)')
+    p.add_argument('--data', default='data', help='folder with db/ (default: ./data)'); p.add_argument('--port', type=int, default=8780)
+    p.add_argument('--host', default='127.0.0.1', help='0.0.0.0 = let others on your network in (no login - home network only)')
+    p = sub.add_parser('import', help='load an export {collection: {doc: data}} into the database')
+    p.add_argument('file'); p.add_argument('--data', default='data')
     a = ap.parse_args(argv)
 
     if a.cmd == 'mat':
@@ -44,6 +49,19 @@ def main(argv=None):
         bad = [n for n in names if n not in PARTS]
         if bad: sys.exit(f'unknown part(s): {bad}; try: ps4fab list')
         for n in names: PARTS[n](a.o)
+    elif a.cmd == 'serve':
+        from .serve import serve
+        srv = serve(a.data, a.host, a.port)
+        print(f'Teardown Tracer running: http://{"localhost" if a.host == "127.0.0.1" else a.host}:{a.port}/  (data: {os.path.abspath(a.data)}, Ctrl+C stops)')
+        try: srv.serve_forever()
+        except KeyboardInterrupt: pass
+    elif a.cmd == 'import':
+        from .serve import Store
+        st, n = Store(a.data), 0
+        with open(a.file) as f: exp = json.load(f)
+        for col, docs in exp.items():
+            for doc, data in docs.items(): st.write(col, doc, data); n += 1
+        print(f'imported {n} documents into {os.path.abspath(a.data)}/db')
     elif a.cmd == 'list':
         from .parts import PARTS
         import inspect

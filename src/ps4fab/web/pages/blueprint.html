@@ -1,0 +1,426 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PS4 Fat Bench Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one blueprint sheet — title block, board drawing, numbered legend, then failure and revision tables */
+:root{
+  --paper:#0d2a4a; --paper-2:#12355c; --line:#cfe3ff; --dim:#7fa3cc; --grid:rgba(207,227,255,.07);
+  --accent:#ffd166; --bad:#ff8a7a; --ok:#8be0b0;
+  --display:"Chakra Petch",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--paper);color:var(--line);font-family:var(--body);line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:1100px;margin:0 auto;padding-block:28px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+h1,h2{font-family:var(--display);letter-spacing:.04em;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.8rem,4vw,2.6rem)}
+h2{font-size:1.25rem;text-transform:uppercase;border-bottom:1px solid var(--dim);padding-bottom:6px}
+p{margin:0;max-width:70ch}
+.titleblock{display:grid;grid-template-columns:1fr auto;gap:16px;border:2px solid var(--line);padding:16px 18px}
+.titleblock dl{display:grid;grid-template-columns:auto auto;gap:2px 14px;margin:0;font-family:var(--mono);font-size:.8rem}
+.titleblock dt{color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.titleblock dd{margin:0}
+@media (max-width:640px){.titleblock{grid-template-columns:1fr}}
+section{display:grid;gap:14px}
+.note{font-size:.85rem;color:var(--dim)}
+.sheet{overflow-x:auto;border:1px solid var(--dim);background:var(--paper-2)}
+.sheet svg{display:block;min-width:760px;width:100%;height:auto}
+svg text{font-family:var(--mono);fill:var(--line)}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.part{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;border-top:1px solid rgba(207,227,255,.18);padding-top:10px;min-width:0}
+.num{font-family:var(--display);font-weight:700;width:30px;height:30px;border:2px solid var(--accent);color:var(--accent);border-radius:50%;display:grid;place-items:center;font-size:.9rem}
+.part b{font-family:var(--display);letter-spacing:.03em}
+.part code,td code{font-family:var(--mono);font-size:.82rem;color:var(--accent)}
+.part small{display:block;color:var(--dim);font-size:.82rem}
+.warn{color:var(--bad)}
+.table{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.88rem}
+th,td{border:1px solid rgba(207,227,255,.25);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:.78rem;background:rgba(207,227,255,.06)}
+td .ref{font-family:var(--mono);color:var(--accent);white-space:nowrap}
+.pill{font-family:var(--mono);font-size:.72rem;padding:1px 7px;border-radius:9px;border:1px solid currentColor;white-space:nowrap}
+.e{color:var(--ok)}.m{color:var(--accent)}.h{color:var(--bad)}
+ol.steps{margin:0;padding-left:1.4em;display:grid;gap:8px;max-width:75ch}
+ol.steps li::marker{font-family:var(--display);color:var(--accent)}
+a{color:var(--accent)}
+.views{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border:1px solid var(--dim);padding:8px;display:flex;flex-wrap:wrap;gap:6px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.views button{font-family:var(--display);letter-spacing:.05em;text-transform:uppercase;font-size:.78rem;color:var(--line);background:transparent;border:1px solid var(--dim);padding:6px 10px;cursor:pointer}
+.views button:hover{border-color:var(--line)}
+.views button[aria-pressed="true"]{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.views button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.views .all{margin-left:auto}
+.trust-svg rect.shared{fill:rgba(139,224,176,.10);stroke:var(--ok)}
+.trust-svg rect.percon{fill:rgba(255,209,102,.10);stroke:var(--accent)}
+.trust-svg rect.fused{fill:rgba(255,138,122,.10);stroke:var(--bad)}
+.trust-svg rect.plain{fill:var(--paper);stroke:var(--dim)}
+.trust-svg .t{font-weight:600;fill:var(--line)} .trust-svg .d{fill:var(--dim)}
+.keylegend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.82rem;color:var(--dim)}
+.keylegend span::before{content:"";display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px;border:1.5px solid}
+.keylegend .k1::before{border-color:var(--ok)} .keylegend .k2::before{border-color:var(--accent)} .keylegend .k3::before{border-color:var(--bad)}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.twocol>div{border:1px solid rgba(207,227,255,.25);padding:12px 14px;min-width:0}
+.twocol ul{margin:6px 0 0;padding-left:1.1em;display:grid;gap:4px}
+@media (max-width:640px){.twocol{grid-template-columns:1fr}}
+.sources{font-size:.82rem;color:var(--dim);display:flex;flex-wrap:wrap;gap:6px 16px}
+</style>
+
+<div class="wrap">
+
+<header class="titleblock">
+  <div>
+    <h1>PS4 Fat Bench Blueprint</h1>
+    <p class="note">Original "fat" PS4 (CUH-10xx / 11xx / 12xx). Numbered parts map, failure causes, and a diagnosis order for the bench.</p>
+  </div>
+  <dl>
+    <dt>Boards</dt><dd>SAA-001 · SAB-001 · SAC-001</dd>
+    <dt>Scale</dt><dd>Schematic, not to scale</dd>
+    <dt>Sheet</dt><dd>1 of 1</dd>
+    <dt>Rev</dt><dd>2026-10-31</dd>
+  </dl>
+</header>
+
+<nav class="views" aria-label="Blueprint views">
+  <button data-show="map">A Map</button>
+  <button data-show="parts">B Parts</button>
+  <button data-show="symptoms">C Symptoms</button>
+  <button data-show="diagnosis">D Diagnosis</button>
+  <button data-show="revisions">E Revisions</button>
+  <button data-show="procedures">F Procedures</button>
+  <button data-show="kit">G Kit</button>
+  <button data-show="firmware">H Firmware</button>
+  <button data-show="trust">I Chain of trust</button>
+  <button data-show="all" class="all">All layers</button>
+</nav>
+
+<section data-view="map">
+  <h2>A · Board map (top side, CUH-10xx/11xx)</h2>
+  <p class="note">Part positions are approximate, drawn to show what sits near what. Use it as a map, then match the real board against the part numbers in section B.</p>
+  <div class="sheet">
+  <svg viewBox="0 0 1000 640" role="img" aria-label="Schematic of PS4 fat motherboard with numbered components">
+    <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#7fa3cc" stroke-width="1"/></pattern></defs>
+    <!-- edges -->
+    <text x="500" y="26" text-anchor="middle" font-size="13" fill="#7fa3cc">REAR OF CONSOLE</text>
+    <text x="500" y="628" text-anchor="middle" font-size="13" fill="#7fa3cc">FRONT OF CONSOLE</text>
+    <rect x="60" y="50" width="880" height="545" fill="none" stroke="#cfe3ff" stroke-width="2.5" rx="6"/>
+    <!-- rear ports -->
+    <g stroke="#cfe3ff" fill="none" stroke-width="1.5">
+      <rect x="560" y="40" width="70" height="26"/><rect x="650" y="40" width="56" height="30"/><rect x="726" y="40" width="44" height="26"/><rect x="790" y="40" width="40" height="26"/>
+    </g>
+    <text x="595" y="84" text-anchor="middle" font-size="11">HDMI</text><text x="678" y="88" text-anchor="middle" font-size="11">LAN</text><text x="748" y="84" text-anchor="middle" font-size="11">AUX</text><text x="810" y="84" text-anchor="middle" font-size="11">OPT</text>
+    <!-- APU + RAM -->
+    <rect x="330" y="230" width="150" height="150" fill="url(#hatch)" stroke="#ffd166" stroke-width="2.5"/>
+    <text x="405" y="300" text-anchor="middle" font-size="15" font-weight="600">APU</text>
+    <text x="405" y="320" text-anchor="middle" font-size="11" fill="#7fa3cc">CXD90026G</text>
+    <g stroke="#cfe3ff" fill="none" stroke-width="1.5">
+      <rect x="300" y="160" width="44" height="50"/><rect x="354" y="160" width="44" height="50"/><rect x="412" y="160" width="44" height="50"/><rect x="466" y="160" width="44" height="50"/>
+      <rect x="300" y="400" width="44" height="50"/><rect x="354" y="400" width="44" height="50"/><rect x="412" y="400" width="44" height="50"/><rect x="466" y="400" width="44" height="50"/>
+    </g>
+    <text x="405" y="150" text-anchor="middle" font-size="11" fill="#7fa3cc">GDDR5 ×4</text><text x="405" y="468" text-anchor="middle" font-size="11" fill="#7fa3cc">GDDR5 ×4  (+8 on underside)</text>
+    <!-- VRM -->
+    <g stroke="#cfe3ff" fill="none" stroke-width="1.2">
+      <rect x="140" y="220" width="22" height="22"/><rect x="140" y="252" width="22" height="22"/><rect x="140" y="284" width="22" height="22"/><rect x="140" y="316" width="22" height="22"/><rect x="140" y="348" width="22" height="22"/>
+      <rect x="180" y="220" width="22" height="22"/><rect x="180" y="252" width="22" height="22"/><rect x="180" y="284" width="22" height="22"/><rect x="180" y="316" width="22" height="22"/><rect x="180" y="348" width="22" height="22"/>
+    </g>
+    <text x="171" y="392" text-anchor="middle" font-size="11" fill="#7fa3cc">APU VRM</text>
+    <!-- southbridge block -->
+    <rect x="610" y="250" width="90" height="90" fill="none" stroke="#cfe3ff" stroke-width="2"/>
+    <text x="655" y="292" text-anchor="middle" font-size="13" font-weight="600">SB</text><text x="655" y="310" text-anchor="middle" font-size="10" fill="#7fa3cc">CXD90025G</text>
+    <rect x="720" y="262" width="56" height="34" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="748" y="314" text-anchor="middle" font-size="10" fill="#7fa3cc">DDR3</text>
+    <rect x="620" y="370" width="34" height="20" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="637" y="406" text-anchor="middle" font-size="10" fill="#7fa3cc">NOR</text>
+    <rect x="680" y="370" width="34" height="34" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="697" y="420" text-anchor="middle" font-size="10" fill="#7fa3cc">SYSCON</text>
+    <!-- HDMI encoder, ethernet -->
+    <rect x="565" y="120" width="44" height="44" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="587" y="180" text-anchor="middle" font-size="10" fill="#7fa3cc">MN86471A</text>
+    <rect x="660" y="120" width="36" height="36" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="678" y="172" text-anchor="middle" font-size="10" fill="#7fa3cc">ETH</text>
+    <!-- clock -->
+    <rect x="530" y="300" width="22" height="22" fill="none" stroke="#cfe3ff" stroke-width="1.2"/><text x="541" y="338" text-anchor="middle" font-size="10" fill="#7fa3cc">CLK</text>
+    <!-- wifi -->
+    <rect x="800" y="150" width="70" height="44" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="835" y="210" text-anchor="middle" font-size="10" fill="#7fa3cc">Wi-Fi/BT</text>
+    <!-- usb hub + front -->
+    <rect x="790" y="440" width="34" height="34" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="807" y="490" text-anchor="middle" font-size="10" fill="#7fa3cc">USB HUB</text>
+    <g stroke="#cfe3ff" fill="none" stroke-width="1.5"><rect x="740" y="580" width="38" height="24"/><rect x="800" y="580" width="38" height="24"/></g>
+    <text x="789" y="572" text-anchor="middle" font-size="10" fill="#7fa3cc">USB 3.0 ×2</text>
+    <!-- connectors -->
+    <rect x="90" y="470" width="120" height="30" fill="none" stroke="#cfe3ff" stroke-dasharray="5 3" stroke-width="1.5"/><text x="150" y="520" text-anchor="middle" font-size="10" fill="#7fa3cc">PSU CONNECTOR</text>
+    <rect x="300" y="530" width="120" height="24" fill="none" stroke="#cfe3ff" stroke-dasharray="5 3" stroke-width="1.5"/><text x="360" y="572" text-anchor="middle" font-size="10" fill="#7fa3cc">SATA (HDD)</text>
+    <rect x="480" y="530" width="140" height="24" fill="none" stroke="#cfe3ff" stroke-dasharray="5 3" stroke-width="1.5"/><text x="550" y="572" text-anchor="middle" font-size="10" fill="#7fa3cc">BD DRIVE RIBBONS</text>
+    <rect x="640" y="590" width="80" height="10" fill="none" stroke="#cfe3ff" stroke-width="1.5"/><text x="680" y="584" text-anchor="middle" font-size="10" fill="#7fa3cc">FRONT PANEL</text>
+    <rect x="860" y="250" width="40" height="120" fill="none" stroke="#cfe3ff" stroke-dasharray="5 3" stroke-width="1.5"/><text x="880" y="390" text-anchor="middle" font-size="10" fill="#7fa3cc">FAN</text>
+
+    <!-- callouts -->
+    <g font-size="13" font-weight="600">
+      <g><circle cx="300" cy="300" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="300" y="305" text-anchor="middle" fill="#ffd166">1</text></g>
+      <g><circle cx="530" cy="185" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="530" y="190" text-anchor="middle" fill="#ffd166">2</text></g>
+      <g><circle cx="610" cy="235" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="610" y="240" text-anchor="middle" fill="#ffd166">3</text></g>
+      <g><circle cx="790" cy="262" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="790" y="267" text-anchor="middle" fill="#ffd166">4</text></g>
+      <g><circle cx="545" cy="125" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="545" y="130" text-anchor="middle" fill="#ffd166">5</text></g>
+      <g><circle cx="545" cy="53" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="545" y="58" text-anchor="middle" fill="#ffd166">6</text></g>
+      <g><circle cx="600" cy="380" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="600" y="385" text-anchor="middle" fill="#ffd166">7</text></g>
+      <g><circle cx="730" cy="388" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="730" y="393" text-anchor="middle" fill="#ffd166">8</text></g>
+      <g><circle cx="541" cy="282" r="12" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="541" y="287" text-anchor="middle" fill="#ffd166" font-size="11">9</text></g>
+      <g><circle cx="712" cy="120" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="712" y="125" text-anchor="middle" fill="#ffd166">10</text></g>
+      <g><circle cx="890" cy="150" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="890" y="155" text-anchor="middle" fill="#ffd166">11</text></g>
+      <g><circle cx="850" cy="457" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="850" y="462" text-anchor="middle" fill="#ffd166">12</text></g>
+      <g><circle cx="225" cy="230" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="225" y="235" text-anchor="middle" fill="#ffd166">13</text></g>
+      <g><circle cx="620" cy="575" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="620" y="580" text-anchor="middle" fill="#ffd166">14</text></g>
+      <g><circle cx="230" cy="485" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="230" y="490" text-anchor="middle" fill="#ffd166">16</text></g>
+      <g><circle cx="915" cy="310" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="915" y="315" text-anchor="middle" fill="#ffd166">17</text></g>
+      <g><circle cx="280" cy="542" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="280" y="547" text-anchor="middle" fill="#ffd166">19</text></g>
+      <g><circle cx="460" cy="542" r="14" fill="#0d2a4a" stroke="#ffd166" stroke-width="2"/><text x="460" y="547" text-anchor="middle" fill="#ffd166">20</text></g>
+    </g>
+  </svg>
+  </div>
+</section>
+
+<section data-view="parts">
+  <h2>B · Numbered parts</h2>
+  <div class="legend">
+    <div class="part"><span class="num">1</span><div><b>APU (CPU + GPU)</b><br><code>CXD90026G</code> 10xx · <code>CXD90026AG</code> 11xx · <code>CXD90037G</code> 12xx<small>Main chip. All three share one stencil footprint (0.6 mm). Solder fatigue here is a common cause of blue light of death (BLOD).</small></div></div>
+    <div class="part"><span class="num">2</span><div><b>GDDR5 main RAM</b><br><code>K4G41325FC-HC03</code> ×16 (10xx/11xx: 8 top, 8 underside) · <code>K4G80325FB-HC03</code> ×8 (12xx)<small>8 GB total. Stencil 0.45 mm. Fails less often than the APU.</small></div></div>
+    <div class="part"><span class="num">3</span><div><b>Southbridge</b><br><code>CXD90025G</code> "Aeolia" 10xx/11xx · <code>CXD90036G</code> "Belize" 12xx<small>Handles USB, SATA, network, standby. Linked to the APU by PCIe x4 and to the syscon by SPI. Beeps/shutdowns can point here.</small></div></div>
+    <div class="part"><span class="num">4</span><div><b>Southbridge DDR3</b><br><code>K4B2G1646E-BCK0</code> (SAA) · <code>K4B2G1646Q-BCMA</code> (SAB)<small>256 MB working memory for the southbridge.</small></div></div>
+    <div class="part"><span class="num">5</span><div><b>HDMI encoder</b><br><code>MN86471A</code> (Panasonic)<small>Powers on, no picture, port looks fine → suspect this chip.</small></div></div>
+    <div class="part"><span class="num">6</span><div><b>HDMI port</b><small>The most common PS4 fault. Check for bent or missing pins and a loose shell. Cheap part, good first hot-air job.</small></div></div>
+    <div class="part"><span class="num">7</span><div><b>NOR flash (firmware)</b><br><code>MX25L25635FMI-10G</code> 32 MB<small class="warn">Dump it with a SPI programmer before any southbridge or nearby heat work. Lost NOR data = bricked board.</small></div></div>
+    <div class="part"><span class="num">8</span><div><b>Syscon</b><br><code>A01-COL</code> (SAA) · <code>A02-COL</code> (SAB)<small class="warn">Holds board-specific data. Don't swap it, the NOR or the southbridge between boards without researching pairing first.</small></div></div>
+    <div class="part"><span class="num">9</span><div><b>Clock generator</b><br><code>IDT 6V41265NLG</code><small>Feeds clocks to APU and southbridge. Rare failure.</small></div></div>
+    <div class="part"><span class="num">10</span><div><b>Ethernet</b><br><code>Marvell 88EC060</code><small>No wired network but Wi-Fi works → this or the LAN jack.</small></div></div>
+    <div class="part"><span class="num">11</span><div><b>Wi-Fi / Bluetooth</b><br><code>Marvell 88W8797</code><small>Weak signal or controllers dropping → check antenna leads first.</small></div></div>
+    <div class="part"><span class="num">12</span><div><b>USB 3.0 hub + front ports</b><br><code>Genesys GL3520</code><small>Dead front USB or controller won't charge → port, then hub.</small></div></div>
+    <div class="part"><span class="num">13</span><div><b>APU power stage (VRM)</b><br>PWM controller <code>IR 35858</code> + MOSFETs<small>Short to ground on the APU rail often lives here. Check with a multimeter before powering a dead board.</small></div></div>
+    <div class="part"><span class="num">14</span><div><b>Front panel</b><small>10xx/11xx: capacitive touch power/eject (liquid or dirt causes ghost ejects). 12xx: physical buttons. Light bar ribbon also here.</small></div></div>
+    <div class="part"><span class="num">15</span><div><b>Thermistors</b><small>9 on top side, 1 underneath. Used for overheat shutdown.</small></div></div>
+    <div class="part"><span class="num">16</span><div><b>Power supply (internal)</b><br><code>ADP-240AR</code> 10xx (5-pin) · <code>ADP-240CR</code> 11xx · <code>ADP-200ER</code> / <code>N14-200P1A</code> 12xx<small class="warn">Not interchangeable between series. Caps can hold mains voltage after unplugging.</small></div></div>
+    <div class="part"><span class="num">17</span><div><b>Fan</b><br><code>Delta KSB0912HE</code> 12 V<small>Clogged fan + dry paste = heat stress on the APU solder.</small></div></div>
+    <div class="part"><span class="num">18</span><div><b>Heatsink + thermal paste</b><small>Repaste every console that comes in. Cheap insurance after a reball.</small></div></div>
+    <div class="part"><span class="num">19</span><div><b>Hard drive (SATA)</b><br>2.5" 500 GB stock<small>A failing drive can cause blue light and safe-mode loops. Swap it before blaming the board.</small></div></div>
+    <div class="part"><span class="num">20</span><div><b>Blu-ray drive</b><small>Separate board and laser. Read errors and stuck discs are a drive problem, not a mainboard one.</small></div></div>
+  </div>
+</section>
+
+<section data-view="symptoms">
+  <h2>C · Symptom → cause</h2>
+  <div class="table"><table>
+    <thead><tr><th>Symptom</th><th>Likely causes (most to least common)</th><th>First check</th><th>Parts</th><th>Difficulty</th></tr></thead>
+    <tbody>
+      <tr><td>Powers on, white light, no picture</td><td>HDMI port pins → MN86471A encoder</td><td>Flashlight on port; try another cable/TV</td><td class="ref">6 → 5</td><td><span class="pill e">Easy</span> → <span class="pill h">Hard</span></td></tr>
+      <tr><td>Blue light pulses, never turns white, then off (BLOD)</td><td>Hard drive → PSU → APU solder → southbridge</td><td>Swap HDD; swap PSU from another console</td><td class="ref">19 → 16 → 1 → 3</td><td><span class="pill e">Easy</span> → <span class="pill h">Hard</span></td></tr>
+      <tr><td>No light, no beep, nothing</td><td>PSU → short on board → front panel ribbon</td><td>Swap PSU; measure 12 V rail resistance to ground</td><td class="ref">16 → 13 → 14</td><td><span class="pill e">Easy</span> → <span class="pill m">Medium</span></td></tr>
+      <tr><td>Light flashes, fan twitches, dies</td><td>PSU protecting against a short → shorted cap/MOSFET near APU</td><td>Board resistance check, thermal camera or IPA trick on rail</td><td class="ref">16 → 13</td><td><span class="pill m">Medium</span></td></tr>
+      <tr><td>Beeps (often 3×) and shuts off</td><td>Southbridge or APU fault, overheat, failing PSU</td><td>Clean fan, repaste, swap PSU first</td><td class="ref">17 → 18 → 16 → 3 → 1</td><td><span class="pill m">Medium</span> → <span class="pill h">Hard</span></td></tr>
+      <tr><td>Shuts off during games, loud fan</td><td>Dry thermal paste, blocked fan</td><td>Open, clean, repaste</td><td class="ref">18 → 17</td><td><span class="pill e">Easy</span></td></tr>
+      <tr><td>Ejects discs by itself / beeps randomly (10xx/11xx)</td><td>Capacitive eject sensor (dirt, liquid) → drive</td><td>Clean front panel area; disconnect eject sensor to test</td><td class="ref">14 → 20</td><td><span class="pill e">Easy</span></td></tr>
+      <tr><td>Safe-mode loop, "cannot start"</td><td>HDD corruption → firmware/NOR</td><td>Reinstall system software on a known-good drive</td><td class="ref">19 → 7</td><td><span class="pill e">Easy</span> → <span class="pill h">Hard</span></td></tr>
+      <tr><td>No Wi-Fi / Bluetooth</td><td>Antenna lead → wireless module</td><td>Reseat antenna cables</td><td class="ref">11</td><td><span class="pill e">Easy</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section data-view="diagnosis">
+  <h2>D · Diagnosis order for an unknown dead console</h2>
+  <ol class="steps">
+    <li><b>Log it.</b> Model sticker (CUH-xxxx), board revision once open, light pattern, beeps, fan behavior.</li>
+    <li><b>Look.</b> HDMI pins, burn marks, liquid residue, missing parts near the APU, swollen PSU caps.</li>
+    <li><b>Swap the easy parts.</b> Known-good HDD and PSU from one of the other consoles (same series only for the PSU).</li>
+    <li><b>Measure before powering.</b> Resistance to ground on the 12 V input and the APU rail. A near-zero reading means a short: find it before anything else.</li>
+    <li><b>Clean and repaste.</b> Fixes shutdowns and rules out heat.</li>
+    <li><b>Back up the NOR</b> with a SPI programmer before any board-level heat.</li>
+    <li><b>Port and small-chip work first:</b> HDMI port → HDMI encoder.</li>
+    <li><b>BGA work last:</b> southbridge reball → APU reball, on your least valuable board first. Preheat to ~150 °C, monitor with a thermocouple.</li>
+  </ol>
+</section>
+
+<section data-view="revisions">
+  <h2>E · Revision table</h2>
+  <div class="table"><table>
+    <thead><tr><th>Model</th><th>Board</th><th>APU</th><th>Southbridge</th><th>GDDR5</th><th>PSU</th><th>Front buttons</th></tr></thead>
+    <tbody>
+      <tr><td>CUH-10xx</td><td>SAA-001</td><td><code>CXD90026G</code></td><td><code>CXD90025G</code></td><td>16 × 4 Gb</td><td><code>ADP-240AR</code></td><td>Capacitive</td></tr>
+      <tr><td>CUH-11xx</td><td>SAB-001</td><td><code>CXD90026AG</code></td><td><code>CXD90025G</code></td><td>16 × 4 Gb</td><td><code>ADP-240CR</code></td><td>Capacitive</td></tr>
+      <tr><td>CUH-12xx</td><td>SAC-001</td><td><code>CXD90037G</code></td><td><code>CXD90036G</code></td><td>8 × 8 Gb</td><td><code>ADP-200ER</code> / <code>N14-200P1A</code></td><td>Physical</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Your first console (CUH-1001A) is a SAA-001 board. The other two will be one of these three rows; the model sticker tells you which.</p>
+</section>
+
+<section data-view="procedures">
+  <h2>F · Bench procedures</h2>
+  <p class="note">Temperatures are starting points. Your thermocouple reading at the chip is what counts, not the number on the station.</p>
+  <div class="legend">
+    <div class="part"><span class="num">F1</span><div><b>Repaste + fan clean</b><small>Remove top cover, PSU and heatsink. Clean old paste with 99% IPA, apply a pea-size dot to the APU die, clean the fan blades and heatsink fins. Do this on every console before anything else.</small></div></div>
+    <div class="part"><span class="num">F2</span><div><b>NOR dump (#7)</b><small>SPI programmer (CH341A with 3.3 V logic, or the 2.8 V mod) with a <b>SOP16</b> clip, board unpowered, ~3.0 V only. Read it three times and compare the files. All three must match. Store them labelled with the console serial.</small></div></div>
+    <div class="part"><span class="num">F3</span><div><b>HDMI port swap (#6)</b><small>Kapton nearby plastics. Preheat board to ~100–120 °C. Add flux, heat the shell pins with hot air at ~380 °C until the port lifts. Clean pads with wick, tin, fit the new port, reflow, then check pins for bridges under magnification.</small></div></div>
+    <div class="part"><span class="num">F4</span><div><b>APU / southbridge removal</b><small>Kapton and foil around the chip; remove anything plastic nearby. Preheat the board from below to ~150 °C. Top hot air with a large nozzle, circling, until the joint reaches ~230–240 °C (factory solder is lead-free, melts at 217 °C). Lift with a vacuum pen once the chip moves freely. Never force it, or you'll pull pads.</small></div></div>
+    <div class="part"><span class="num">F5</span><div><b>Pad prep</b><small>Flux, then drag wide wick with a flat iron tip until board and chip pads are flat and shiny. Clean with IPA. Check for lifted or missing pads before going on.</small></div></div>
+    <div class="part"><span class="num">F6</span><div><b>Reball the chip</b><small>Thin flux on the chip, align the stencil (CXD90026G, 0.6 mm), pour 0.6 mm Sn63/Pb37 balls, brush the extras off. Heat gently until the balls go shiny and round (~200–215 °C, leaded melts at 183 °C). Let it cool, then lift the stencil.</small></div></div>
+    <div class="part"><span class="num">F7</span><div><b>Refit the chip</b><small>Thin flux on board pads, align the chip to the silkscreen corners. Preheat to ~150 °C, top heat until the chip "settles" and self-centres (~210–220 °C at the joint). Do not press down. Cool slowly. Leave the bottom heater on and step it down.</small></div></div>
+    <div class="part"><span class="num">F8</span><div><b>First power-on</b><small>Resistance check on the 12 V and APU rails first. Then a known-good PSU and HDD, heatsink fitted with fresh paste. Never power the APU without its heatsink, even for a second.</small></div></div>
+  </div>
+</section>
+
+<section data-view="kit">
+  <h2>G · Kit checklist</h2>
+  <div class="table"><table>
+    <thead><tr><th>Item</th><th>Pick</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td>Stencil kit</td><td>18-pc PS4+PS5 (includes <code>CXD90026G</code>, <code>CXD90044G</code>, PS4 DDR5)</td><td>F6, all fat APUs</td></tr>
+      <tr><td>Solder balls</td><td>0.6 mm Sn63/Pb37, 25k (+ 0.45 mm if doing RAM)</td><td>F6</td></tr>
+      <tr><td>Flux</td><td>Genuine Amtech NC-559-V2-TF, or Kingbo RMA-218 / Chip Quik SMD291</td><td>F3–F7</td></tr>
+      <tr><td>Hot air station</td><td>ATTEN</td><td>F3–F7</td></tr>
+      <tr><td>Preheater</td><td>T-8280, 110 V, 280 × 270 mm, on its own circuit</td><td>F3–F7</td></tr>
+      <tr><td>Thermocouple</td><td>K-type meter, Kapton-taped beside the chip</td><td>Every heat job</td></tr>
+      <tr><td>SPI programmer</td><td>CH341A (3.3 V logic or 2.8 V mod) + <b>SOP16</b> clip (fat NOR is SOP16)</td><td>F2, H</td></tr>
+      <tr><td>Syscon tools</td><td>Arduino Nano v3 (CH340), FT232RL, LQFP100→DIP board, 220 Ω (+100/510/1k), 2× 1N4148, breadboards, Dupont, 32–34 AWG wire</td><td>H</td></tr>
+      <tr><td>Blank syscon (1 per console)</td><td><code>R5F100PLAFB</code> / <code>PLDFB</code> / <code>PLGFB</code> / <code>R5F101PLAFB</code> / <code>PLDFB</code></td><td>H</td></tr>
+      <tr><td>Consumables</td><td>99% IPA, 2.5–3.5 mm wick, Kapton tape, foil, thermal paste</td><td>Everything</td></tr>
+      <tr><td>Practice boards</td><td>Dead laptop board or GPU</td><td>Before F4</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section data-view="firmware">
+  <h2>H · Firmware revert (fat), BwE method</h2>
+  <p class="note">Reverts only to the firmware in the backup slot (the one before the last update). NOR and syscon must be patched as a pair. Does not work on syscons marked "SIE INC".</p>
+  <p class="note"><b>Switching back and forth</b> (Modded Warfare's "revertible firmware"): keep a matched NOR + syscon backup taken <i>while the console was on each firmware</i>, leave a Teensy 2++ wired inside, and restore the pair you want (~15 min per switch). Only works with your own console's backups. Each switch reinstalls system software, so the HDD is wiped. Two HDDs, one per firmware, avoid that.</p>
+  <ol class="steps">
+    <li><b>Dump NOR (#7)</b> three times, compare (F2).</li>
+    <li><b>Dump syscon (#8)</b> with the Arduino glitch reader: <code>SysconReader.exe COMx</code>. On-board: lift pins 22 and 23 first. Dumps don't match → try 100/510/1k Ω resistors.</li>
+    <li><b>Patch</b> in BwE PS4 NOR Validator. NOR: Patch and Swap CoreOS, enable UART. Syscon: downgrade + service mode patches, enable debug.</li>
+    <li><b>Program a blank syscon</b> via FT232RL + Renesas Flash Programmer: export .bin to S28, 1-wire UART @ 115200, Erase/Program/Verify.</li>
+    <li><b>Swap syscon</b>: remove original, fit programmed blank. <b>Write patched NOR.</b> Keep the original chip and dumps.</li>
+  </ol>
+  <div class="table"><table>
+    <thead><tr><th>Signal</th><th>Fat syscon pin</th><th>Arduino (read)</th><th>FT232RL (write)</th></tr></thead>
+    <tbody>
+      <tr><td>EVDD0</td><td>23 (lift on-board)</td><td>5V</td><td>VDD</td></tr>
+      <tr><td>VDD</td><td>22 (lift on-board)</td><td>D4</td><td>VDD</td></tr>
+      <tr><td>EVSS0 (GND)</td><td>21</td><td>GND</td><td>GND</td></tr>
+      <tr><td>RESET</td><td>13</td><td>D2</td><td>RTS → 1N4148 → RESET</td></tr>
+      <tr><td>TOOL0</td><td>12</td><td>TXD via 220 Ω, and RXD</td><td>RXD → TOOL0; TXD → 1N4148 → RXD</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section data-view="trust">
+  <h2>I · Chain of trust (how a PS4 decides what to trust)</h2>
+  <p class="note">From power-on, each stage checks the next before handing over control. Standalone copy for sharing: <a href="/pages/chain-of-trust.html">PS4 Chain of Trust</a>.</p>
+  <div class="sheet">
+  <svg class="trust-svg" viewBox="0 0 900 330" role="img" aria-label="Boot chain: syscon powers the board; the APU security processor boots from its own ROM with fused keys; it decrypts and checks the NOR loader; the loader checks the kernel; the kernel loads system software from a per-console encrypted hard drive. A jailbreak enters at the system software, after boot.">
+    <defs><marker id="tar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#cfe3ff"/></marker></defs>
+    <g font-size="12.5">
+      <rect class="shared" x="10" y="40" width="150" height="110" rx="4" stroke-width="1.5"/>
+      <text class="t" x="85" y="64" text-anchor="middle">1 · Syscon (#8)</text>
+      <text class="d" x="85" y="86" text-anchor="middle">Renesas RL78</text><text class="d" x="85" y="104" text-anchor="middle">power sequencing,</text>
+      <text class="d" x="85" y="120" text-anchor="middle">version records,</text><text class="d" x="85" y="136" text-anchor="middle">error log</text>
+      <rect class="fused" x="190" y="40" width="160" height="110" rx="4" stroke-width="1.5"/>
+      <text class="t" x="270" y="64" text-anchor="middle">2 · Security proc.</text>
+      <text class="d" x="270" y="86" text-anchor="middle">inside the APU (#1)</text><text class="d" x="270" y="104" text-anchor="middle">boots from its own ROM</text>
+      <text x="270" y="120" text-anchor="middle" fill="#ff8a7a" font-weight="600">fused root keys</text><text class="d" x="270" y="136" text-anchor="middle">never leave the chip</text>
+      <rect class="percon" x="380" y="40" width="150" height="110" rx="4" stroke-width="1.5"/>
+      <text class="t" x="455" y="64" text-anchor="middle">3 · NOR (#7)</text>
+      <text class="d" x="455" y="86" text-anchor="middle">MX25L25635F, 32 MB</text><text class="d" x="455" y="104" text-anchor="middle">encrypted loader</text>
+      <text x="455" y="120" text-anchor="middle" fill="#ffd166" font-weight="600">per-console data</text><text class="d" x="455" y="136" text-anchor="middle">(wrapped keys, IDs)</text>
+      <rect class="shared" x="560" y="40" width="140" height="110" rx="4" stroke-width="1.5"/>
+      <text class="t" x="630" y="64" text-anchor="middle">4 · Kernel</text>
+      <text class="d" x="630" y="86" text-anchor="middle">signed, same on</text><text class="d" x="630" y="104" text-anchor="middle">every console of</text><text class="d" x="630" y="120" text-anchor="middle">that firmware</text>
+      <rect class="percon" x="730" y="40" width="160" height="110" rx="4" stroke-width="1.5"/>
+      <text class="t" x="810" y="64" text-anchor="middle">5 · System software</text>
+      <text class="d" x="810" y="86" text-anchor="middle">on the hard drive (#19)</text>
+      <text x="810" y="104" text-anchor="middle" fill="#ffd166" font-weight="600">drive encrypted with</text><text x="810" y="120" text-anchor="middle" fill="#ffd166" font-weight="600">a per-console key</text>
+      <text class="d" x="810" y="136" text-anchor="middle">games, browser, UI</text>
+    </g>
+    <g stroke="#cfe3ff" stroke-width="1.5" fill="none" marker-end="url(#tar)"><path d="M160 95 H186"/><path d="M350 95 H376"/><path d="M530 95 H556"/><path d="M700 95 H726"/></g>
+    <g font-size="11" class="d" text-anchor="middle"><text class="d" x="173" y="30">powers on</text><text class="d" x="363" y="30">decrypts + checks</text><text class="d" x="543" y="30">checks</text><text class="d" x="713" y="30">checks</text></g>
+    <text class="d" x="10" y="184" font-size="12">A failed check stops the boot there. Without a UART log, the symptom (light bar, beeps, no picture, see C) is the clue.</text>
+    <text class="d" x="10" y="236" font-size="12">Board-locked: the yellow stages only decrypt on the APU they were made for.</text>
+    <path d="M810 270 V156" stroke="#ffd166" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+    <rect class="plain" x="640" y="270" width="250" height="48" rx="4" stroke-width="1.5" style="stroke:#ffd166"/>
+    <text class="t" x="765" y="290" text-anchor="middle" font-size="12.5">A jailbreak enters here</text><text class="d" x="765" y="308" text-anchor="middle" font-size="11.5">a bug in software that already booted</text>
+    <path d="M270 270 V156" stroke="#ff8a7a" stroke-width="2" stroke-dasharray="2 4" fill="none"/>
+    <rect class="plain" x="150" y="270" width="250" height="48" rx="4" stroke-width="1.5" style="stroke:#ff8a7a"/>
+    <text class="t" x="275" y="290" text-anchor="middle" font-size="12.5">Out of reach from software</text><text class="d" x="275" y="308" text-anchor="middle" font-size="11.5">fused keys inside the security processor</text>
+  </svg>
+  </div>
+  <div class="keylegend"><span class="k1">Same on every console</span><span class="k2">Per-console, locked to the APU</span><span class="k3">Fused in silicon</span></div>
+
+  <p class="note">Simplified. The southbridge chip has two small processors of its own, EMC and EAP. The EMC loads its first loader from the NOR, and that loader starts the EAP kernel loader and the APU's boot ROM (<a href="https://psdevwiki.com/ps4/MediaCon">MediaCon</a>, <a href="https://psdevwiki.com/ps4/Southbridge">Southbridge</a>). The secure loader is stored in the NOR as <code>sflash0s1.cryptx2</code> (<a href="https://psdevwiki.com/ps4/Codenames">Codenames</a>). The wiki is community-written and marks parts of this as incomplete.</p>
+  <div class="legend">
+    <div class="part"><span class="num">I1</span><div><b>Fused root keys</b><small>Burned into the security processor at the factory. Used inside the chip only; never in the NOR, RAM or anywhere a probe reaches.</small></div></div>
+    <div class="part"><span class="num">I2</span><div><b>Wrapped per-console keys</b><small>Stored encrypted in the NOR. Unlock this console's identity data and hard drive. Only this APU can unwrap them, so one console's NOR won't boot another board.</small></div></div>
+    <div class="part"><span class="num">I3</span><div><b>Shared firmware keys</b><small>Sign and encrypt the system software; the same on every console and well studied publicly.</small></div></div>
+  </div>
+
+  <div class="twocol">
+    <div><b class="e">A jailbreak can</b><ul><li>Run with full kernel control on that console</li><li>Ask its own security processor to unwrap its own keys</li><li>Make decrypted backups of its own NOR data and drive key</li></ul></div>
+    <div><b class="h">A jailbreak can't</b><ul><li>Read the fused root keys from software (on the PS5 they reportedly leaked anyway, see the table)</li><li>Make one console's identity work on another board</li><li>Run on a console that doesn't boot, or on firmware newer than its bug</li></ul></div>
+  </div>
+
+  <div class="table"><table>
+    <thead><tr><th>Layer</th><th>PS4</th><th>PS5</th></tr></thead>
+    <tbody>
+      <tr><td>Root of trust</td><td>Security processor in the APU, fused keys</td><td>Same idea. Reports from 31 Dec 2025 say its Level 0 boot ROM keys leaked (not independently confirmed). Burned into silicon, so a software update can't change them on existing consoles (<a href="https://hothardware.com/news/sony-faces-unpatchable-ps5-jailbreak-threat-after-rom-keys-leak">HotHardware</a>, <a href="https://www.techspot.com/news/110778-playstation-5-rom-keys-may-out-wild-opening.html">TechSpot</a>)</td></tr>
+      <tr><td>Above the kernel</td><td>Nothing; kernel control is the top</td><td>A hypervisor supervises the kernel</td></tr>
+      <tr><td>Kernel code</td><td>Readable once you have kernel access</td><td>Execute-only: it runs but can't be read</td></tr>
+      <tr><td>Public jailbreaks</td><td>Many, on older firmware</td><td>As of Nov 2026: a hypervisor exploit was reported for firmware 13.20/13.60 in Oct 2026, a base for developers and not a full jailbreak (<a href="https://wccftech.com/byepervisor-reborn-cracks-ps5-hypervisor-13-60-not-useful-regular-users-yet/">Wccftech</a>). A community status report lists nothing public for 14.00/14.10 (<a href="https://github.com/ZigZagBoi1/PS5-14.10-Research/blob/master/PS5-FW-14.10-Jailbreak-Status-Report.md">GitHub</a>). Earlier hypervisor work: <a href="https://hardwear.io/talks/byepervisor-how-we-broke-the-ps5-hypervisor/">Byepervisor talk</a></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">The PS5 column changes month to month. Checked 4 Nov 2026; check again before relying on it.</p>
+
+  <h2>Learn it on the bench</h2>
+  <div class="table"><table>
+    <thead><tr><th>Tool</th><th>Status</th><th>What it shows about the chain</th></tr></thead>
+    <tbody>
+      <tr><td>Your eyes</td><td><span class="pill e">Have</span></td><td>Light bar, beeps, fan, picture or not: how far the chain got (map it with section C)</td></tr>
+      <tr><td>Multimeter</td><td><span class="pill e">Have</span></td><td>Shorts to ground on the rails, PSU outputs against its label. No power, no stage 1</td></tr>
+      <tr><td>Phone macro photos</td><td><span class="pill e">Have</span></td><td>HDMI pins, burnt or cracked parts, compared against the Teardown Tracer</td></tr>
+      <tr><td>PC + the HDD</td><td><span class="pill e">Have</span></td><td>Drive contents are encrypted, but SMART health is readable: rules the drive in or out</td></tr>
+      <tr><td>USB-UART (CP2102)</td><td><span class="pill m">~$5 later</span></td><td>Boot log from the bottom-side pads, line by line. Listen-only; plugs into the diag tool</td></tr>
+      <tr><td>CH341A v1.7 + SOIC16 clip</td><td><span class="pill m">~$10 later</span></td><td>NOR backup; the diag tool shows which bytes are per-console (F2)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Questions to work through</h2>
+  <ol class="steps">
+    <li>Where does each of your three consoles stop, judging by the symptom? Same place, or three different faults?</li>
+    <li>How would you tell a hardware fault (power rail, cracked solder ball) from a firmware fault (bad NOR data, syscon mismatch)?</li>
+    <li>If the root key is burned into the chip, why can't you measure it with a probe?</li>
+    <li>Why does the hard drive have its own per-console encryption when the NOR is already protected?</li>
+    <li>What does a repair look like at each stage: a replaced part, a rewritten chip, or nothing fixable?</li>
+  </ol>
+  <p class="note">Watch: <a href="https://media.ccc.de/v/33c3-7946-console_hacking_2016">fail0verflow, “Console Hacking 2016” (33C3)</a>. Read: <a href="https://www.psdevwiki.com/ps4/">PS4 Dev Wiki</a>, <a href="https://www.psdevwiki.com/ps5/">PS5 Dev Wiki</a>.</p>
+</section>
+
+<section>
+  <h2>Sources</h2>
+  <div class="sources">
+    <a href="https://www.psdevwiki.com/ps4/SAA-001">PS4 Dev Wiki: SAA-001</a>
+    <a href="https://www.psdevwiki.com/ps4/SAB-001">SAB-001</a>
+    <a href="https://www.psdevwiki.com/ps4/SAC-001">SAC-001</a>
+    <a href="https://www.psdevwiki.com/ps4/Southbridge">Southbridge</a>
+    <a href="https://www.psdevwiki.com/ps4/Motherboards_Retail">Retail boards</a>
+    <a href="https://gamingbolt.com/inside-the-playstation-4-motherboard-components-explained">GamingBolt teardown</a>
+    <a href="https://www.consoleservicecentre.co.za/blog/ps4-blue-light-of-death-fix-guide">BLOD guide</a>
+    <a href="https://harktech.co.uk/help/ps4-ps5-blue-light-death-wont-power-on">Harktech: won't power on</a>
+    <a href="https://www.badcaps.net/forum/troubleshooting-hardware-devices-and-electronics-theory/troubleshooting-power-supplies-and-power-supply-design/89201-ps4-adp-240ar-fat-power-supply-blood">Badcaps: ADP-240AR</a>
+    <a href="https://gamrconnect.vgchartz.com/thread/204990/new-ps4-model-updated-with-new-info/9/">CUH-1200 teardown notes</a>
+  </div>
+</section>
+
+</div>
+<script>
+// one view at a time, or all; the view lives in the URL hash so links and reloads keep it
+const sections = [...document.querySelectorAll('[data-view]')];
+const buttons = [...document.querySelectorAll('.views button')];
+function show() {
+  let v = location.hash.slice(1);
+  if (!buttons.some(b => b.dataset.show === v)) v = 'all';
+  sections.forEach(s => s.hidden = v !== 'all' && s.dataset.view !== v);
+  buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.show === v));
+}
+buttons.forEach(b => b.addEventListener('click', () => { location.hash = b.dataset.show; }));
+addEventListener('hashchange', show);
+show();
+</script>
+
+</body></html>

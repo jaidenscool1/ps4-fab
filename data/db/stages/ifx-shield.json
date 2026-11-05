@@ -1,0 +1,31 @@
+{
+ "markers": [
+  {
+   "h": 0.3333,
+   "id": "ifx-shield-other-1",
+   "label": "",
+   "layer": "other",
+   "n": 1,
+   "note": "My reading of the iFixit step 22 photo, not stated by iFixit. Confirm on your board. Step 22: the heatsink stays attached to the EMI shield.",
+   "value": "Heatsink fin stack",
+   "verified": false,
+   "w": 0.5,
+   "x": 0.7,
+   "y": 0.35
+  },
+  {
+   "h": 0.2,
+   "id": "ifx-shield-other-2",
+   "label": "",
+   "layer": "other",
+   "n": 2,
+   "note": "My reading of the iFixit step 22 photo, not stated by iFixit. Confirm on your board.",
+   "value": "Heat pipes (copper)",
+   "verified": false,
+   "w": 0.1,
+   "x": 0.25,
+   "y": 0.45
+  }
+ ],
+ "photo": "4e8703f41eeef6eb6c4b1cbb7bad5c38"
+}

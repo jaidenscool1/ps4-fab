@@ -57,4 +57,7 @@ def hdd_sled(out):
     print(f'hdd_sled: {bb.size.X:.1f} x {bb.size.Y:.1f} x {bb.size.Z:.1f} mm, ~{s.volume / 1000 * 1.27:.0f} g PETG')
 
 
+# fits = console families (the app's Model list) a part was measured on; the profile page offers it only for those
+fat_matte_top.fits = fat_left_strip.fits = hdd_sled.fits = ['CUH-12xx']
+fat_matte_top.title, fat_left_strip.title, hdd_sled.title = 'Matte top cover v2', 'Left strip v1', 'HDD quick-swap sled'
 PARTS = {'fat_matte_top': fat_matte_top, 'fat_left_strip': fat_left_strip, 'hdd_sled': hdd_sled}

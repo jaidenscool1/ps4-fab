@@ -1,66 +1,81 @@
 # ps4fab
 
-Measure console parts from ordinary phone photos and build printable replacement parts.
+The **PS4 Teardown Tracer** as a program you run yourself, plus the tools behind it.
 
-The measuring trick is a **printed marker mat**: two pages of ChArUco markers on the table next to the part.
-From one photo the program finds the markers, works out exactly where the camera was, and turns any pixel into
-real millimetres at a height you choose. Tested on a synthetic photo: a 160 x 280 mm box came back within
-0.07 mm. Plain photo scaling was 3% off, because a 22 mm-tall rim is closer to the camera than the table.
+- **Teardown Tracer app** (`ps4fab serve`): console profiles, the two-sided 3D board with every mapped part,
+  click-a-part tracing to the APU, pin readings, teardown stages, and the Bench Blueprint, Chain of trust,
+  Caliper sheet and c1 shot-list pages.
+- **Printable parts per profile**: a profile shows STL download buttons when we have measured parts for its model
+  (right now CUH-12xx: matte top cover, left strip, HDD sled).
+- **Measuring mat**: two printed marker pages beside a part turn one phone photo into true millimetres.
+  On a synthetic test, a 160 x 280 mm box came back within 0.07 mm.
 
 ## Install
 
 Python 3.10-3.12 ([uv](https://docs.astral.sh/uv/) recommended):
 
 ```sh
-git clone <this repo> && cd ps4-fab
+git clone https://github.com/jaidenscool1/ps4-fab && cd ps4-fab
 uv venv -p 3.12 .venv && uv pip install -p .venv/bin/python -e '.[test]'
-.venv/bin/ps4fab --help
-.venv/bin/python -m pytest -q        # 4 tests: mat accuracy + every part builds and fits a 250 mm bed
+.venv/bin/python -m pytest -q        # 10 tests
 ```
+
+## Run the app
+
+```sh
+.venv/bin/ps4fab serve               # then open http://localhost:8780/
+```
+
+Everything you change in the app (profiles, notes, readings) is saved as JSON files in `data/db/`
+(one file per document). To share with the group:
+
+- **Through git:** commit and push `data/`; the others `git pull`. Small, readable diffs per console.
+- **Live on one network:** one person runs `ps4fab serve --host 0.0.0.0` and the rest open `http://<their-ip>:8780/`.
+  Edits show up for everyone within a few seconds. There is no login, so only do this on a home network.
+
+The 3D view loads three.js and fonts from the internet. Everything else works offline.
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `ps4fab mat` | Writes `measuring_mat.pdf`. Print both pages at **100% / Actual size**, then caliper the 100 mm bar. |
-| `ps4fab guide -o DIR` | Writes the measuring guide with diagrams: where to put the caliper, how to take the photo. |
-| `ps4fab measure PHOTO --check 100.0 --h 0 22` | Camera pose + true-scale top views at each height (10 mm grid). HEIC works directly. |
-| `ps4fab view PHOTO --origin X Y --angle A --size L W --h H` | A top view lined up with the part, with its own mm grid. Use it for reading features. |
-| `ps4fab list` | Every part and the measurements it was built from. |
-| `ps4fab build [PART ...] -o out` | Builds STLs (default: all). Already oriented for printing: outside face down. |
+| `ps4fab serve [--data DIR] [--port N] [--host H]` | Runs the Teardown Tracer app |
+| `ps4fab import export.json` | Loads `{collection: {doc: data}}` documents into `data/db` |
+| `ps4fab mat` | Writes `measuring_mat.pdf`. Print both pages at **100% / Actual size**, caliper the 100 mm bar |
+| `ps4fab guide -o DIR` | Measuring guide with diagrams (caliper spots, how to take the photo) |
+| `ps4fab measure PHOTO --check 100.0 --h 0 22` | Camera pose + true-scale top views at those heights. HEIC works |
+| `ps4fab view PHOTO --origin X Y --angle A --size L W --h H` | Top view lined up with a part, with its own mm grid |
+| `ps4fab list` / `ps4fab build [PART ...]` | List parts and their sources / build STLs (oriented for printing) |
 
-## Measuring workflow
+## Measuring a part
 
-1. Print the mat and write down the caliper reading of the 100 mm bar (pass it as `--check`).
-2. Lay page 1 and page 2 on the table on either side of the part. No tape needed; they don't have to line up.
-3. Phone held flat, about 2 ft up, 1x zoom, whole part + both pages in frame, no flash.
-4. `ps4fab measure photo.HEIC --h 0 22` gives the overview. Find the part's corner and angle in it, then
-   `ps4fab view ...` gives a part-aligned view.
-5. **Read every feature at its own height.** With the camera about 600 mm up, a 22 mm rim near the end of a
-   280 mm part shifts about 5 mm between the table-height view and the rim-height view.
-6. Caliper only what photos can't see: wall and plate thickness, clip depth.
+1. Print the mat; pass the caliper reading of the 100 mm bar as `--check`.
+2. Pages flat on either side of the part (no tape needed), phone held flat about 2 ft up, 1x zoom, no flash.
+3. `ps4fab measure photo.HEIC --h 0 22`, find the part's corner and angle, then `ps4fab view ...`.
+4. **Read every feature at its own height.** A 22 mm rim near the end of a 280 mm part shifts about 5 mm between
+   the table-height view and the rim-height view.
+5. Caliper only what photos can't show: wall and plate thickness, clip depth.
 
-## Parts
+## Adding a printable part
 
-| Part | Console | Status |
-|---|---|---|
-| `fat_matte_top` | Fat CUH-12xx matte top (marking 4-572-317) | v2 from real measurements. **Print the 2 TEST pieces first**: front clip shape is estimated |
-| `fat_left_strip` | Fat CUH-12xx left strip (4-572-450) | v1 from a mat photo. Front clips not modelled yet |
-| `hdd_sled` | Fat HDD pocket in the metal shield | Bare 2.5" drive sled, fit not tested |
+Write a builder in `src/ps4fab/parts.py` (build123d) that writes STLs into the folder it's given.
+Put **where every number came from** in its docstring, mark guesses ESTIMATE, and set
+`.fits = [...]` (the Model ids from the app's profile list, e.g. `'CUH-12xx'`) and a short `.title`.
+Add it to `PARTS`. The profile page then offers it automatically. Shared cover shapes live in `covers.py`.
 
-Covers are split into two halves plus a splice plate (glue with 2-part plastic epoxy), so they fit a 250 x 250 bed.
-Print settings: PETG, 0.2 mm layers, 4 walls, 40% gyroid, outside face down on a textured plate, no supports.
-The original clear light guide is reused (it screws to the boss on the matte top).
+## Layout
 
-## Adding a part
+```
+src/ps4fab/web/     the app: tracer.html (the page), shim.js (database bridge), tiles/ (3D textures), pages/
+src/ps4fab/serve.py web server + JSON-file database + STL zips
+data/db/            the shared data (stages, consoles, auto-detected parts, readings)
+```
 
-Add a function to `src/ps4fab/parts.py` that builds it with build123d and writes STLs to the `out` folder it is given.
-Put **where each number came from** in the docstring (caliper, mat photo, datasheet), then add it to `PARTS`.
-The shared cover shape (profile, vents, latch loops, clips, bosses, splitting) is in `covers.py`.
+## Rules
 
-## Rules for this repo
-
-- **Don't commit photos** (`.gitignore` blocks them; they show people's homes). Commit numbers and code.
-- Only our own measurements go into parts. Don't copy numbers out of other people's models
-  (many on Printables are CC BY-NC).
-- Say how a number was measured and how sure it is. Estimates are marked ESTIMATE in the code.
+- Keep the repo **private**. The iFixit reference board (textures and part positions) is derived from the
+  [iFixit PS4 teardown](https://www.ifixit.com/Teardown/PlayStation+4+Teardown/19493) (CC BY-NC-SA 3.0)
+  and McMaster's SAA-001 scans ([siliconpr0n](https://siliconpr0n.org/map/sony/saa-001/)). Non-commercial use only.
+- No personal or room photos in git (`.gitignore` blocks loose photos). Board textures the app needs live in `src/ps4fab/web/`.
+- Printable parts use only our own measurements, never numbers copied from other people's models.
+- Every number says how it was measured and how sure it is.

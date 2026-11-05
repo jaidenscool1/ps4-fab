@@ -1,0 +1,18 @@
+{
+ "markers": [
+  {
+   "h": 0.05,
+   "id": "ifx-top-screws-1",
+   "label": "",
+   "layer": "screws",
+   "n": 1,
+   "note": "My reading of the iFixit step 10 photo, not stated by iFixit. Confirm on your board. One of the four T9 screws (step 10 text); only this one is visible in the photo.",
+   "value": "T9 Security Torx",
+   "verified": false,
+   "w": 0.0375,
+   "x": 0.57,
+   "y": 0.59
+  }
+ ],
+ "photo": "68277e76a6233e3d95d8d8a664615d0c"
+}

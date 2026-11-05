@@ -1,0 +1,226 @@
+<title>PS4 Caliper Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one bench column; sticky console bar; each reading is a row with a number field sized like a caliper display. */
+:root{
+  --paper:#eef1f4; --sheet:#ffffff; --ink:#1d2630; --mute:#5b6875; --rule:#d3dae1;
+  --accent:#c98a00; --accent-ink:#1d2630; --ok:#1f7a4d; --todo:#9aa6b2; --focus:#2d6cdf;
+  --lcd:#e4ead7; --lcd-ink:#24301c;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12171c; --sheet:#1a2128; --ink:#e3e8ed; --mute:#98a4b0; --rule:#2c3640;
+  --accent:#f0b429; --accent-ink:#12171c; --ok:#5cc58f; --todo:#5f6b77; --focus:#7aa7ff;
+  --lcd:#26301f; --lcd-ink:#d6e6c0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12171c; --sheet:#1a2128; --ink:#e3e8ed; --mute:#98a4b0; --rule:#2c3640;
+  --accent:#f0b429; --accent-ink:#12171c; --ok:#5cc58f; --todo:#5f6b77; --focus:#7aa7ff;
+  --lcd:#26301f; --lcd-ink:#d6e6c0; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.5 var(--body);
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:24px 24px;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sheet)}
+.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:2px solid var(--ink);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.bar-in{max-width:820px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+h1{font:700 26px/1 var(--display);letter-spacing:.01em;margin:0;text-wrap:balance}
+.consoles{display:flex;gap:6px}
+.consoles button{font:600 15px var(--display);letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);
+  padding:4px 12px;border-radius:3px;cursor:pointer}
+.consoles button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.progress{margin-left:auto;font:500 14px var(--mono);color:var(--mute);font-variant-numeric:tabular-nums}
+.meter{height:6px;background:var(--rule);border-radius:3px;overflow:hidden;flex-basis:100%}
+.meter i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.intro{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;margin-top:16px;display:grid;gap:6px}
+.intro p{margin:0;max-width:68ch}
+.banner{border-left:4px solid var(--accent);background:var(--sheet);padding:10px 14px;margin-top:12px;border-radius:2px}
+section{margin-top:22px}
+h2{font:700 15px var(--display);letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px;display:flex;gap:10px;align-items:baseline}
+h2 small{font:500 13px var(--body);letter-spacing:0;text-transform:none;color:var(--mute)}
+.rows{background:var(--sheet);border:1px solid var(--rule);border-radius:4px}
+.row{display:grid;grid-template-columns:1fr auto;gap:6px 16px;padding:12px 14px;border-top:1px solid var(--rule)}
+.row:first-child{border-top:0}
+.row .what{min-width:0}
+.row .name{font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:2px;border:1px solid var(--todo);color:var(--todo)}
+.chip.ok{border-color:var(--ok);color:var(--ok)}
+.how{color:var(--mute);font-size:14px;margin-top:2px;max-width:62ch}
+.why{color:var(--mute);font-size:13px;margin-top:2px;font-style:italic}
+.entry{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.lcd{display:flex;align-items:center;background:var(--lcd);color:var(--lcd-ink);border:2px solid var(--ink);border-radius:3px;padding:2px 8px}
+.lcd input{width:6.5ch;border:0;background:transparent;color:inherit;font:500 20px var(--mono);text-align:right;font-variant-numeric:tabular-nums;padding:2px 0}
+.lcd input.txt{width:14ch;font-size:15px;text-align:left}
+.lcd span{font:500 13px var(--mono);margin-left:4px}
+.note{width:100%;max-width:240px;font:14px var(--body);border:1px solid var(--rule);border-radius:3px;padding:4px 6px;background:var(--sheet);color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.saved-at{font:12px var(--mono);color:var(--mute)}
+@media (max-width:520px){.row{grid-template-columns:1fr}.entry{align-items:stretch}.lcd{align-self:flex-start}.note{max-width:none}}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+
+<header class="bar"><div class="bar-in">
+  <h1>PS4 Caliper Sheet</h1>
+  <div class="consoles" id="consoles" role="group" aria-label="Console"></div>
+  <span class="progress" id="progress">0 / 0 measured</span>
+  <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+</div></header>
+
+<div class="wrap">
+  <div class="intro">
+    <p>Readings for the Teardown Tracer's 3D model. It draws only parts with a measured source, so each number here unlocks a part or settles a conflict between photos.</p>
+    <p>Measure in <b>millimetres</b> to 0.1 mm. "Above the table" means the console lies flat on its feet on a level table, and you measure from the table up. Each field saves when you leave it or press Enter.</p>
+  </div>
+  <div class="banner" id="status" role="status">Connecting to saved readings…</div>
+  <div id="groups"></div>
+</div>
+
+<script>
+// The checklist itself (structure). Readings live in the db: readings/<console>__<id>.
+const GROUPS = [
+  {title:"Settles open conflicts", note:"one reading each, done first", items:[
+    {id:"model", name:"Model number on the label", unit:"text", how:"Underside sticker, e.g. CUH-1001A. Also note the board number (1-889-352-xx) if you can see it.", why:"Keeps every reading tied to one revision."},
+    {id:"board_up_h", name:"Board's upper surface above the table", unit:"mm", how:"Top cover off, board still in. Depth rod straight down beside the board edge, or a ruler against the board edge.", why:"Front USB says ~26.8 mm, rear HDMI says ~12 or ~21 mm. This one number decides it."},
+    {id:"hdmi_lo", name:"HDMI opening, bottom edge above the table", unit:"mm", how:"Assembled console, rear. Bottom edge of the metal HDMI port mouth.", why:"iFixit rear photo puts it at 37.6 mm; the model has 20–34."},
+    {id:"hdmi_hi", name:"HDMI opening, top edge above the table", unit:"mm", how:"Same port, top edge.", why:"Gives the port height and confirms which way up the board sits."},
+    {id:"usb_lo", name:"Front USB opening, bottom edge above the table", unit:"mm", how:"Either front USB-A port, bottom edge of the metal mouth.", why:"Photo reading 27.7 mm; checks the board height from the front."},
+    {id:"inlet_mid", name:"Power inlet centre above the table", unit:"mm", how:"Rear figure-8 (C8) socket, middle of the socket.", why:"Confirms the PSU sits below the board."},
+    {id:"slot_lo", name:"Disc slot, bottom edge above the table", unit:"mm", how:"Front slot, lowest edge of the opening.", why:"Disc centre vs slot band is 5–7.5 mm off in the model."},
+    {id:"slot_hi", name:"Disc slot, top edge above the table", unit:"mm", how:"Same slot, upper edge.", why:"With the bottom edge this places the Blu-ray drive."},
+  ]},
+  {title:"Case", note:"shell and slant", items:[
+    {id:"h_front", name:"Total height at the front", unit:"mm", how:"Table to the highest point at the front edge.", why:"Sony states 53 mm overall; front and back may differ."},
+    {id:"h_back", name:"Total height at the back", unit:"mm", how:"Table to the highest point at the rear edge.", why:""},
+    {id:"overhang", name:"Top overhang at the front", unit:"mm", how:"Seen from the side: how far the top front edge sticks out past the bottom front edge.", why:"The model uses a 15° lean (0.27); this measures it."},
+    {id:"wall", name:"Top cover wall thickness", unit:"mm", how:"Cover off: caliper jaws across the cover's edge.", why:"Walls are assumed 2 mm."},
+  ]},
+  {title:"Parts out of the console", note:"overall size, then holes", items:[
+    {id:"psu_l", name:"PSU (ADP-240AR) length", unit:"mm", how:"Longest side of the metal/plastic body, not counting cables.", why:"No measured source yet."},
+    {id:"psu_w", name:"PSU width", unit:"mm", how:"", why:""},
+    {id:"psu_h", name:"PSU height", unit:"mm", how:"Thickness lying flat.", why:"Photo readings disagree (18–38 mm)."},
+    {id:"fan_l", name:"Fan housing length", unit:"mm", how:"Outer housing, longest side.", why:""},
+    {id:"fan_w", name:"Fan housing width", unit:"mm", how:"", why:""},
+    {id:"fan_h", name:"Fan housing height", unit:"mm", how:"Thickness lying flat.", why:"Seller lists 32 mm, which may be the box."},
+    {id:"bd_l", name:"Blu-ray drive length", unit:"mm", how:"Front (slot side) to back.", why:""},
+    {id:"bd_w", name:"Blu-ray drive width", unit:"mm", how:"", why:""},
+    {id:"bd_h", name:"Blu-ray drive height", unit:"mm", how:"Thickness lying flat, including the top plate.", why:"Model assumes a 12.7 mm slim drive."},
+    {id:"hs_l", name:"Heatsink fin block length", unit:"mm", how:"Fin stack only.", why:""},
+    {id:"hs_w", name:"Heatsink fin block width", unit:"mm", how:"", why:""},
+    {id:"hs_h", name:"Heatsink fin height", unit:"mm", how:"Base plate bottom to fin tops.", why:""},
+    {id:"caddy", name:"HDD caddy length × width", unit:"text", how:"e.g. 112 × 72", why:""},
+  ]},
+  {title:"Screws", note:"per teardown step", items:[
+    {id:"scr_cover", name:"Top cover: count, length, head", unit:"text", how:"e.g. 1 × 8 mm Phillips under the warranty sticker", why:"iFixit gives no counts or lengths for most steps."},
+    {id:"scr_psu", name:"PSU: count, length, head", unit:"text", how:"", why:""},
+    {id:"scr_bd", name:"Blu-ray drive: count, length, head", unit:"text", how:"", why:""},
+    {id:"scr_board", name:"Board / shields: count, length, head", unit:"text", how:"", why:""},
+    {id:"scr_hs", name:"Heatsink: count, length, head", unit:"text", how:"", why:""},
+  ]},
+];
+const ITEMS = GROUPS.flatMap(g => g.items);
+const CONSOLES = ["c1","c2","c3"], NAMES = {};
+// ps4fab: also list every console profile from the Teardown Tracer (by name)
+fetch('/api/db/consoles').then(r => r.json()).then(j => { for (const [id, d] of Object.entries(j.docs || {})) if (id !== 'ifx') { if (!CONSOLES.includes(id)) CONSOLES.push(id); if (d.name) NAMES[id] = d.name; } renderConsoles(); }).catch(() => {});
+let current = "c1", readings = {}, db = null;
+try { const c = localStorage.getItem("caliper-console"); if (CONSOLES.includes(c)) current = c; } catch {}
+
+const $ = s => document.querySelector(s);
+function key(c, id){ return c + "__" + id; }
+
+function renderConsoles(){
+  const el = $("#consoles"); el.textContent = "";
+  for (const c of CONSOLES){
+    const b = document.createElement("button");
+    b.textContent = NAMES[c] || c; b.setAttribute("aria-pressed", c === current);
+    b.onclick = () => { current = c; try{localStorage.setItem("caliper-console", c)}catch{}; renderConsoles(); renderGroups(); };
+    el.append(b);
+  }
+}
+
+function renderProgress(){
+  const n = ITEMS.filter(i => readings[key(current, i.id)]?.value).length;
+  $("#progress").textContent = `${n} / ${ITEMS.length} measured on ${current}`;
+  $("#meter").style.width = (100 * n / ITEMS.length) + "%";
+}
+
+function renderGroups(){
+  const root = $("#groups"); root.textContent = "";
+  for (const g of GROUPS){
+    const s = document.createElement("section");
+    const h = document.createElement("h2"); h.textContent = g.title;
+    const sm = document.createElement("small"); sm.textContent = g.note; h.append(sm);
+    const rows = document.createElement("div"); rows.className = "rows";
+    for (const it of g.items) rows.append(row(it));
+    s.append(h, rows); root.append(s);
+  }
+  renderProgress();
+}
+
+function row(it){
+  const r = readings[key(current, it.id)] || {};
+  const el = document.createElement("div"); el.className = "row";
+  const what = document.createElement("div"); what.className = "what";
+  const name = document.createElement("div"); name.className = "name";
+  const label = document.createElement("label"); label.htmlFor = "v-" + it.id; label.textContent = it.name;
+  const chip = document.createElement("span"); chip.className = "chip" + (r.value ? " ok" : ""); chip.textContent = r.value ? "measured" : "not measured";
+  name.append(label, chip); what.append(name);
+  if (it.how){ const p = document.createElement("div"); p.className = "how"; p.textContent = it.how; what.append(p); }
+  if (it.why){ const p = document.createElement("div"); p.className = "why"; p.textContent = it.why; what.append(p); }
+
+  const entry = document.createElement("div"); entry.className = "entry";
+  const lcd = document.createElement("div"); lcd.className = "lcd";
+  const inp = document.createElement("input"); inp.id = "v-" + it.id; inp.value = r.value || "";
+  if (it.unit === "mm"){ inp.inputMode = "decimal"; inp.placeholder = "--.-"; inp.pattern = "[0-9]+([.,][0-9]+)?"; }
+  else { inp.className = "txt"; inp.placeholder = "type here"; }
+  lcd.append(inp);
+  if (it.unit === "mm"){ const u = document.createElement("span"); u.textContent = "mm"; lcd.append(u); }
+  const note = document.createElement("input"); note.className = "note"; note.id = "n-" + it.id; note.placeholder = "note (optional)"; note.value = r.note || "";
+  note.setAttribute("aria-label", it.name + " note");
+  const at = document.createElement("div"); at.className = "saved-at"; at.textContent = r.at ? "saved " + new Date(r.at).toLocaleString() : "";
+  entry.append(lcd, note, at);
+  el.append(what, entry);
+
+  const save = async () => {
+    let v = inp.value.trim().replace(",", ".");
+    if (it.unit === "mm" && v && !/^\d+(\.\d+)?$/.test(v)){ at.textContent = "Enter a number in mm, like 26.8"; return; }
+    const prev = readings[key(current, it.id)] || {};
+    if (v === (prev.value || "") && note.value.trim() === (prev.note || "")) return; // unchanged: no write
+    if (!db){ at.textContent = "Not saved: sign in to claude.ai to keep readings."; return; }
+    at.textContent = "saving…";
+    const doc = {console: current, item: it.id, value: v, unit: it.unit, note: note.value.trim(), at: new Date().toISOString()};
+    try { await db.collection("readings").doc(key(current, it.id)).set(doc); }
+    catch (e){ at.textContent = "Not saved (" + (e.code || "error") + "). Check you have edit access, then try again."; }
+  };
+  for (const x of [inp, note]){
+    x.addEventListener("blur", save);
+    x.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); x.blur(); } });
+  }
+  return el;
+}
+
+renderConsoles(); renderGroups();
+
+(async () => {
+  const status = $("#status");
+  const timer = setTimeout(() => { status.textContent = "Saved readings didn't load. Fields still work, but nothing is kept until the page reconnects."; }, 10000);
+  const cl = window.claude;
+  db = cl && cl.use ? await cl.use("db") : null;
+  if (!db){ clearTimeout(timer); status.textContent = "Readings can't be saved in this view (open it on claude.ai while signed in)."; return; }
+  db.collection("readings").onSnapshot(snap => {
+    clearTimeout(timer);
+    readings = {};
+    snap.docs.forEach(d => { readings[d.id] = d.data(); });
+    const n = snap.size;
+    status.textContent = n ? `${n} reading${n === 1 ? "" : "s"} saved across all consoles.` : "No readings yet. Pick a console and start with the first section.";
+    // Re-render only rows the viewer isn't typing in.
+    const active = document.activeElement && document.activeElement.id;
+    renderGroups();
+    if (active){ const el = document.getElementById(active); if (el) el.focus(); }
+  }, e => { clearTimeout(timer); status.textContent = "Couldn't load readings (" + e.code + ")."; });
+})();
+</script>

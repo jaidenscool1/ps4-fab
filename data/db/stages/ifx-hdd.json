@@ -1,0 +1,18 @@
+{
+ "markers": [
+  {
+   "h": 0.05,
+   "id": "ifx-hdd-screws-1",
+   "label": "",
+   "layer": "screws",
+   "n": 1,
+   "note": "My reading of the iFixit step 6 photo, not stated by iFixit. Confirm on your board. Screwdriver tip position. Step 7 text: a single screw secures the caddy.",
+   "value": "Caddy screw",
+   "verified": false,
+   "w": 0.0375,
+   "x": 0.44,
+   "y": 0.625
+  }
+ ],
+ "photo": "5e7880f49758c89840bd49a2c572abbb"
+}
