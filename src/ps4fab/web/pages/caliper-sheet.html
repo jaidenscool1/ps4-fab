@@ -123,7 +123,9 @@ const GROUPS = [
   ]},
 ];
 const ITEMS = GROUPS.flatMap(g => g.items);
-const CONSOLES = ["c1","c2","c3"];
+const CONSOLES = ["c1","c2","c3"], NAMES = {};
+// ps4fab: also list every console profile from the Teardown Tracer (by name)
+fetch('/api/db/consoles').then(r => r.json()).then(j => { for (const [id, d] of Object.entries(j.docs || {})) if (id !== 'ifx') { if (!CONSOLES.includes(id)) CONSOLES.push(id); if (d.name) NAMES[id] = d.name; } renderConsoles(); }).catch(() => {});
 let current = "c1", readings = {}, db = null;
 try { const c = localStorage.getItem("caliper-console"); if (CONSOLES.includes(c)) current = c; } catch {}
 
@@ -134,7 +136,7 @@ function renderConsoles(){
   const el = $("#consoles"); el.textContent = "";
   for (const c of CONSOLES){
     const b = document.createElement("button");
-    b.textContent = c; b.setAttribute("aria-pressed", c === current);
+    b.textContent = NAMES[c] || c; b.setAttribute("aria-pressed", c === current);
     b.onclick = () => { current = c; try{localStorage.setItem("caliper-console", c)}catch{}; renderConsoles(); renderGroups(); };
     el.append(b);
   }
