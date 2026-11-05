@@ -1,0 +1,18 @@
+{
+ "markers": [
+  {
+   "h": 0.05,
+   "id": "ifx-frame-screws-1",
+   "label": "",
+   "layer": "screws",
+   "n": 1,
+   "note": "My reading of the iFixit step 17 photo, not stated by iFixit. Confirm on your board. Screwdriver tip position. Step 17 text: \"a few screws\", no count.",
+   "value": "Frame / shield screw",
+   "verified": false,
+   "w": 0.0375,
+   "x": 0.745,
+   "y": 0.67
+  }
+ ],
+ "photo": "25f7aca57083cbac84c19c535d1134aa"
+}

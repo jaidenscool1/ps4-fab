@@ -12,3 +12,6 @@ out/
 *.heic
 *.png
 *.mat.json
+# the app's own files and shared data ARE tracked
+!src/ps4fab/web/**
+!data/**

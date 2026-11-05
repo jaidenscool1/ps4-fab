@@ -1,0 +1,45 @@
+{
+ "markers": [
+  {
+   "h": 0.1333,
+   "id": "ifx-shell-other-1",
+   "label": "",
+   "layer": "other",
+   "n": 1,
+   "note": "My reading of the iFixit step 8 photo, not stated by iFixit. Confirm on your board. Steps 8 photos 2–3 show a Security Torx screw under a sticker.",
+   "value": "Warranty seal sticker",
+   "verified": false,
+   "w": 0.15,
+   "x": 0.33,
+   "y": 0.55
+  },
+  {
+   "h": 0.1333,
+   "id": "ifx-shell-other-2",
+   "label": "",
+   "layer": "other",
+   "n": 2,
+   "note": "My reading of the iFixit step 8 photo, not stated by iFixit. Confirm on your board. Being peeled with tweezers in this photo.",
+   "value": "Warranty seal sticker",
+   "verified": false,
+   "w": 0.15,
+   "x": 0.67,
+   "y": 0.55
+  },
+  {
+   "h": 0.1833,
+   "id": "ifx-shell-connectors-1",
+   "label": "",
+   "layer": "connectors",
+   "n": 1,
+   "note": "My reading of the iFixit step 8 photo, not stated by iFixit. Confirm on your board. Step 4 lists the rear ports; the USB-A-shaped one is the auxiliary (camera) port.",
+   "part": "aux",
+   "value": "USB-A-shaped rear port",
+   "verified": false,
+   "w": 0.0875,
+   "x": 0.37,
+   "y": 0.75
+  }
+ ],
+ "photo": "71e94945176c74830510d786d6d17cf1"
+}

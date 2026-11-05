@@ -1,0 +1,1887 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PS4 Fat Teardown Tracer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: same blueprint sheet as the Bench Blueprint — title block, console + stage rails, 3D board beside the part panels, parts table below */
+:root{
+  --paper:#0d2a4a; --paper-2:#12355c; --line:#cfe3ff; --dim:#7fa3cc; --grid:rgba(207,227,255,.07); --rule:rgba(207,227,255,.22);
+  --accent:#ffd166; --bad:#ff8a7a; --ok:#8be0b0; --rel:#00e5ff; --path:#ff2bd6; --guess:#ff9a3c; --cap:#5dff8a; --capn:#d2f55a; --cu:#b794ff;
+  --display:"Chakra Petch",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+body{background:var(--paper);color:var(--line);font-family:var(--body);line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1400px;margin:0 auto;padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:20px}
+h1,h2,h3{font-family:var(--display);letter-spacing:.04em;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.6rem,3.6vw,2.4rem)}
+h2{font-size:1.2rem;text-transform:uppercase;border-bottom:1px solid var(--dim);padding-bottom:6px}
+h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
+p{margin:0;max-width:70ch}
+a{color:var(--accent)}
+.note{font-size:.85rem;color:var(--dim)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font-family:var(--display);letter-spacing:.05em;text-transform:uppercase;font-size:.75rem;background:transparent;border:1px solid var(--dim);color:var(--line);padding:6px 10px;cursor:pointer}
+.btn:hover{border-color:var(--line)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:var(--paper)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font-size:inherit}
+
+.titleblock{display:grid;grid-template-columns:1fr auto;gap:16px;border:2px solid var(--line);padding:16px 18px}
+.titleblock dl{display:grid;grid-template-columns:auto auto;gap:2px 14px;margin:0;font-family:var(--mono);font-size:.8rem;align-content:start}
+.titleblock dt{color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.titleblock dd{margin:0}
+#saveState.ok{color:var(--ok)} #saveState.busy{color:var(--accent)} #saveState.err{color:var(--bad)}
+@media (max-width:640px){.titleblock{grid-template-columns:1fr}}
+.banner{border:1px solid var(--bad);color:var(--bad);padding:8px 12px;font-size:.88rem;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+.rail{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.consoles{border:1px solid var(--dim);padding:10px;display:grid;gap:10px;background:var(--paper)}
+.fields{display:flex;flex-wrap:wrap;gap:10px}
+.field{display:grid;gap:3px;font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-family:var(--display);min-width:0}
+.field input,.field select,.field textarea{font-family:var(--mono);font-size:.88rem;text-transform:none;letter-spacing:0;color:var(--line);background:var(--paper-2);border:1px solid var(--rule);padding:6px 8px;min-width:0}
+.field textarea{resize:vertical;min-height:64px;font-family:var(--body)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.stages{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border:1px solid var(--dim);padding:8px;display:flex;gap:6px;overflow-x:auto}
+.stages .btn{display:grid;gap:1px;text-align:left;white-space:nowrap;flex:none}
+.stages .btn small{font-family:var(--mono);font-size:.68rem;text-transform:none;letter-spacing:0;opacity:.8}
+
+.layers{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.76rem;border:1px solid var(--rule);background:transparent;color:var(--dim);padding:4px 8px;cursor:pointer}
+.chip .sw{width:12px;height:12px;border-radius:2px;border:2px solid var(--c);flex:none}
+.chip[aria-pressed="true"]{color:var(--line);border-color:var(--c)}
+.chip[aria-pressed="true"] .sw{background:var(--c)}
+.chip b{font-weight:600;color:var(--c)}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}
+@media (max-width:980px){.work{grid-template-columns:minmax(0,1fr)}}
+.photoCol{display:grid;gap:8px;min-width:0}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.viewport{position:relative;border:1px solid var(--dim);background:var(--paper-2);overflow:auto;max-height:84vh;min-height:280px}
+.stage3d{position:relative;height:clamp(380px,74vh,860px);overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#1d4a78 0%,#0b2240 55%,#06162b 100%)}
+#gl{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#gl.armed{cursor:crosshair}
+#gl.over{cursor:pointer}
+#gl.panning{cursor:grabbing}
+#labels3d{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;transform:translate(-50%,-130%);font:600 11px/1.3 var(--mono);color:#fff;background:rgba(5,15,30,.86);border:1px solid var(--c,#fff);padding:1px 5px;white-space:nowrap}
+#tip{position:absolute;pointer-events:none;font:500 12px/1.4 var(--mono);color:#fff;background:rgba(5,15,30,.94);border:1px solid var(--dim);padding:4px 8px;max-width:360px;transform:translate(14px,14px)}
+#tip b{color:var(--accent)}
+.pins{max-height:260px;overflow:auto;border:1px solid var(--rule)}
+.pins table{min-width:0;font-size:.8rem}
+.pins td,.pins th{padding:3px 6px}
+.pins tr.sel{background:rgba(255,209,102,.15)}
+.pinbox{border:1px solid var(--accent);padding:10px;display:grid;gap:8px}
+.cmp{font-family:var(--mono);font-size:.8rem}
+.hud{position:absolute;left:10px;bottom:10px;font:600 11px/1.5 var(--mono);color:var(--dim);background:rgba(5,15,30,.7);padding:4px 8px;pointer-events:none}
+.canvas{position:relative;width:100%}
+.canvas.armed{cursor:crosshair}
+.canvas img{display:block;width:100%;max-width:none;height:auto;user-select:none;-webkit-user-drag:none}
+#flatSvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.box{position:absolute;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);cursor:grab;touch-action:none}
+.box.auto{border-width:1px}
+.box.sel{border-color:var(--accent);box-shadow:0 0 0 2px #000,0 0 0 5px var(--accent);z-index:3}
+.box.rel{border-color:var(--rel);box-shadow:0 0 0 2px #000,0 0 0 4px var(--rel);z-index:2}
+.box.guess{border-color:var(--guess);box-shadow:0 0 0 2px #000,0 0 0 4px var(--guess);z-index:2}
+.box.path{border-color:var(--path);box-shadow:0 0 0 2px #000,0 0 0 4px var(--path);z-index:2}
+.box.dim{opacity:.5}
+.empty{display:grid;place-items:center;gap:10px;text-align:center;padding:48px 20px;min-height:280px;align-content:center}
+.viewport.drag{outline:2px dashed var(--accent);outline-offset:-6px}
+.hint{font-size:.8rem;color:var(--dim);font-family:var(--mono)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.78rem;font-family:var(--mono);color:var(--dim)}
+.legend i{display:inline-block;width:18px;height:4px;vertical-align:middle;margin-right:5px;background:var(--c)}
+.legend i.thin{height:2px;opacity:.6}
+
+.side{display:grid;gap:16px;min-width:0}
+.hublinks a{text-decoration:none}
+.profile-note{font-size:.85rem;color:var(--dim)}
+.panel{border:1px solid var(--dim);padding:12px;display:grid;gap:10px;background:var(--paper)}
+.ref{font-family:var(--display);font-weight:700;font-size:1.5rem;color:var(--c,var(--accent))}
+.check{display:flex;gap:8px;align-items:center;font-size:.9rem;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--ok)}
+.links ul,.links ol,.facts ul{margin:0;padding-left:1.1em;display:grid;gap:7px;font-size:.86rem}
+.links li small{display:block;color:var(--dim);font-size:.8rem}
+.links .dot{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:baseline}
+.links .guess{color:var(--guess);font-size:.78rem;font-family:var(--mono)}
+.links .vis{font-family:var(--mono);font-size:.74rem;color:var(--ok)}
+.facts code,td code,.links code{font-family:var(--mono);font-size:.82rem;color:var(--accent)}
+cite{font-style:normal;font-family:var(--mono);font-size:.74rem;white-space:nowrap}
+
+.table{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.86rem}
+th,td{border:1px solid var(--rule);padding:6px 9px;text-align:left;vertical-align:top}
+th{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:.74rem;background:rgba(207,227,255,.06)}
+td.r{font-family:var(--mono);font-weight:600;color:var(--c);white-space:nowrap}
+tbody tr{cursor:pointer}
+tbody tr:hover,tbody tr.sel{background:rgba(207,227,255,.07)}
+.pill{font-family:var(--mono);font-size:.72rem;padding:1px 7px;border-radius:9px;border:1px solid currentColor;white-space:nowrap}
+.yes{color:var(--ok)} .no{color:var(--dim)}
+</style>
+
+<div class="wrap">
+
+<header class="titleblock">
+  <div>
+    <h1>PS4 Fat Teardown Tracer</h1>
+    <p class="note">The board top and bottom photos, aligned into one two-sided 3D board with every visible part mapped. Click any part to light up what it connects to and its route to the APU. The board's copper and every route come from McMaster's 600 dpi scans of the bare board.</p>
+  </div>
+  <dl>
+    <dt>Console</dt><dd id="tbConsole">–</dd>
+    <dt>Model</dt><dd id="tbModel">–</dd>
+    <dt>Stage</dt><dd id="tbStage">–</dd>
+    <dt>Saved</dt><dd id="saveState" class="busy">Connecting…</dd>
+  </dl>
+</header>
+
+<div id="banner" class="banner" role="status" hidden></div>
+
+<nav class="rail hublinks" aria-label="Other pages">
+  <a class="btn" href="/pages/blueprint.html" target="_blank" rel="noopener">Bench Blueprint</a>
+  <a class="btn" href="/pages/blueprint.html#trust" target="_blank" rel="noopener">Chain of trust</a>
+  <a class="btn" href="/pages/caliper-sheet.html" target="_blank" rel="noopener">Caliper Sheet</a>
+</nav>
+
+<section class="consoles" aria-label="Console profiles">
+  <div class="rail" id="consoleRail"></div>
+</section>
+
+<form class="panel" id="newCon" hidden>
+  <h3>New console profile</h3>
+  <div class="fields">
+    <label class="field">Name<input id="ncName" placeholder="e.g. Console 2" maxlength="40" required></label>
+    <label class="field">Brand<select id="ncBrand"></select></label>
+    <label class="field">Model<select id="ncFam"></select></label>
+    <label class="field">Exact model (sticker)<input id="ncModel" placeholder="e.g. CUH-1001A" maxlength="30"></label>
+  </div>
+  <div class="rail"><button class="btn" type="submit" aria-pressed="true">Create and open</button><button class="btn" type="button" id="ncCancel">Cancel</button></div>
+</form>
+
+<section class="panel" id="profile" aria-label="Console profile"></section>
+
+<nav class="stages" id="stageRail" aria-label="Teardown stages"></nav>
+
+<section class="stage" id="stageSec" style="display:grid;gap:14px">
+  <h2 id="stageTitle"></h2>
+  <div class="layers" id="layers" aria-label="Layers"></div>
+  <div class="work">
+    <div class="photoCol">
+      <div class="tools">
+        <div class="rail" id="asmRail" hidden><button class="btn" type="button" data-asm="shell" aria-pressed="true">Shell</button><button class="btn" type="button" data-asm="shield" aria-pressed="true">Chassis &amp; shields</button><button class="btn" type="button" data-asm="board" aria-pressed="true">Board</button><button class="btn" type="button" data-asm="explode" aria-pressed="false">Explode</button></div>
+        <div class="rail" id="view3dRail"><button class="btn" type="button" data-view="top">Top</button><button class="btn" type="button" data-view="tilt">Tilted</button><button class="btn" type="button" data-view="bottom">Bottom</button><button class="btn" type="button" data-view="side">Side</button><button class="btn" type="button" id="innerBtn" aria-pressed="false" title="Inner-layer copper read from McMaster's X-ray maps (about 75% of the board is covered)">Inner layers</button></div>
+      </div>
+      <div class="viewport" id="viewport">
+        <div class="stage3d" id="stage3d" hidden><canvas id="gl" aria-label="3D view of the board. Left-drag pans, middle-drag orbits, scroll zooms, click a part to trace it."></canvas><div id="labels3d"></div><div id="tip" hidden></div><div class="hud" id="hud"></div></div>
+        <div class="empty" id="empty">
+          <p><b>No 3D model for this stage yet.</b></p>
+          <p class="note" id="emptyWhy">This page only shows 3D models built from measured sources. Nothing measured exists yet for the parts in this step (case, PSU, Blu-ray drive, fan, heatsink, shields), so nothing is drawn rather than a guess. The sourced facts on the right still apply.</p>
+        </div>
+      </div>
+      <div class="legend"><span style="--c:var(--accent)"><i></i>selected</span><span style="--c:var(--rel)"><i></i>connects to (sourced)</span><span style="--c:var(--path)"><i></i>route to the APU</span><span style="--c:var(--guess)"><i></i>unconfirmed</span><span style="--c:var(--cap)"><i></i>its capacitors (copper)</span><span style="--c:var(--capn)"><i></i>capacitors beside it (likely)</span><span style="--c:var(--cu)"><i></i>its copper + parts on it (scans)</span><span style="--c:#78cdff"><i></i>pale-blue core = inner-layer copper (X-ray)</span><span style="--c:#cfe3ff"><i class="thin"></i>thin/faint = no copper seen there</span></div>
+      <p class="hint" id="hint"></p>
+      <p class="note" id="credit" hidden>Reference photos (used to measure the model, not shown): <a href="https://www.ifixit.com/Teardown/PlayStation+4+Teardown/19493" target="_blank" rel="noopener">iFixit PlayStation 4 Teardown</a> by Walter Galan et al., CC BY-NC-SA 3.0; board shots courtesy of Chipworks. Routes follow copper detected in these photos; parts not hand-mapped were auto-detected by colour and shape, so their type is a guess. Board size and geometry are calibrated against McMaster's 600-dpi SAA-001 board scans (<a href="https://siliconpr0n.org/map/sony/saa-001/" target="_blank" rel="noopener">siliconpr0n.org</a>): board 261.4 × 250.1 mm (±0.4%), part positions within about 0.2 mm median, 0.45 mm p90 of the scans.</p>
+    </div>
+    <aside class="side">
+      <div class="panel links" id="links"></div>
+      <div class="panel" id="editor"></div>
+      <div class="panel facts" id="facts"></div>
+    </aside>
+  </div>
+  <h3 id="tableTitle">Parts table</h3>
+  <div class="table"><table>
+    <thead><tr><th>Ref</th><th>Part</th><th>Silkscreen</th><th>Marking / value / screw type</th><th>Note</th><th>Verified</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table></div>
+</section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const LAYERS = [
+  ['screws','Screws','S','#ffe600'],['brackets','Brackets','BK','#e0a83a'],['cables','Cables','CB','#ff8a00'],
+  ['connectors','Connectors','CN','#ff2e2e'],['ics','ICs','U','#ff2bd6'],['mosfets','MOSFETs','Q','#00e5ff'],
+  ['transistors','Transistors','TR','#2f7dff'],['inductors','Inductors','L','#a66bff'],['capacitors','Capacitors','C','#ff9ecf'],
+  ['resistors','Resistors','R','#ffffff'],['diodes','Diodes','D','#ffc9a0'],['fuses','Fuses','F','#b4ff00'],
+  ['thermistors','Thermistors','TH','#9fc3ff'],['crystals','Crystals','Y','#00ffc8'],['testpoints','Test points','TP','#fff6a0'],
+  ['other','Other','X','#c9d0dc'],
+].map(([id,name,pre,color]) => ({id, name, pre, color}));
+const L = Object.fromEntries(LAYERS.map(l => [l.id, l]));
+const SIZE = {screws:[.025,.033],brackets:[.06,.06],cables:[.06,.04],connectors:[.04,.05],ics:[.035,.045],mosfets:[.016,.022],transistors:[.012,.016],
+  inductors:[.025,.033],capacitors:[.016,.022],resistors:[.01,.008],diodes:[.01,.01],fuses:[.015,.012],thermistors:[.015,.012],crystals:[.02,.012],testpoints:[.008,.011],other:[.04,.04]};
+// real part heights in mm and what the body is made of (drives the 3D material)
+const LAYER_MM = {screws:[2,'metal'],brackets:[1,'metal'],cables:[.3,'plastic'],connectors:[5,'plastic'],ics:[1.2,'epoxy'],mosfets:[.9,'epoxy'],transistors:[1,'epoxy'],inductors:[3,'ferrite'],
+  capacitors:[1,'ceramic'],resistors:[.4,'epoxy'],diodes:[.8,'epoxy'],fuses:[.2,'label'],thermistors:[.2,'label'],crystals:[1,'metal'],testpoints:[.05,'gold'],other:[1,'plastic']};
+
+/* ---------- sources ---------- */
+const IFX = 'https://www.ifixit.com/Teardown/PlayStation+4+Teardown/19493';
+const SRC = {
+  saa: ['PS4 Dev Wiki · SAA-001', 'https://www.psdevwiki.com/ps4/SAA-001'],
+  sb: ['PS4 Dev Wiki · Southbridge', 'https://www.psdevwiki.com/ps4/Southbridge'],
+  tb: ['PS4 Dev Wiki · Timebases', 'https://www.psdevwiki.com/ps4/Timebases'],
+  reg: ['PS4 Dev Wiki · Regulators', 'https://www.psdevwiki.com/ps4/Regulators'],
+  prot: ['PS4 Dev Wiki · Protection', 'https://www.psdevwiki.com/ps4/Protection'],
+  therm: ['PS4 Dev Wiki · Thermal', 'https://www.psdevwiki.com/ps4/Thermal'],
+  x39: ['PS4 Dev Wiki · 39A207', 'https://www.psdevwiki.com/ps4/39A207'],
+  conn: ['PS4 Dev Wiki · Connectors', 'https://www.psdevwiki.com/ps4/Connectors'],
+  buzz: ['PS4 Dev Wiki · Buzzer', 'https://www.psdevwiki.com/ps4/Buzzer'],
+  sch: ['PS4 Dev Wiki · Syscon Hardware (100-pin pinout)', 'https://www.psdevwiki.com/ps4/Syscon_Hardware'],
+  mxnor: ['Macronix MX25L25635F datasheet', 'https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/510/MX25L25635F.pdf'],
+  mx1006: ['Macronix MX25L1006E datasheet', 'https://static.chipdip.ru/lib/032/DOC032032644.pdf'],
+  rl78: ['Renesas RL78/G13: VDD 1.6–5.5 V', 'https://www.digikey.com/en/product-highlight/r/renesas/rl78-g13'],
+  hdmiw: ['PS4 Dev Wiki · HDMI pinout', 'https://www.psdevwiki.com/ps4/HDMI'],
+  bwe: ['BetterWayElectronics · PS4 UART pinouts (on Repair Wiki)', 'https://repair.wiki/w/Playstation_4_Fault_finding_with_UART'],
+  gbt: ['GBAtemp · SAA-001 UART reading and NOR programming (KIlly728)', 'https://gbatemp.net/threads/ps4-saa-001-uart-reading-and-nor-programming-from-a-dummy.674004/'],
+  probe: ['Diode-mode method (TronicsFix forum)', 'https://tronicsfixforum.com/t/ps5-no-display-break-out-board-all-pins-read-normal-in-diode-mode-but/13448'],
+};
+const cite = k => `<cite><a href="${SRC[k][1]}" target="_blank" rel="noopener">${SRC[k][0]}</a></cite>`;
+
+/* ---------- board parts ---------- */
+const PARTS = {
+  apu:      {name:'APU (CPU + GPU)', mm:2.6, kind:'metal', desc:'Main chip. Everything on the board serves it.', buy:'CXD90026G', warn:'Used/pulled chips only; needs a full BGA reball (your 0.6 mm stencil).'},
+  gddr5:    {name:'GDDR5 (APU RAM)', mm:1.1, kind:'epoxy', buy:'K4G41325FC-HC03'},
+  sb:       {name:'Southbridge', mm:1.4, kind:'epoxy', desc:'Handles USB, SATA, network, Blu-ray and the main flash, also in standby.'},
+  ddr3:     {name:'Southbridge DDR3', mm:1.1, kind:'epoxy', buy:'K4B2G1646E-BCK0'},
+  nor:      {name:'Main NOR flash', mm:2.3, kind:'epoxy', desc:'Holds boot firmware. Dump it before any heat work nearby. A GBAtemp guide (KIlly728) dumped an SAA-001 NOR with a CH341A and a SOP-16 adapter; that board\'s chip was marked MX25L2565E, an E-version of this part. Read it twice and compare before changing anything.', buy:'MX25L25635FMI-10G', warn:'Paired with this console\'s syscon: write your own dump to a new chip, never another console\'s.'},
+  syscon:   {name:'Syscon', mm:1.4, kind:'epoxy', desc:'Power and boot management chip, paired with this console\'s NOR.', buy:'R5F100PLAFB', warn:'A blank RL78 only works after you program it with this console\'s own syscon dump (blueprint section H).'},
+  clk:      {name:'Clock generator', mm:.9, kind:'epoxy', buy:'6V41265NLG'},
+  eth:      {name:'Ethernet controller', mm:.9, kind:'epoxy', buy:'88EC060-NN82'},
+  wifi:     {name:'Wi-Fi / Bluetooth module', mm:2.4, kind:'metal'},
+  hdmienc:  {name:'HDMI chip (MN86471A)', mm:2, kind:'metal', buy:'MN86471A'},
+  usbhub:   {name:'USB 3.0 hub (GL3520)', mm:.9, kind:'epoxy', buy:'GL3520'},
+  flash2:   {name:'Serial flash 25L1006E', mm:1.6, kind:'epoxy', buy:'MX25L1006EM1I', warn:'Holds the bridge firmware: dump the old chip and write it to the new one.'},
+  satabridge:{buy:'MB86C311B', name:'SATA bridge (MB86C311B)', mm:.9, kind:'epoxy', desc:'Fujitsu SATA bridge. Marking read from the iFixit photo at full zoom; part listed for SAA-001 on the PS4 Dev Wiki.'},
+  xtal:     {name:'32.768 kHz crystal', mm:2, kind:'metal', none:'A 32.768 kHz watch crystal (marking read from a listing photo). Which chip it clocks is not documented in my sources. A crystal can\'t be checked with a multimeter beyond looking for a short.'},
+  stm8:     {name:'STM8-family microcontroller', mm:.9, kind:'epoxy', none:'Marking only partly legible in the photo (STM8…). Its job and connections are not documented in my sources.'},
+  vrmctl:   {name:'VRM controller (IR 3585B)', mm:.9, kind:'epoxy', buy:'IR3585B'},
+  vrmstage: {name:'VRM power stage', mm:.9, kind:'epoxy'},
+  vrmchoke: {name:'VRM choke', mm:4, kind:'ferrite'},
+  vrmcapin: {name:'VRM input capacitor', mm:5.8, kind:'alum', shape:'cyl'},
+  vrmcapout:{name:'Polymer capacitor (470)', mm:1.9, kind:'polymer'},
+  inductor: {name:'Inductor (other rail)', mm:3.5, kind:'ferrite', none:'Which rail this inductor feeds isn\'t documented. Its marking (e.g. 4R7 = 4.7 µH, 1R0 = 1.0 µH) gives the value, not the destination.'},
+  x39:      {name:'39A207 IC', mm:1.1, kind:'epoxy'},
+  sata:     {name:'HDD SATA connector', mm:5.5, kind:'plastic'},
+  hdmi:     {name:'HDMI port', mm:6.5, kind:'metal', buy:'PS4 CUH-1000 HDMI port'},
+  lan:      {name:'Ethernet jack', mm:13.5, kind:'metal'},
+  aux:      {name:'AUX port', mm:7, kind:'metal', none:'Wiki: proprietary port for the PlayStation Camera. Which chip drives it isn\'t documented.', src:'conn'},
+  optical:  {name:'Optical audio out', mm:9, kind:'plastic', none:'Listed on the Connectors page. Which chip drives it isn\'t documented.', src:'conn'},
+  fusb:     {name:'Front USB 3.0 ports', mm:7, kind:'metal'},
+  conn:     {name:'Unidentified connector', mm:5, kind:'cream', none:'Purpose not identified.'},
+  therm:    {name:'Thermistor', mm:.2, kind:'label', none:'Listed for SAA-001, but which chip reads the thermistors isn\'t documented (Thermal page).', src:'therm'},
+  fuse:     {name:'Fuse', mm:.2, kind:'label', none:'Listed for SAA-001. Which rail it protects isn\'t documented. A good fuse reads about 0 Ω end to end; open means it blew.', src:'prot'},
+  uarttx:   {name:'UART TX test pad', mm:.25, kind:'solder', shape:'cyl', none:'Console serial output: wire it to your adapter\'s RX, plus GND. 115200 baud, 8N1 (GBAtemp guide, Repair Wiki). Silent until the UART flag is set in the NOR (PS4 Wee Tools: Flags → UART On; BWE gives it as 01 at offsets 0x1C931F and 0x1CC31F). 3.3 V logic only: a 5 V adapter can damage the board.', src:'bwe'},
+  uartrx:   {name:'UART RX test pad', mm:.25, kind:'solder', shape:'cyl', none:'Console serial input: wire your adapter\'s TX here only if you need to send; reading needs just TX and GND. Silent until the UART flag is set in the NOR (PS4 Wee Tools: Flags → UART On; BWE gives it as 01 at offsets 0x1C931F and 0x1CC31F). 3.3 V logic only: a 5 V adapter can damage the board.', src:'bwe'},
+  uartgnd:  {name:'UART ground pad', mm:.25, kind:'solder', shape:'cyl', none:'Ground for the UART adapter.', src:'bwe'},
+  sbtx:     {name:'Southbridge TX test pad', mm:.25, kind:'solder', shape:'cyl', none:'Labelled Southbridge TX on the BWE pinout: a second serial port. What it prints isn\'t documented in my sources.', src:'bwe'},
+  sbrx:     {name:'Southbridge RX test pad', mm:.25, kind:'solder', shape:'cyl', none:'Labelled Southbridge RX on the BWE pinout.', src:'bwe'},
+  pinkpad:  {name:'Pink disc over a hole', mm:.2, kind:'plastic', shape:'cyl', none:'A pink disc covering a board hole on the underside, as photographed. Its purpose isn\'t documented.'},
+  cellclip: {name:'Coin cell holder clip', mm:1.5, kind:'metal', none:'Part of the coin cell holder (the clip that holds the cell\'s + side).'},
+  cell:     {name:'CR2032 coin cell', mm:4, kind:'metal', shape:'cyl', buy:'CR2032', none:'No documented connection. A CR2032 is a 3 V lithium cell: measure it, and if it reads well under 3 V, replace it.'},
+  buzzer:   {name:'Buzzer', mm:5, kind:'plastic', shape:'cyl', none:'Wiki: piezo beeper for power states and boot stages. The chip that drives it isn\'t documented.', src:'buzz'},
+  pkgcap:   {name:'APU package capacitors', mm:.2, kind:'label'},
+  silk:     {name:'Board silkscreen', mm:.05, kind:'label', none:'A board marking, not a part.'},
+  bd:       {name:'Blu-ray drive', offboard:true},
+  fan:      {name:'Fan', offboard:true},
+  hdd:      {name:'Hard drive', offboard:true},
+};
+const EDGES = [
+  ['gddr5','apu',1,'APU RAM','saa','Ball-to-ball link: the copper fans out under both chips, so most of it is hidden. Memory faults show as artifacts or blue light; reball is the route.'],
+  ['sb','apu',1,'PCIe Gen2 ×4','saa','Wiki note: with PCIe lanes cut the console flashes blue forever. The visible bundle can be inspected for scratches or corrosion.'],
+  ['syscon','sb',1,'SPI','sb','Wiki pinout: pins 64–66 and 69 are the SPI lines to the southbridge test points (SB-TP1–4); pin 63 looks like the SB → syscon interrupt. Syscon pins are probeable; the southbridge end is a BGA ball.'],
+  ['syscon','apu',1,'APU-RESET# + APU I²C','sch','Wiki pinout: pin 9 = APU-RESET#, pins 24–27 = APU I²C, pin 8 = VR-PWROK + APU-PWROK.'],
+  ['syscon','vrmctl',1,'VR enable / power-good / SMBus','sch','Wiki pinout: pins 2–3 VRDY, 5 VRHOT_ICRIT, 8 VR-PWROK, 51 VR-EN, 57–58 SM_CLK / SM_DIO. Those are IR digital-VRM signal names, which is why I tie them to the IR 3585B: my reading.'],
+  ['syscon','stm8',1,'STM8 power / eject','sch','Wiki pinout: pin 44 → STM8-PWR NRST, pin 84 → STM8-PWR (POWER#), pin 85 → STM8-EJECT (EJECT#). The wiki names two STM8s; which one this is isn\'t stated.'],
+  ['syscon','buzzer',1,'buzzer power switch','sch','Wiki pinout: pin 6 = power switch (BUZZER).'],
+  ['syscon','usbhub',1,'USB hub power switch','sch','Wiki pinout: pin 4 = power switch (USBHUB).'],
+  ['syscon','satabridge',1,'bridge + HDD power switch','sch','Wiki pinout: pin 37 = power switch (USBBRIDGE + HDD).'],
+  ['syscon','hdmienc',1,'HDMI power switches','sch','Wiki pinout: pin 29 = power switch (HDMI-0 + APU-4), pin 74 = power switch (HDMI-1).'],
+  ['syscon','ddr3',1,'southbridge / DDR3 power switch','sch','Wiki pinout: pin 54 = power switch (SB-1 + SB-2 + DDR3), pin 55 = SB-0.'],
+  ['syscon','fan',1,'FAN-CTL','sch','Wiki pinout: pin 28 = FAN-CTL.'],
+  ['syscon','clk',0,'I²C to the clock chip?','The wiki marks pins 93–94 as "i2c (PCIe clockgen smbus?)", with its own question mark.','Pins 93/94.'],
+  ['syscon','wifi',0,'Wi-Fi reset?','The wiki marks pin 82 as "Wi-Fi reset?", with its own question mark.','Pin 82.'],
+  ['nor','sb',1,'main serial flash','sb','SOP16 legs are probeable. Dump it with the CH341A + SOP16 clip (F2) three times and compare.'],
+  ['ddr3','sb',1,'southbridge RAM','saa','Ball-to-ball, mostly hidden under the two chips.'],
+  ['eth','sb',1,'GbLAN controller','sb','Check the jack first, then this chip. The southbridge end is a BGA ball.'],
+  ['lan','eth',1,'LAN','saa','Jack pins go through the magnetics in the jack to the controller.'],
+  ['wifi','sb',1,'wireless','sb','Reseat the antenna leads first. The module solders to the board as one block.'],
+  ['usbhub','sb',1,'USB 3.0 hub','sb','The hub is on the underside; the route crosses to the southbridge through vias.'],
+  ['satabridge','sb',1,'SATA bridge','sb','Wiki: the southbridge (Aeolia) has the MB86C311B SATA bridge. QFN with visible copper running to the southbridge.'],
+  ['flash2','satabridge',1,'SATA-bridge firmware','saa','The wiki lists one 25L1006E for the SATA bridge and one for the USB hub. This one sits directly under the bridge (about 6 mm away, underside), so it is the bridge\'s by position: my reading. SOP8: probeable.'],
+  ['sata','satabridge',0,'HDD SATA lines','My reading: the connector sits next to the bridge and its traces run straight to it (100% visible copper). The wiki does not spell out this link.','Continuity from the connector\'s data pins to the bridge.'],
+  ['sata','sb',1,'HDD handled by southbridge','sb','A failing HDD gives blue light: swap the drive before suspecting this path.'],
+  ['hdd','sata',1,'SATA','sb','Plugs into the SATA connector.'],
+  ['bd','sb',1,'Blu-ray handled by southbridge','sb','Drive faults stay in the drive: test with a known-good drive.'],
+  ['x39','bd',1,'disc-read faults','x39','Wiki: if a new laser still won\'t read discs, this IC or the laser ribbon can be faulty.'],
+  ['clk','sb',1,'possibly PCIe clock','tb','Wiki says "possibly". QFN; outputs are differential (HCSL).'],
+  ['clk','apu',1,'possibly PCIe clock','tb','Wiki says "possibly". QFN; outputs are differential (HCSL).'],
+  ['hdmi','hdmienc',1,'HDMI','saa','The port\'s legs come through right beside the shield on the underside. Inspect port pins first (most common fault), then this chip.'],
+  ['hdmienc','apu',0,'video from the GPU','The GPU is inside the APU (iFixit step 19), but the link to this chip isn\'t documented. A ~10-trace bus runs from the shield toward the APU.','No picture with a good port → this chip is the usual suspect.'],
+  ['fusb','usbhub',0,'downstream USB ports','A hub feeds ports, but the routing isn\'t documented.','Continuity from port data pins toward the hub.'],
+  ['vrmstage','apu',0,'APU power','Placed right beside the APU, but not documented.','Resistance to ground on the choke\'s output pad: near 0 Ω means a short on the APU rail.'],
+  ['vrmchoke','vrmstage',0,'phase output','Standard buck layout; not documented for this board.','Each choke sits on one power stage\'s output.'],
+  ['vrmcapin','vrmstage',0,'input decoupling','Standard buck layout; not documented.','Shorted input caps pull 12 V down: check resistance to ground.'],
+  ['vrmcapout','vrmchoke',0,'output filter','Standard buck layout; not documented.','A shorted output cap reads near 0 Ω to ground.'],
+  ['vrmctl','vrmstage',0,'PWM control','Wiki lists the IR 3585B as a regulator on SAA-001 but not what it controls.','QFN on the board bottom.'],
+  ['pkgcap','apu',0,'on the APU package','They sit on the APU substrate in the photo.','Knocked-off package caps are easy to miss after a reball: inspect under magnification.'],
+];
+/* ---------- pins: function and what a meter should show, only from cited sources ---------- */
+const SYSCON_PINS = [["P142", ""], ["P141", "VR-VRDY1"], ["P140", "VR-VRDY2"], ["P120", "power switch (USBHUB)"], ["P47", "VR-VRHOT_ICRIT"], ["P46", "power switch (BUZZER)"], ["P45", "NC"], ["P44", "VR-PWROK + APU-PWROK"], ["P43", "APU-RESET#"], ["P42", "(HDR-A SPI-CS)"], ["P41", "power switch (PSU-7)"], ["P40", "TOOL0 -> HDR-A pin 22 (open circuit between pin and header)"], ["RESET#", "-> HDR-A pin 24"], ["P124", "pulldown?"], ["P123", "power switch (PSU-5)"], ["P137", "testpoint?"], ["P122", "-> HDR-A pin 28 (4bit input-only, port 12)"], ["P121", "-> HDR-A pin 29 (4bit input-only, port 12)"], ["REGC", "cap to GND"], ["Vss", "GND"], ["EVss0", "GND"], ["Vdd", "Vcc"], ["EVdd0", "== pin 22"], ["P60", "APU i2c dev 0xba"], ["P61", "APU i2c dev 0xba"], ["P62", "APU i2c dev 0x78/0x98"], ["P63", "APU i2c dev 0x78/0x98"], ["P31", "FAN-CTL"], ["P64", "power switch (HDMI-0 + APU-4)"], ["P65", "LED"], ["P66", "LED"], ["P67", "LED"], ["P77", "pulldown"], ["P76", ""], ["P75", "APU?"], ["P74", ""], ["P73", "power switch (USBBRIDGE + HDD)"], ["P72", "-> HDR-A pin 12 (HDR-A SPI-SO)"], ["P71", "(HDR-A SPI-SI)"], ["P70", "-> HDR-A pin 10 (HDR-A SPI-CLK)"], ["P06", "power switch (PSU-1)"], ["P05", ""], ["EVss1", "GND"], ["P80", "STM8-PWR pin 7 (NRST)"], ["P81", "NC testpoint"], ["P82", "LED"], ["P83", "power switch(PSU-4)"], ["P84", "pulldown?"], ["P85", "power switch (PSU-2)"], ["P86", "power switch (APU-0) + PSW-APU-3 pin 3"], ["P87", "VR-EN + power switch (APU-1)"], ["P30", "NC testpoint"], ["EVdd1", "Vcc"], ["P50", "power switch (SB-1 + SB-2 + DDR3)"], ["P51", "power switch (SB-0) (6pin near Wi-Fi + 8pin between SC/SB)"], ["P52", "testpoint?"], ["P53", "VR-SM_CLK"], ["P54", "VR-SM_DIO"], ["P55", "power switch (APU-2)"], ["P56", ""], ["P57", ""], ["P17", ""], ["P16", "SB-TP0 looks like SB -> SC interrupt line (INTP5)"], ["P15", "SB-TP1 (SPI-CLK)"], ["P14", "SB-TP2 (SPI-SI) + SC-P11 in a weird way? + elsewhere"], ["P13", "SB-TP3 (SPI-SO)"], ["P12", "-> HDR-A pin 15 (SC ucmd UART)"], ["P11", "-> HDR-A pin 16 (SC ucmd UART)"], ["P10", "SB-TP4 (SPI-CS)"], ["P101", "power switch (VR)"], ["P110", ""], ["P111", ""], ["P146", "NC"], ["P147", "power switch (HDMI-1)"], ["P100", "power switch (PSU-0)"], ["P156", "pulldown?"], ["P155", "pulldown?"], ["P154", "PSW-APU-2 pin 1 + PSW-APU-3 pin 1"], ["P153", "-> HDR-G pin 11"], ["P152", "-> HDR-G pin 15"], ["P151", "power switch (PSU-3)"], ["P150", "Wi-Fi reset?"], ["P27", "NC testpoint"], ["P26", "STM8-PWR pin 1 + HDR-C pin 8 (POWER#) (serial clock)"], ["P25", "STM8-EJECT pin 1 + HDR-C pin 7 (EJECT#)"], ["P24", "pulldown?"], ["P23", "pulldown?"], ["P22", ""], ["P21", "NC testpoint"], ["P20", ""], ["P130", "power switch (PSU-6) (P130 is tied to sc-internal RESET)"], ["P102", ""], ["P04", "i2c ( PCIe clockgen smbus?)"], ["P03", "-> HDR-F pin 1 (i2c ( PCIe clockgen smbus?))"], ["P02", "-> HDR-F pin 2 (XXX did I fuckup the HDR-F mapping here?)"], ["P01", ""], ["P00", ""], ["P145", ""], ["P144", ""], ["P143", ""]];
+const LOGIC = 'Logic signal: switches between 0 V and the supply, so a meter reading isn\'t a fixed value.';
+const PINDEF = {
+  nor: {pkg:'SOP-16', src:'mxnor', pins:[
+    ['DNU/SIO3','Do not use (SIO3 in quad mode)',LOGIC],['VCC','+3 V supply','2.7–3.6 V to ground with the console on (datasheet range).'],
+    ['RESET#','Hardware reset, active low, internal pull-up','Sits at VCC (2.7–3.6 V) unless held in reset (datasheet: internal pull-up).'],
+    ['NC','No connection inside the chip','No internal connection.'],['NC','No connection inside the chip','No internal connection.'],['NC','No connection inside the chip','No internal connection.'],
+    ['CS#','Chip select, low = selected',LOGIC],['SO/SIO1','Serial data out',LOGIC],['WP#/SIO2','Write protect','Datasheet: tied to GND or VCC.'],
+    ['GND','Ground','0 V. Continuity (beep) to any ground point.'],
+    ['NC','No connection inside the chip','No internal connection.'],['NC','No connection inside the chip','No internal connection.'],['NC','No connection inside the chip','No internal connection.'],['NC','No connection inside the chip','No internal connection.'],
+    ['SI/SIO0','Serial data in',LOGIC],['SCLK','Clock in',LOGIC]]},
+  flash2: {pkg:'SOP-8', src:'mx1006', nolegs:'Pin 1 isn\'t visible in the photo, so the legs aren\'t numbered on the model. Find the dot on your chip: pin 1 is beside it, counting anticlockwise.', pins:[
+    ['CS#','Chip select, low = selected',LOGIC],['SO/SIO1','Serial data out',LOGIC],['WP#','Write protect','Tied to GND or VCC.'],['GND','Ground','0 V. Continuity to ground.'],
+    ['SI/SIO0','Serial data in',LOGIC],['SCLK','Clock in',LOGIC],['HOLD#','Pause without deselecting',LOGIC],['VCC','+3.3 V supply','2.7–3.6 V to ground with the console on (datasheet range).']]},
+  hdmi: {pkg:'HDMI type A', src:'hdmiw', nolegs:'The port\'s legs are hidden under its shell in the photo, so pins are listed here instead of placed on the model.',
+    pins:['TMDS Data2+','TMDS Data2 shield','TMDS Data2−','TMDS Data1+','TMDS Data1 shield','TMDS Data1−','TMDS Data0+','TMDS Data0 shield','TMDS Data0−','TMDS Clock+','TMDS Clock shield','TMDS Clock−','CEC','Reserved / HEC Data−','SCL (DDC I²C clock)','SDA (DDC I²C data)','DDC / CEC / HEC ground','+5 V (max 50 mA)','Hot-plug detect / HEC Data+']
+      .map((n, i) => [n, n, /shield|ground/i.test(n) ? 'Ground: continuity (beep) to ground.' : i === 17 ? '+5 V supplied by the console when on (wiki: +5 V, max 50 mA).' : 'Signal pin: compare its diode-mode reading with the same pin on another console.'])},
+  syscon: {pkg:'LQFP-100', src:'sch', pins: SYSCON_PINS.map(([name, d]) => [name, d || 'No function listed on the wiki',
+    /^(Vss|EVss)/.test(name) ? '0 V. Continuity (beep) to ground.'
+    : /^(Vdd|EVdd)/.test(name) ? 'Supply pin. The RL78/G13 runs on 1.6–5.5 V (Renesas); the PS4 rail value isn\'t documented, so compare with pin 22 on another console.'
+    : name === 'REGC' ? 'Internal regulator pin: a 0.47–1 µF capacitor to ground (Renesas). Don\'t load it with a probe for long.'
+    : /^NC/.test(d) ? 'Not connected (wiki).' : LOGIC])},
+};
+const pinKey = (part, n) => part + '#' + n;
+const readings = {};   // console -> {"nor#2": {d, v, n}}
+const rd = c => readings[c] || (readings[c] = {});
+let selPin = null;     // pin number on the selected part
+function buyLinks(q) {
+  const e = encodeURIComponent(q);
+  return `<a href="https://www.ebay.com/sch/i.html?_nkw=${e}&_sop=15" target="_blank" rel="noopener">eBay (cheapest first)</a> · <a href="https://www.aliexpress.com/wholesale?SearchText=${e}&SortType=price_asc" target="_blank" rel="noopener">AliExpress</a> · <a href="https://www.lcsc.com/search?q=${e}" target="_blank" rel="noopener">LCSC</a>`;
+}
+// auto-detected part codes
+const AUTO = {c:['capacitors','Ceramic capacitor (MLCC)',.6,'ceramic'], r:['resistors','Chip resistor',.4,'epoxy'], i:['ics','IC with visible leads',1,'epoxy'],
+  t:['capacitors','Small 2-terminal chip (0201/0402)',.3,'ceramic'], n:['ics','Dark package, no visible leads (QFN/DFN or shielded inductor)',.9,'epoxy'], j:['other','Through-hole solder joint',.9,'solder'], q:['transistors','Transistor / small 3-pin part',1,'epoxy'],
+  p:['testpoints','Test pad',.05,'gold'], o:['other','Unidentified part',.6,'grey'], d:['diodes','Diode',.8,'epoxy'], h:['other','Through-hole pins',.8,'solder'],
+  e:['capacitors','Electrolytic capacitor',5.8,'alum'], l:['inductors','Ferrite inductor',1.2,'ferrite'], m:['mosfets','Power MOSFET (DFN package)',.9,'epoxy'],
+  y:['crystals','Metal-can part (likely a crystal)',1,'metal'], k:['connectors','Small connector',3,'plastic']};
+
+const STAGES = [
+  {id:'shell', name:'Outer shell & stickers', facts:[
+    ['Stickers hide Security Torx screws. The guide does not give a count.', 8],
+    ['Rear ports: power inlet, optical audio out, HDMI, Ethernet, auxiliary port.', 4]]},
+  {id:'hdd', name:'HDD bay', facts:[
+    ['The drive sits behind a plastic cover held by screws (count not given).', 6],
+    ['One screw holds the drive caddy.', 7],
+    ['Stock drive: HGST 500 GB, 5400 RPM, SATA II. A replacement must be 9.5 mm thick or less and at least 160 GB.', 7]]},
+  {id:'top', name:'Rear screws & top cover', facts:[
+    ['The top cover comes off after four <code>T9</code> Security Torx screws.', 10]]},
+  {id:'psu', name:'Power supply', facts:[
+    ['Retaining brackets come off before the PSU. The guide does not give a screw count.', 12],
+    ['PSU input rated 100–240 V AC.', 13],
+    ['The PSU label in the step 13 photo reads model <code>ADP-240AR</code>.', 13]]},
+  {id:'bd', name:'Blu-ray drive', facts:[
+    ['The drive comes out after "a couple screws". No exact count given.', 15],
+    ['Drive board ICs: <code>Renesas RJ832841FP1</code>, <code>Mitsumi 312 3536A</code>, <code>ROHM BD7763EFV</code> (motor driver), <code>STM8ED 9H A07</code> (not identified).', 16]]},
+  {id:'frame', name:'Frame screws & panels', facts:[
+    ['"A few screws", then the panels peel off. No exact count given.', 17]]},
+  {id:'mobo', name:'Motherboard out', facts:[]},
+  {id:'shield', name:'EMI shield, heatsink & fan', facts:[
+    ['The heatsink stays attached to the EMI shield and is hard to separate.', 22],
+    ['Fan: 85 mm centrifugal.', 11]]},
+  {id:'btop', name:'Board top', facts:[
+    ['Board silkscreen in the photo reads <code>SAA-001 1-889-352-11</code>, the same board as a CUH-10xx.', 19],
+    ['Boxed on this side (the APU side): red <code>SCEI CXD90026G</code> APU; orange <code>Samsung K4G41325FC-HC03</code> GDDR5; yellow <code>SCEI CXD90025G</code> southbridge; green <code>Samsung K4B2G1646E-BCK0</code> DDR3; blue <code>Macronix MX25L25635FMI</code> NOR; violet <code>Marvell 88EC060-NN82</code> Ethernet; black <code>SCEI 1327KM44S</code> (no description given).', 19],
+    ['<code>Panasonic MN86471A</code> HDMI LSI and <code>Marvell 88W8797</code> Wi-Fi / Bluetooth / FM (close-ups).', 21]]},
+  {id:'bbot', name:'Board bottom', facts:[
+    ['Step 20 shows "the other side" of the board. Boxed: red <code>Genesys Logic GL3520</code> USB 3.0 hub; orange <code>Samsung K4G41325FC-HC03</code> GDDR5; yellow <code>International Rectifier 35858</code> (the wiki reads this marking as IR 3585B); green <code>Macronix 25L1006E</code> serial flash; blue <code>39A207 1328 E1 3FU</code>.', 20]]},
+  {id:'asm', name:'Assembly (fit check)', facts:[]},
+  {id:'apu', name:'APU close-up', facts:[
+    ['Marked <code>SCEI CXD90026G</code> on the iFixit unit.', 19]]},
+];
+const S = Object.fromEntries(STAGES.map(s => [s.id, s]));
+/* ---------- assembly: parts in case coordinates (mm). x = across the width (left->right as seen from above, top cover off),
+   y = from the back edge toward the front grille, z = up from the bottom. conf: 'spec' (official / standard), 'photo' (+-3 %, measured
+   on a top-down video frame scaled by the 275 mm case width), 'low' (outline unclear in the photo). h: null = height unknown. ---------- */
+const HF = 'HOW-FIXIT PS4 teardown video, frame 2 (seen from below, bottom cover off; scale: case width 275 mm = 566 px)';
+// Case coordinates in mm: x across the width (left->right seen from the front), y from the front (0) to the back, z up from the outside bottom.
+// conf: 'spec' official/standard · 'photo' measured on a photo · 'est' estimated so everything fits (see corrections) · 'low' rough
+const ASM = {
+  caseW: 275, caseD: 295.4, caseH: 53, wall: 2, split: [25.2, 29.1], slant: .27, glossW: 96,
+  slantSrc: 'Parallelogram side profile: the top overhangs at the front and the bottom sticks out at the back (iFixit step 3 photos). A lean of tan = 0.27 (15 deg) puts the front USB flush with the front face and the rear ports flush with the rear face, inside the 295 mm silhouette measured from below.',
+  tall: [[145.8,80.9,4.0,"vrmchoke"],[159.1,80.9,4.0,"vrmchoke"],[177.4,82.0,4.0,"vrmchoke"],[194.5,81.9,4.0,"vrmchoke"],[211.5,82.1,4.0,"vrmchoke"],[228.8,82.1,4.0,"vrmchoke"],[140.3,56.2,5.8,"vrmcapin"],[155.4,56.3,5.8,"vrmcapin"],[172.1,56.2,5.8,"vrmcapin"],[189.4,56.2,5.8,"vrmcapin"],[206.3,56.0,5.8,"vrmcapin"],[224.0,56.0,5.8,"vrmcapin"],[32.8,157.2,3.5,"inductor"],[57.2,160.5,3.5,"inductor"],[37.6,169.4,3.5,"inductor"],[237.2,244.4,3.5,"inductor"],[64.6,137.6,5.5,"sata"],[141.8,273.6,7.0,"aux"],[165.7,265.2,13.5,"lan"],[189.7,274.3,6.5,"hdmi"],[214.3,274.3,9.0,"optical"],[176.4,15.1,7.0,"fusb"],[35.2,192.8,5.0,"conn"],[53.5,200.0,5.0,"conn"],[32.9,225.7,5.0,"conn"],[237.5,40.9,4.0,"cell"],[241.1,257.3,5.0,"buzzer"],[234.7,100.1,3.5,"inductor"],[198.7,48.5,3.5,"inductor"],[245.1,79.7,3.5,"inductor"],[148.4,50.0,3.5,"inductor"],[220.2,230.9,3.5,"inductor"],[239.4,230.5,5.4,"auto-e"],[41.6,155.7,5.4,"auto-e"],[176.2,37.2,5.8,"auto-e"],[248.6,100.6,5.4,"auto-e"],[58.9,167.7,5.4,"auto-e"],[47.3,155.6,5.4,"auto-e"],[148.6,26.7,5.8,"auto-e"],[242.7,100.7,5.4,"auto-e"],[239.1,236.1,5.4,"auto-e"],[148.4,259.9,5.8,"auto-e"]], gddr5: [[193.8,127.5],[215.2,127.3],[236.8,127.3],[248.4,155.1],[248.5,176.8],[194.2,205.2],[215.5,205.0],[237.2,204.9]],
+  rearPortsSeen: [37.6, 42.6], rearPortsSrc: 'iFixit step 4 rear photo (upright): HDMI/LAN openings at 37.6-42.6 mm above the bottom; the power inlet at ~12 mm (lower half).',
+  caseSrc: 'Width and height: Sony CUH-1001A Safety Guide (275 x 53 x 305 mm). Depth 295 mm: outline in the top-down frames. Split band 25.2-29.1 mm: front view. Walls 2 mm: assumed.',
+  boardBottom: 33.8, boardTop: 35.4, apuDown: true,
+  boardSrc: 'The board hangs its ports and the APU downward. The front USB-A openings (standard 12.5 x 5.12 mm) read 27.7-32.8 mm above the bottom in the front view, scaled against the 53 mm height; a USB-A receptacle\'s opening sits ~1.0-6.1 mm from the board, so the board underside is at ~33.8 mm (±1.5).',
+  sata: {x: 64.6, y: 137.6, zc: 31.05}, cutout: {x0: 2, x1: 102.8, y0: 29.5, y1: 132},
+  boardParts: [{"part":"gddr5","x":187.9,"y":120.8,"w":11.7,"d":13.4,"h":1.1},{"part":"gddr5","x":209.2,"y":120.5,"w":11.9,"d":13.6,"h":1.1},{"part":"gddr5","x":230.8,"y":120.5,"w":11.9,"d":13.5,"h":1.1},{"part":"gddr5","x":241.4,"y":149.4,"w":14.0,"d":11.5,"h":1.1},{"part":"gddr5","x":241.5,"y":171.1,"w":14.0,"d":11.5,"h":1.1},{"part":"gddr5","x":188.4,"y":198.5,"w":11.7,"d":13.4,"h":1.1},{"part":"gddr5","x":209.6,"y":198.3,"w":11.8,"d":13.4,"h":1.1},{"part":"gddr5","x":231.2,"y":198.1,"w":12.0,"d":13.5,"h":1.1},{"part":"apu","x":192.5,"y":146.7,"w":40.5,"d":38.9,"h":2.6},{"part":"sb","x":105.9,"y":198.4,"w":16.7,"d":16.3,"h":1.4},{"part":"wifi","x":64.3,"y":229.6,"w":23.0,"d":17.7,"h":2.4},{"part":"aux","x":135.5,"y":265.7,"w":12.7,"d":15.8,"h":7},{"part":"lan","x":156.4,"y":252.3,"w":18.6,"d":26.0,"h":13.5},{"part":"hdmi","x":181.7,"y":267.8,"w":16.0,"d":13.0,"h":6.5},{"part":"optical","x":208.1,"y":267.1,"w":12.4,"d":14.4,"h":9},{"part":"fusb","x":156.1,"y":4.0,"w":40.5,"d":22.4,"h":7},{"part":"cell","x":227.4,"y":30.5,"w":20.2,"d":20.8,"h":4}],
+  slotZ: 26.4, slotSrc: 'Disc slot: centre of the front slot band in the front view.',
+  parts: [
+    {id: 'board', name: 'Motherboard SAA-001', level: 'board', x: 16.3, y: 15.2, w: 250.4, d: 261.6, z: 33.8, h: 1.6, conf: 'photo', outline: [[109.1,18.9],[109.0,21.3],[108.9,23.6],[108.7,26.0],[108.6,28.3],[107.4,28.4],[106.2,28.6],[104.9,28.7],[103.7,28.8],[103.5,29.0],[103.3,29.2],[103.0,29.4],[102.8,29.5],[103.1,54.4],[103.3,79.3],[103.6,104.2],[103.8,129.1],[103.6,129.8],[103.4,130.4],[103.2,131.1],[103.0,131.7],[102.2,132.3],[101.4,132.8],[100.6,133.3],[99.7,133.8],[96.1,133.9],[92.4,134.0],[88.8,134.0],[85.1,134.1],[85.2,135.7],[85.3,137.4],[85.4,139.1],[85.4,140.7],[85.2,141.7],[85.0,142.6],[84.8,143.5],[84.6,144.4],[77.5,144.5],[70.5,144.5],[63.4,144.5],[56.3,144.5],[56.3,144.1],[56.3,143.6],[56.2,143.2],[56.2,142.7],[55.0,142.7],[53.9,142.7],[52.7,142.7],[51.5,142.8],[51.5,143.1],[51.5,143.4],[51.5,143.7],[51.5,144.1],[49.5,144.1],[47.5,144.1],[45.6,144.2],[43.6,144.2],[43.5,141.8],[43.5,139.5],[43.5,137.1],[43.4,134.7],[43.1,134.5],[42.8,134.3],[42.5,134.1],[42.2,133.9],[36.7,133.9],[31.2,133.9],[25.7,133.9],[20.2,133.9],[19.6,134.2],[19.0,134.4],[18.5,134.6],[17.9,134.9],[17.5,135.4],[17.1,135.9],[16.7,136.4],[16.3,136.9],[16.5,170.9],[16.5,205.0],[16.6,238.9],[16.7,272.7],[16.9,273.2],[17.0,273.6],[17.2,274.1],[17.3,274.5],[17.7,274.9],[18.1,275.3],[18.5,275.7],[19.0,276.1],[19.5,276.3],[20.1,276.5],[20.7,276.6],[21.3,276.8],[45.8,276.6],[70.2,276.4],[94.5,276.3],[118.7,276.3],[119.1,275.7],[119.6,275.1],[120.0,274.5],[120.5,273.9],[121.7,273.8],[122.9,273.8],[124.1,273.7],[125.3,273.7],[125.8,273.7],[126.2,273.7],[126.7,273.8],[127.2,273.8],[127.7,274.4],[128.3,275.1],[128.8,275.7],[129.4,276.3],[130.9,276.3],[132.4,276.4],[133.9,276.4],[135.4,276.4],[135.5,273.8],[135.5,271.2],[135.6,268.6],[135.7,266.0],[138.6,266.0],[141.4,265.9],[144.3,265.9],[147.2,265.8],[147.5,268.5],[147.7,271.1],[147.9,273.7],[148.1,276.3],[150.1,276.3],[152.1,276.3],[154.1,276.4],[156.1,276.4],[156.2,275.0],[156.3,273.6],[156.4,272.3],[156.5,270.9],[156.2,270.8],[155.9,270.6],[155.6,270.5],[155.3,270.3],[155.3,270.0],[155.3,269.6],[155.3,269.3],[155.3,268.9],[154.7,268.8],[154.1,268.7],[153.5,268.6],[152.9,268.6],[152.9,267.5],[152.9,266.4],[152.9,265.3],[152.8,264.2],[153.6,264.1],[154.4,264.1],[155.1,264.1],[155.9,264.0],[156.1,263.8],[156.2,263.7],[156.3,263.5],[156.5,263.3],[156.5,260.7],[156.4,258.0],[156.4,255.4],[156.4,252.8],[157.0,252.6],[157.7,252.4],[158.3,252.3],[158.9,252.1],[162.8,252.1],[166.6,252.1],[170.4,252.0],[174.3,252.0],[174.5,254.9],[174.6,257.9],[174.8,260.9],[175.0,263.8],[175.8,263.8],[176.6,263.9],[177.4,263.9],[178.3,263.9],[178.3,265.0],[178.3,266.0],[178.3,267.1],[178.3,268.2],[177.7,268.2],[177.1,268.3],[176.5,268.4],[175.9,268.4],[175.7,268.9],[175.5,269.4],[175.3,269.8],[175.1,270.3],[175.1,271.8],[175.2,273.3],[175.3,274.7],[175.3,276.2],[177.1,276.2],[178.8,276.2],[180.6,276.2],[182.4,276.2],[182.4,275.1],[182.4,274.0],[182.5,272.8],[182.5,271.7],[184.7,271.6],[186.9,271.4],[189.1,271.2],[191.3,271.1],[192.8,271.2],[194.3,271.3],[195.8,271.4],[197.3,271.5],[197.4,272.7],[197.5,273.8],[197.7,275.0],[197.8,276.2],[200.5,276.2],[203.1,276.2],[205.7,276.2],[208.3,276.1],[208.4,274.1],[208.4,272.1],[208.4,270.0],[208.5,268.0],[211.4,268.1],[214.4,268.1],[217.4,268.2],[220.4,268.2],[220.4,270.2],[220.4,272.2],[220.5,274.2],[220.5,276.2],[231.0,276.1],[241.5,276.1],[252.0,276.1],[262.5,276.0],[263.1,275.8],[263.6,275.6],[264.2,275.3],[264.8,275.1],[265.3,274.5],[265.7,273.8],[266.2,273.1],[266.7,272.5],[266.2,212.3],[265.8,153.0],[265.4,93.9],[265.3,34.4],[265.3,30.7],[265.3,26.9],[265.3,23.2],[265.3,19.4],[265.1,18.9],[264.9,18.5],[264.7,18.0],[264.5,17.5],[264.0,17.0],[263.4,16.6],[262.8,16.1],[262.2,15.7],[245.9,15.4],[229.6,15.3],[213.2,15.2],[196.8,15.2],[196.5,16.2],[196.3,17.1],[196.0,18.1],[195.7,19.1],[191.4,19.1],[187.1,19.1],[182.8,19.2],[178.5,19.2],[178.4,19.4],[178.4,19.7],[178.4,19.9],[178.4,20.2],[177.0,20.2],[175.6,20.2],[174.2,20.2],[172.9,20.2],[172.8,19.9],[172.7,19.6],[172.6,19.3],[172.5,18.9],[171.7,18.9],[171.0,18.9],[170.2,18.9],[169.5,18.9],[169.5,18.3],[169.5,17.7],[169.5,17.1],[169.5,16.5],[168.8,16.5],[168.1,16.5],[167.4,16.5],[166.8,16.5],[166.7,17.2],[166.7,17.9],[166.7,18.6],[166.7,19.3],[164.3,19.2],[161.9,19.2],[159.5,19.2],[157.2,19.2],[156.8,18.2],[156.5,17.3],[156.2,16.3],[155.9,15.4],[147.1,15.4],[138.3,15.5],[129.5,15.6],[120.7,15.6],[120.2,15.8],[119.8,15.9],[119.3,16.0],[118.9,16.1],[118.8,16.8],[118.7,17.4],[118.6,18.0],[118.5,18.6],[116.2,18.7],[113.8,18.8],[111.5,18.9]],
+     src: 'Shape exact (600-dpi scans). Plan position from frame 7 (board calibrated) tied to frame 2 by the fan hub (±5 mm); validated: its front USB lands at the case front, HDMI/LAN/AUX/optical at the back. APU side down.'},
+    {id: 'psu', name: 'Power supply ADP-240AR', model: 'psu', below: true, clr: 5.8, x: 1.5, y: 179.3, w: 270.6, d: 84.1, z: 2.2, h: 25.6, conf: 'est', src: HF + ' (footprint). Height: room under the board minus the 5.8 mm capacitors hanging over it.'},
+    {id: 'fan', name: 'Fan KSB0912HE', model: 'fan', below: true, clr: 5.8, x: 144, y: 18.5, w: 124.4, d: 105.9, z: 2.2, h: 25.6, conf: 'est', hub: [217.2, 82.1], src: HF + ' (footprint, hub). Height: room under the board minus the VRM capacitors over it.'},
+    {id: 'heatsink', name: 'Heatsink (fin stack + heat pipes)', model: 'heatsink', below: true, clr: 2.6, x: 150, y: 124.5, w: 115, d: 54.5, z: 2.2, h: 29, conf: 'est', src: 'Estimated: fills the gap between the fan outlet (y 124) and the PSU (y 179) under the APU (mapped to x 192-233, y 147-186). Heat sink on the shield seen in the HOW-FIXIT frames and iFixit step 22.'},
+    {id: 'bd', name: 'Blu-ray drive (slim)', model: 'bd', below: true, clr: 0, x: 3, y: 12.3, w: 128, d: 126, z: 14.8, h: 12.7, conf: 'est', src: 'Standard 12.7 mm slim-drive size (estimate). Stacked directly under the hard drive, which is fixed by the board SATA connector.'},
+    {id: 'hdd', name: '2.5" hard drive (9.5 mm)', model: 'hdd', bay: true, x: 29.7, y: 32, w: 69.85, d: 100.2, z: 27.5, h: 9.5, conf: 'spec', src: 'Size: SNIA SFF-8201 Table 3-1. Plugs straight into the board SATA connector (user-confirmed) in the bay formed by the board cutout: long axis front-to-back, connector end at the rear, centred on the connector (x 64.6), connector ~3.5 mm above the drive base.'},
+  ],
+  corrections: [
+    ['Board orientation', 'APU side up (v21)', 'APU side down', 'The 13.5 mm LAN jack would reach 40 mm on top of the board, but the rear view shows it below the split line. Also: iFixit lifts the board out and the heatsink stays in the case (step 22), frame 10 shows the fan once the board is out, and frame 3 is the console bottom.'],
+    ['Board height', 'top 26.8 mm (v21)', 'underside 33.8, top 35.4 mm', 'Same USB reading, with the ports hanging under the board.'],
+    ['PSU and fan level', 'above the board', 'below the board', 'Frame 2 is a bottom view (it mirrors frame 7, the top view), and it shows the PSU, fan and drive.'],
+    ['Power supply height', '38 mm (side view) / 18.2 (v21)', '25.6 mm', 'Room under the board (33.8 - 2.2 floor) minus the 5.8 mm capacitors hanging over it.'],
+    ['Fan height', '32 mm (listing) / 18.2 (v21)', '25.6 mm', 'Same room under the board.'],
+    ['Blu-ray drive', 'above the board (v21), slot 7.5 mm off', 'below the board, centred on the slot', 'Matches the front slot band now.'],
+    ['Board cutout', 'Blu-ray bay', 'hard-drive bay (SATA connector at its rear edge)', 'The cutout runs 102.5 mm front to back, matching the drive length (100.2 mm), and the board SATA connector sits on its rear edge.'],
+    ['Hard drive position', 'on top under the glossy panel (v22)', 'in the board bay, plugged into the SATA connector, z 27.5-37', 'User confirmed it plugs straight into the board. The connector hangs from the board underside, so the drive sits at that level, long axis front-to-back.'],
+    ['Blu-ray drive height', 'centred on the slot (v22, z 20-32.8)', 'under the hard drive, z 14.8-27.5', 'Both drives sit in the front-left corner (disc slot on the left in the front view), so the Blu-ray stacks below the hard drive.'],
+  ],
+  claims: [
+    {part: 'psu', what: 'Amazon listing for the PSU: 11.3 x 4 x 2 in', L: 287, W: 101.6, H: 50.8},
+    {part: 'fan', what: 'Seller listing for the fan: 12 x 10.5 x 3.2 cm', L: 120, W: 105, H: 32},
+  ],
+};
+// Teardown steps as 3D scenes of the same assembly. Displacements (mm) show where each removed piece goes.
+const GHOST = {glossy: [-15, 0, 30], hdd: [0, 0, 45], bottomPlate: [0, 0, -40], psu: [0, 25, -45], bd: [-10, -40, -40], lowerFrame: [0, 0, -38],
+  upperWalls: [0, 0, 70], topMatte: [0, 0, 70], band: [0, 0, 70], topShield: [0, 0, 55], board: [0, 0, 40], heatsink: [0, 0, -45], fan: [0, 0, -45], lowerWalls: [0, 0, -30]};
+const ORDER = [['shell', [], 'tilt'], ['hdd', ['glossy', 'hdd'], 'tilt'], ['top', ['bottomPlate'], 'btilt'], ['psu', ['psu'], 'btilt'], ['bd', ['bd'], 'btilt'],
+  ['frame', ['lowerFrame'], 'btilt'], ['mobo', ['upperWalls', 'band', 'topMatte', 'topShield', 'board'], 'tilt'], ['shield', ['heatsink', 'fan'], 'tilt']];
+const ASM_STAGES = {}; { let gone = []; for (const [id, rem, v] of ORDER) { ASM_STAGES[id] = {gone: [...gone], removed: rem, view: v, solid: id === 'shell'}; gone = gone.concat(rem); } }
+ASM_STAGES.asm = {gone: [], removed: [], view: 'tilt', solid: false};
+const asmStage = () => refC(cur.c) === 'ifx' ? ASM_STAGES[cur.s] : null;
+function fitChecks() {
+  const out = [], P = ASM.parts, ok = (pass, text, why) => out.push({pass, text, why}), Wl = ASM.wall;
+  for (const q of P) {
+    // slanted front/rear walls: front inner face at y = slant*(53-z) + wall (worst at the part's bottom), rear at caseD - slant*z - wall (worst at its top)
+    const fr = q.y - (ASM.slant * (ASM.caseH - q.z) + Wl), rr = ASM.caseD - ASM.slant * (q.z + q.h) - Wl - (q.y + q.d);
+    const m = Math.min(q.x - Wl, ASM.caseW - Wl - q.x - q.w, fr, rr), top = ASM.caseH - Wl - (q.z + q.h), bot = q.z - Wl;
+    ok(m >= -1.5 && top >= -.5 && bot >= -.5, `${q.name} fits inside the case`, `${m.toFixed(1)} mm to the nearest (slanted) wall, ${top.toFixed(1)} mm under the top, ${bot.toFixed(1)} mm over the bottom.`);
+  }
+  const bd = P.find(x => x.level === 'board'), plan = (a, b) => Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > 0 && Math.min(a.y + a.d, b.y + b.d) - Math.max(a.y, b.y) > 0;
+  for (const q of P.filter(x => x.bay)) {
+    const c = ASM.cutout, inside = q.x >= c.x0 - .5 && q.x + q.w <= c.x1 + .5 && q.y >= c.y0 - .5 && q.y + q.d <= c.y1 + .5;
+    ok(inside, `${q.name} inside the board bay`, inside ? `Within the cutout (x ${c.x0}-${c.x1}, y ${c.y0}-${c.y1}), so nothing on the board is above or below it.` : 'Sticks out of the cutout into the board.');
+    const dz = q.z + 3.5 - ASM.sata.zc, dx = q.x + q.w / 2 - ASM.sata.x, dy = ASM.sata.y - (q.y + q.d);
+    ok(Math.abs(dz) <= 1.5 && Math.abs(dx) <= 2 && dy >= 0 && dy <= 8, `${q.name} plugs into the board SATA connector`, `Connector height off by ${dz.toFixed(1)} mm, sideways ${dx.toFixed(1)} mm, and the drive end is ${dy.toFixed(1)} mm in front of the connector centre.`);
+  }
+  for (const q of P.filter(x => x !== bd && !x.bay && plan(x, bd))) {
+    if (q.below) { const room = ASM.boardBottom - q.clr - (q.z + q.h);
+      ok(room >= -.5, `${q.name} under the board`, `Its top is at ${(q.z + q.h).toFixed(1)} mm; the deepest board part hanging over it reaches down to ${(ASM.boardBottom - q.clr).toFixed(1)} mm (${q.clr} mm part): ${room >= 0 ? 'clear by ' + room.toFixed(1) : 'collides by ' + (-room).toFixed(1)} mm.`); }
+    else { const gap = q.z - ASM.boardTop - 1.2;
+      ok(gap >= -.5, `${q.name} over the board`, `Bottom at ${q.z} mm; board top ${ASM.boardTop} + 1.2 mm for its top-side parts: ${gap >= 0 ? 'clear by ' + gap.toFixed(1) : 'collides by ' + (-gap).toFixed(1)} mm.`); }
+  }
+  for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+    const a = P[i], b = P[j]; if (a === bd || b === bd || !plan(a, b)) continue;
+    const oz = Math.min(a.z + a.h, b.z + b.h) - Math.max(a.z, b.z);
+    ok(oz <= 0, `${a.name} vs ${b.name}`, oz <= 0 ? `Stacked, ${(-oz).toFixed(1)} mm apart in height.` : `They collide: ${oz.toFixed(1)} mm of overlap in height.`);
+  }
+  for (const c of ASM.claims) {
+    const q = P.find(x => x.id === c.part), long = Math.max(q.w, q.d), short = Math.min(q.w, q.d), agree = Math.abs(c.L / long - 1) < .05 && Math.abs(c.W / short - 1) < .05;
+    ok(c.L <= ASM.caseW && agree && c.H <= q.h + 1, c.what, c.L > ASM.caseW ? `Can't be the part: ${c.L.toFixed(0)} mm is wider than the 275 mm case (box size). Footprint ${long.toFixed(0)} x ${short.toFixed(0)} mm.`
+      : agree ? `Footprint agrees within 5 %; its ${c.H} mm height is more than the ${q.h} mm of room, so that figure is the box.` : 'Footprint differs from the photo by over 5 %.');
+  }
+  const d = P.find(x => x.id === 'bd'), sc = d.z + d.h / 2;
+  ok(Math.abs(sc - ASM.slotZ) <= 2 ? true : null, 'Blu-ray disc path vs the front slot', `Drive centre ${sc.toFixed(1)} mm, slot band centre ${ASM.slotZ} mm (${(ASM.slotZ - sc).toFixed(1)} mm apart).` + (Math.abs(sc - ASM.slotZ) <= 2 ? '' : ' With the hard drive fixed by the SATA connector, the drive can\'t go higher. Either the PS4 drive is thinner than a 12.7 mm slim drive, or its slot sits above its middle. Caliper the drive thickness to settle it.'));
+  ok(true, 'Power inlet height', 'iFixit\'s upright rear photo (step 4) puts the inlet in the lower half (~12 mm), matching the PSU below the board. HOW-FIXIT 17.png was upside down.');
+  const fy = z => ASM.slant * (ASM.caseH - z), ry = z => ASM.caseD - ASM.slant * z, us = ASM.boardParts.find(c => c.part === 'fusb');
+  if (us) { const zc = ASM.boardBottom - us.h / 2, d = fy(zc) - us.y; ok(Math.abs(d) <= 5, 'Front USB vs the slanted front face', `Front face at ${fy(zc).toFixed(1)} mm at the USB height; the ports reach y ${us.y} (${d >= 0 ? 'proud by ' + d.toFixed(1) : 'recessed ' + (-d).toFixed(1)} mm).`); }
+  for (const c of ASM.boardParts.filter(c => /lan|hdmi/.test(c.part))) { const zc = ASM.boardBottom - c.h / 2, d = ry(zc) - (c.y + c.d);
+    ok(Math.abs(d) <= 12, `Rear ${c.part.toUpperCase()} vs the slanted rear face`, `Rear face at ${ry(zc).toFixed(1)} mm at its height; the port ends at ${(c.y + c.d).toFixed(1)} (${d >= 0 ? 'recessed ' + d.toFixed(1) : 'proud ' + (-d).toFixed(1)} mm).`); }
+  { const h = ASM.boardParts.find(c => c.part === 'hdmi'), z0 = ASM.boardBottom - h.h, [a, b] = ASM.rearPortsSeen;
+    ok(null, 'Rear port height vs iFixit\'s rear photo', `Model: HDMI spans ${z0.toFixed(1)}-${ASM.boardBottom} mm (hanging from the APU-side-down board). The upright iFixit rear photo shows the openings at ${a}-${b} mm, about 10 mm higher. The front USB height matches the model, and with the board APU side up the USB would be 9 mm off instead. No flat board satisfies both, so one of the two port groups must mount differently (riser or reverse mount), or one photo reading is wrong. Caliper the HDMI opening height on your console.`); }
+  return out;
+}
+// Console profiles. ref = the measured console whose 3D model and photos a profile of that model shows (only one so far).
+const BRANDS = {
+  PlayStation: [['CUH-10xx', 'PS4 original, CUH-10xx', 'SAA-001', 'ifx'], ['CUH-11xx', 'PS4 original, CUH-11xx', 'SAB-001'], ['CUH-12xx', 'PS4 original, CUH-12xx', 'SAC-001'],
+    ['CUH-2xxx', 'PS4 Slim, CUH-2xxx'], ['CUH-7xxx', 'PS4 Pro, CUH-7xxx'], ['CFI-10xx', 'PS5, CFI-10xx'], ['CFI-11xx', 'PS5, CFI-11xx'], ['CFI-12xx', 'PS5, CFI-12xx'],
+    ['CFI-20xx', 'PS5 Slim, CFI-20xx'], ['CFI-70xx', 'PS5 Pro, CFI-70xx']],
+  Xbox: [['x360', 'Xbox 360'], ['x1', 'Xbox One'], ['x1s', 'Xbox One S'], ['x1x', 'Xbox One X'], ['xss', 'Xbox Series S'], ['xsx', 'Xbox Series X']],
+  Nintendo: [['HAC-001', 'Switch (HAC-001)'], ['HDH-001', 'Switch Lite (HDH-001)'], ['HEG-001', 'Switch OLED (HEG-001)'], ['sw2', 'Switch 2']],
+  Other: [['other', 'Not listed']],
+};
+const FAM = {}; for (const [brand, l] of Object.entries(BRANDS)) for (const [id, label, board, ref] of l) FAM[id] = {id, brand, label, board: board || '', ref: ref || null};
+const famOf = p => p.family ?? (/^CUH-10\d\d/i.test(p.model || '') ? 'CUH-10xx' : '');   // guess from the sticker only until a model is picked
+const LINKS = {c1: [['c1 teardown shot list', '/pages/c1-guide/index.html']]};
+// printable parts from the ps4fab server: [{name, title, fits:[family ids]}]
+let PRINTS = []; fetch('/api/parts').then(r => r.ok ? r.json() : []).then(l => { PRINTS = l; $('profile').dataset.c = ''; render(); }).catch(() => {});
+const printsHtml = fam => { const l = PRINTS.filter(p => p.fits.includes(fam));
+  return `<h3>Printable parts</h3>` + (l.length ? `<div class="rail">${l.map(p => `<a class="btn" href="/stl/${encodeURIComponent(p.name)}.zip" download title="${esc(p.about)}">${esc(p.title)} (STL)</a>`).join('')}</div><p class="profile-note">Built from measurements of this model. Print the TEST pieces in each zip first; see README in the zip.</p>`
+    : `<p class="profile-note">No printable parts measured for ${esc(FAM[fam]?.label || 'this model')} yet.</p>`); };
+const refC = c => c === 'ifx' || con(c).board3d ? c : FAM[famOf(con(c))]?.ref || null;
+const SC = () => refC(cur.c) || cur.c;   // console whose board data (3D, photos, parts) this view shows
+const firstStage = c => refC(c) !== 'ifx' && con(c).board3d ? con(c).board3d.top : STAGES[0].id;   // own model: open on the board
+function consoleIds() {
+  const ids = new Set([...Object.keys(consoles), ...Object.keys(stages).map(k => k.split('-')[0])]); ids.delete('ifx');
+  return ['ifx', ...[...ids].sort((a, b) => (con(a).created || 0) - (con(b).created || 0) || a.localeCompare(b))];
+}
+const conName = c => c === 'ifx' ? 'iFixit reference' : con(c).name || (/^c\d+$/.test(c) ? 'Console ' + c.slice(1) : 'Console');
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const clamp01 = v => Math.min(1, Math.max(0, v));
+
+let db = null, assets = null, ready = false, loaded = false;
+const stages = {}, consoles = {}, autos = {};   // autos: "ifx-btop" -> {doc, list:[{x,y,w,h,a,t,L,S,owner}]}
+const visible = new Set(LAYERS.map(l => l.id));
+let cur = {c:'ifx', s:'btop'}, selected = null, zoom = 1, armed = false, showGuess = false, showAuto = true, movable = false, showInner = false;
+try { Object.assign(cur, JSON.parse(localStorage.getItem('tracer.cur2')) || {}); showGuess = localStorage.getItem('tracer.guess') === '1'; } catch {}
+if (!S[cur.s]) cur = {c:'ifx', s:'btop'};
+
+const key = () => SC() + '-' + cur.s;
+const st = k => stages[k] || (stages[k] = {photo:null, markers:[]});
+const con = c => consoles[c] || (consoles[c] = {model:'', board:''});
+const refOf = m => m.auto ? 'A·' + (AUTO[m.t][0] === 'other' ? 'X' : L[AUTO[m.t][0]].pre) + m.i : L[m.layer].pre + m.n;
+const nextN = (s, layer) => 1 + Math.max(0, ...s.markers.filter(m => m.layer === layer).map(m => m.n));
+const sizeOf = m => [m.w || SIZE[m.layer][0], m.h || SIZE[m.layer][1]];
+const partName = m => m.auto ? AUTO[m.t][1] : PARTS[m.part]?.name || L[m.layer].name.replace(/s$/, '');
+
+/* ---------- the two-sided board: top-photo coordinates are the board's own coordinates ---------- */
+function boardInfo() { const c = SC(), b = con(c).board3d; return b && (cur.s === b.top || cur.s === b.bottom) && stages[c + '-' + b.top]?.photo && stages[c + '-' + b.bottom]?.photo ? b : null; }
+function topToBot(b, u, v) { const [[a, c, e], [d, f, g]] = b.W, X = u * b.iw, Y = v * b.ih; return [(b.iw - 1 - (a * X + c * Y + e)) / b.iw, (d * X + f * Y + g) / b.ih]; }
+function botToTop(b, x, y) { return fixOn() ? botToTopFix(b, x, y) : botToTopAff(b, x, y); }
+function botToTopAff(b, x, y) {
+  const [[a, c, e], [d, f, g]] = b.W, xf = (b.iw - 1) - x * b.iw - e, yf = y * b.ih - g, det = a * f - c * d;
+  return [(f * xf - c * yf) / det / b.iw, (-d * xf + a * yf) / det / b.ih];
+}
+/* ---------- photo -> true board geometry (iFixit console only) ----------
+   The iFixit photos aren't orthographic (lens + perspective: up to ~1.8 mm off). Each side's photo was registered to the
+   McMaster 600-dpi bare-board scans (scanner geometry calibrated on the syscon's 0.5 mm pad pitch and on two 90-degree-rotated scans),
+   giving photo px -> true mm per side (homography + 4th-order polynomial; held-out error 0.16-0.18 mm median, ~0.3 mm p90).
+   The bottom is joined to the top by fitting the mirrored board outline (0.17 mm median). Board coordinates stay "raw top photo";
+   W3 applies the correction, so everything placed through W3 lands at its true position. Fit scripts: tracer-pipeline/scan/. */
+const FIX = {"top":{"d":4,"H":[[-0.099434862,-0.000585758631,315.652724],[0.00106153619,-0.0995643182,280.46826],[2.16008762e-06,5.12937145e-07,1.0]],"C":[[0.362935162,-0.020580035],[0.152974837,-0.464140473],[-0.415883986,0.005926326],[1.02128875,1.57282375],[-0.776667163,0.125526453],[0.448573308,-2.34632888],[-0.537349854,0.690373469],[-1.27279929,1.32310159],[-0.256522636,-1.26796739],[-0.0693038558,-0.900949655],[-2.50272341,0.989194519],[0.939823179,-2.38720109]]},"bot":{"d":4,"H":[[0.0994779946,-0.000321099825,-79.3906822],[0.000884255535,0.0979109354,-17.3459685],[6.09667617e-06,-4.80220893e-06,1.0]],"C":[[0.414463329,0.224423395],[-0.665010332,0.0225356361],[0.170263267,-0.110140391],[-1.7653736,0.188603856],[0.0126369902,0.688863688],[-1.01244258,-0.0700030041],[-1.00295121,-1.03830695],[0.66042589,-1.57012724],[-0.785989232,4.40670661],[0.491804992,0.0653967706],[5.41700124,-3.09213198],[2.24810495,2.82574715]]},"R":[[-0.999997995,-0.00200272009],[0.00200272009,-0.999997995]],"t":[0.402231064,261.6348],"S":[[-10.0777421,0.0705284181,3154.13348],[-0.0705284181,-10.0777421,2843.69052]]};
+const fixOn = () => SC() === 'ifx' && !!con('ifx').board3d;
+function fixMM(f, X, Y) {   // photo px -> board mm
+  const [[a, b, c], [d, e, g], [h, i, j]] = f.H, w = h * X + i * Y + j; let mx = (a * X + b * Y + c) / w, my = (d * X + e * Y + g) / w;
+  const x = (X - 2000) / 2000, y = (Y - 1500) / 1500; let k = 0;
+  for (let p = 0; p <= f.d; p++) for (let q = 0; q <= f.d - p; q++) { if (p + q < 2) continue; const t = x ** p * y ** q; mx += t * f.C[k][0]; my += t * f.C[k][1]; k++; }
+  return [mx, my];
+}
+const mmToN = ([mx, my]) => { const [[a, b, c], [d, e, g]] = FIX.S; return [(a * mx + b * my + c) / 4000, (d * mx + e * my + g) / 3000]; };
+const fixTop = (u, v) => mmToN(fixMM(FIX.top, u * 4000, v * 3000));                       // raw top photo -> corrected
+const fixBot = (x, y) => { const [bx, by] = fixMM(FIX.bot, x * 4000, y * 3000), [[a, b], [c, d]] = FIX.R;   // bottom photo -> corrected top frame
+  return mmToN([a * -bx + b * by + FIX.t[0], c * -bx + d * by + FIX.t[1]]); };
+// raw-top coordinates whose corrected position is the bottom point's true position (Newton, seeded by the old affine)
+function botToTopFix(b, x, y) {
+  const [tu, tv] = fixBot(x, y); let [u, v] = botToTopAff(b, x, y);
+  for (let it = 0; it < 4; it++) {
+    const [fu, fv] = fixTop(u, v), h = 1e-4, [au, av] = fixTop(u + h, v), [bu, bv] = fixTop(u, v + h);
+    const j11 = (au - fu) / h, j21 = (av - fv) / h, j12 = (bu - fu) / h, j22 = (bv - fv) / h, det = j11 * j22 - j12 * j21, ru = tu - fu, rv = tv - fv;
+    u += (j22 * ru - j12 * rv) / det; v += (-j21 * ru + j11 * rv) / det;
+  }
+  return [u, v];
+}
+// Every part in the current view with its side, owning stage and board coordinates (u, v)
+function sceneParts() {
+  const b = boardInfo(), list = [];
+  const sides = b ? [[b.top, 'top'], [b.bottom, 'bot']] : [[cur.s, 'top']];
+  for (const [sid, side] of sides) {
+    const k = SC() + '-' + sid;
+    for (const m of st(k).markers) {
+      if (!visible.has(m.layer)) continue;
+      const [u, v] = side === 'bot' ? botToTop(b, m.x, m.y) : [m.x, m.y];
+      list.push({m, id: m.id, side, k, u, v});
+    }
+    for (const a of (showAuto ? autos[k]?.list || [] : [])) {
+      if (a.gone || !visible.has(AUTO[a.t][0])) continue;   // retired by hand layout: no solder pads in the bare scan
+      const [u, v] = side === 'bot' ? botToTop(b, a.x, a.y) : [a.x, a.y];
+      list.push({m: a, id: a.id, side, k, u, v});
+    }
+  }
+  return list;
+}
+let partsCache = null; const scene = () => partsCache || (partsCache = sceneParts());
+const findPart = id => scene().find(p => p.id === id);
+const selP = () => selected && findPart(selected);
+const selM = () => { const p = selP(); return p && !p.m.auto ? p.m : null; };
+
+/* ---------- part graph ---------- */
+const edgesOn = () => EDGES.filter(e => e[2] || showGuess);
+function findPath(from) {
+  if (from === 'apu') return ['apu'];
+  const prev = {[from]: null}, q = [from], es = edgesOn();
+  while (q.length) {
+    const p = q.shift();
+    for (const e of es) {
+      const o = e[0] === p ? e[1] : e[1] === p ? e[0] : null;
+      if (!o || o in prev) continue;
+      prev[o] = [p, e];
+      if (o === 'apu') { const path = [{part:'apu', edge:e}]; let c = p; while (c !== from) { path.unshift({part:c, edge:prev[c][1]}); c = prev[c][0]; } return [from, ...path]; }
+      q.push(o);
+    }
+  }
+  return null;
+}
+const dist = (a, b) => Math.hypot(a.u - b.u, a.v - b.v);
+const nearest = (from, xs) => xs.reduce((a, b) => dist(a, from) <= dist(b, from) ? a : b);
+function routeFor(a, b) { // traced copper route between two parts, either direction
+  const rs = con(SC()).routes || [];
+  return rs.find(r => r.a === a && r.b === b) || rs.find(r => r.a === b && r.b === a) || null;
+}
+// Capacitors per part, from the bare-scan copper (rb/caps_nets.py): net = shares a traced copper island, decap = same supply pour within 10 mm,
+// under = other side inside the package (through vias), near = within 4 mm of the package, no shared outer copper (likely decoupling)
+const CAPWHY = {net: 'on the same traced copper', decap: 'on the same power pour, within 10 mm', under: 'behind it on the other side (through vias)', near: 'right beside it: placement says decoupling, the copper runs on an inner layer (likely)'};
+const capsOf = id => con(SC()).caps?.[id] || [];
+const capHosts = id => Object.entries(con(SC()).caps || {}).filter(([, l]) => l.some(([c]) => c === id)).map(([h, l]) => ({h, k: l.find(([c]) => c === id)[1]}));
+function addCaps(id, state) { for (const [c, k] of capsOf(id)) if (!state.has(c)) state.set(c, k === 'near' ? 'capn' : 'cap'); }
+// What lights up for the selection: state per part id, plus the links to draw
+// Copper islands from McMaster's bare-board scans (rb/caps_nets.py -> tiles/isl*): every outer-layer copper piece a part's pads touch, on its own side.
+// Ground is left out (it touches everything); power pours (> 40 mm2) are lit but don't count as "on the same copper".
+let ISL = null;
+const islSideOf = id => /bbot/.test(id) ? 'bbot' : 'btop';
+function loadIsl(b) {
+  if (ISL || loadIsl.busy || !b?.tiles?.top?.startsWith('tiles/')) return;
+  loadIsl.busy = true;
+  fetch('tiles/isl.json').then(r => r.ok ? r.json() : null).then(d => {
+    if (!d) return;
+    d.plane = {btop: new Set(d.planes.btop), bbot: new Set(d.planes.bbot)}; d.idx = {btop: new Map(), bbot: new Map()};
+    for (const [id, l] of Object.entries(d.parts)) { const s = islSideOf(id), m = d.idx[s]; for (const i of l) if (!d.plane[s].has(i)) (m.get(i) || m.set(i, []).get(i)).push(id); }
+    // through-board links (vias matched top <-> bottom): islands joined into nets, keyed 'btop:id' / 'bbot:id'
+    const par = new Map(), f = x => { while (par.has(x) && par.get(x) !== x) x = par.get(x); return x; };
+    for (const [t, b] of d.via || []) { const a = f('btop:' + t), c = f('bbot:' + b); if (a !== c) par.set(a, c); }
+    d.net = new Map(); for (const k of par.keys()) { const r = f(k); (d.net.get(r) || d.net.set(r, []).get(r)).push(k); }
+    for (const [r, l] of d.net) if (!l.includes(r)) l.push(r);
+    d.netOf = new Map(); for (const l of d.net.values()) for (const k of l) d.netOf.set(k, l);
+    ISL = d; render();
+  }).catch(() => {});
+}
+function addCopper(sp, state) {
+  const l = ISL?.parts[sp.id]; if (!l) return null;
+  const s = islSideOf(sp.id), ids = {btop: new Set(), bbot: new Set()}, on = new Set();
+  for (const i of l) {
+    ids[s].add(i); if (ISL.plane[s].has(i)) continue;           // pours are lit but not followed
+    for (const k of ISL.netOf.get(s + ':' + i) || []) { const [ks, ki] = k.split(':'); ids[ks].add(+ki); }
+  }
+  for (const ks of ['btop', 'bbot']) for (const i of ids[ks]) if (!ISL.plane[ks].has(i)) for (const id of ISL.idx[ks].get(i) || []) if (id !== sp.id) on.add(id);
+  for (const id of on) if (!state.has(id)) state.set(id, 'cu');
+  const other = s === 'btop' ? 'bbot' : 'btop';
+  return {side: s, ids: {btop: [...ids.btop], bbot: [...ids.bbot]}, n: ids.btop.size + ids.bbot.size, across: ids[other].size, parts: [...on], planes: l.filter(i => ISL.plane[s].has(i)).length};
+}
+function relation() { const r = relationBase(); if (r) r.cu = addCopper(r.sp, r.state); return r; }
+// two parts joined by scan copper: they share a non-pour island, directly or through matched vias
+function cuNets(id) { const l = ISL?.parts[id], out = new Set(); if (!l) return out; const s = islSideOf(id);
+  for (const i of l) if (!ISL.plane[s].has(i)) { const k = s + ':' + i, n = ISL.netOf.get(k); out.add(n ? n[0] : k); } return out; }
+function copperJoined(a, b) { const A = cuNets(a); for (const k of cuNets(b)) if (A.has(k)) return true; return false; }
+function relationBase() {
+  const sp = selP(); if (!sp) return null;
+  const all = scene(), state = new Map([[sp.id, 'sel']]), links = [];
+  const add = (p, kind, e, label) => { if (!state.has(p.id) || kind === 'path') state.set(p.id, kind); links.push({a: sp, b: p, kind, e, label, route: routeFor(sp.id, p.id)}); };
+  if (sp.m.auto) {
+    const owner = sp.m.owner && all.find(p => p.id === sp.m.owner);
+    if (owner) add(owner, 'rel', null, 'same part (through-hole pins)');
+    let near = null;
+    const hosts = capHosts(sp.id);   // a capacitor lights the chips it serves; an auto IC lights its capacitors
+    for (const {h, k} of hosts) if (!state.has(h)) state.set(h, k === 'near' ? 'capn' : 'cap');
+    addCaps(sp.id, state);
+    if (showGuess && !hosts.length) { const mapped = all.filter(p => !p.m.auto && PARTS[p.m.part] && p.id !== sp.m.owner && p.side === sp.side); if (mapped.length) { near = nearest(sp, mapped); add(near, 'guess', null, 'nearest mapped part'); } }
+    return {sp, state, links, nb: [], path: null, owner, near, hosts};
+  }
+  const m = sp.m;
+  for (const p of all) if (p.m.auto && p.m.owner === sp.id) state.set(p.id, 'rel');  // its own pins through the board
+  addCaps(sp.id, state);
+  if (!PARTS[m.part]) return {sp, state, links, nb: [], path: null};
+  const byPart = part => all.filter(p => !p.m.auto && p.m.part === part);
+  const nb = edgesOn().filter(e => e[0] === m.part || e[1] === m.part).map(e => ({e, other: e[0] === m.part ? e[1] : e[0]}));
+  for (const {e, other} of nb) {
+    let xs = byPart(other);
+    if (xs.length > 1 && byPart(m.part).length > 1) xs = [nearest(sp, xs)];  // arrays pair with the nearest one
+    for (const x of xs) add(x, e[2] ? 'rel' : 'guess', e, e[3]);
+  }
+  const path = findPath(m.part);
+  if (path) {
+    let prev = sp;
+    for (const step of path.slice(1)) {
+      const cands = byPart(step.part);
+      if (!cands.length) { prev = null; continue; }
+      const near = prev ? nearest(prev, cands) : cands[0];
+      state.set(near.id, 'path');
+      if (prev) links.push({a: prev, b: near, kind: 'path', e: step.edge, label: step.edge[3], route: routeFor(prev.id, near.id)});
+      prev = near;
+    }
+  }
+  return {sp, state, links, nb, path};
+}
+function whereIs(part) { return STAGES.filter(s => (stages[SC() + '-' + s.id]?.markers || []).some(x => x.part === part)).map(s => s.id); }
+
+/* ---------- saving: one write at a time per document, retried once on a transient error ---------- */
+const timers = {}, writing = {}, again = {}, failed = new Map();
+const refFor = k => k.startsWith('console:') ? db.doc('consoles/' + k.slice(8)) : k.startsWith('auto:') ? db.doc('auto/' + k.slice(5)) : k.startsWith('read:') ? db.doc('readings/' + k.slice(5)) : db.doc('stages/' + k);
+const bodyFor = k => k.startsWith('console:') ? con(k.slice(8)) : k.startsWith('auto:') ? packAuto(k.slice(5)) : k.startsWith('read:') ? {v: rd(k.slice(5))} : st(k);
+function save(k, delay = 0) {
+  clearTimeout(timers[k]);
+  timers[k] = setTimeout(() => { delete timers[k]; flush(k); }, delay);
+  showSave();
+}
+async function flush(k) {
+  if (!db) return showSave();
+  if (writing[k]) { again[k] = true; return; }
+  writing[k] = true; showSave();
+  try {
+    try { await refFor(k).set(structuredClone(bodyFor(k))); }
+    catch (e) { if (e?.code !== 'unavailable') throw e; await sleep(700 + Math.random() * 800); await refFor(k).set(structuredClone(bodyFor(k))); }
+    failed.delete(k);
+  } catch (e) { failed.set(k, e); }
+  writing[k] = false;
+  if (again[k]) { again[k] = false; return flush(k); }
+  showSave();
+}
+function flushAll() { for (const k of Object.keys(timers)) { clearTimeout(timers[k]); delete timers[k]; flush(k); } }
+addEventListener('visibilitychange', () => { if (document.hidden) flushAll(); });
+addEventListener('pagehide', flushAll);
+const busy = () => Object.keys(timers).length || Object.values(writing).some(Boolean);
+function showSave() {
+  const el = $('saveState');
+  let cls = 'ok', txt = 'All changes saved';
+  if (!db) { cls = ready ? 'err' : 'busy'; txt = ready ? 'Not saving' : 'Connecting…'; }
+  else if (failed.size) { cls = 'err'; txt = 'Not saved'; }
+  else if (busy()) { cls = 'busy'; txt = 'Saving…'; }
+  else if (!loaded) { cls = 'busy'; txt = 'Loading…'; }
+  el.className = cls; el.textContent = txt;
+  if (failed.size) {
+    const e = [...failed.values()][0];
+    const why = e?.code === 'quota_exceeded' ? 'The artifact database is full. Delete unused markers, then retry.'
+      : e?.code === 'revoked' || e?.code === 'not_granted' ? 'This view lost write access. Reload the page; your unsaved edits are still on screen until you do.'
+      : `Last save failed (${esc(e?.code || 'error')}). Your edits are still on screen.`;
+    banner(why + ' <button class="btn" type="button" id="retryBtn">Retry save</button>');
+    $('retryBtn').onclick = () => { for (const k of failed.keys()) flush(k); };
+  } else if ($('retryBtn')) banner('');
+}
+function banner(html) { $('banner').innerHTML = html; $('banner').hidden = !html; }
+function parseAuto(k, doc) {
+  if (doc.v === 2) {
+    const list = (doc.items || []).map((it, i) => { const [x, y, w, h, a, t, Lmm, Smm, c, T, ex] = it;
+      return {auto: true, id: `auto:${k}:${i}`, i: i + 1, x, y, w, h, a, t, L: Lmm, S: Smm, c, T: T || [], ...(ex || {}), owner: null, layer: AUTO[t]?.[0] || 'other'}; });
+    autos[k] = {doc, list}; return;
+  }
+  const list = (doc.parts || '').split(';').filter(Boolean).map((s, i) => {
+    const [x, y, w, h, a, t, Lmm, Smm, owner] = s.split(',');
+    return {auto: true, id: `auto:${k}:${i}`, i: i + 1, x: x / 1e5, y: y / 1e5, w: w / 1e5, h: h / 1e5, a: +a, t, L: +Lmm, S: +Smm, owner: owner || null, layer: AUTO[t]?.[0] || 'other'};
+  });
+  autos[k] = {doc, list};
+}
+function packAuto(k) { const a = autos[k];
+  if (a.doc.v === 2) return {...a.doc, items: a.list.map(p => { const ex = {}; for (const q of ['m', 'ma', 'mf', 'text', 'gone']) if (p[q] != null) ex[q] = p[q]; const it = [p.x, p.y, p.w, p.h, p.a, p.t, p.L, p.S, p.c, p.T]; if (Object.keys(ex).length) it.push(ex); return it; })};
+  return {...a.doc, parts: a.list.map(p => [Math.round(p.x * 1e5), Math.round(p.y * 1e5), Math.round(p.w * 1e5), Math.round(p.h * 1e5), Math.round(p.a), p.t, p.L, p.S, p.owner || ''].join(',')).join(';')}; }
+
+/* ---------- render ---------- */
+function renderConsoles() {
+  const ids = consoleIds(); if (loaded && !ids.includes(cur.c)) cur.c = 'ifx';
+  $('consoleRail').innerHTML = ids.map(c => { const m = con(c).model || FAM[famOf(con(c))]?.label || '';
+    return `<button class="btn" type="button" data-c="${esc(c)}" aria-pressed="${c === cur.c}">${esc(conName(c))}${m && c !== 'ifx' ? ' · ' + esc(m) : ''}</button>`; }).join('') +
+    `<button class="btn" type="button" id="newConBtn">+ New console</button>`;
+  const f = con(cur.c);
+  $('tbConsole').textContent = conName(cur.c);
+  $('tbModel').textContent = [f.model, f.board].filter(Boolean).join(' · ') || 'not logged';
+}
+const famOptions = (brand, sel) => (BRANDS[brand] || []).map(([id, label]) => `<option value="${id}"${id === sel ? ' selected' : ''}>${esc(label)}</option>`).join('');
+const brandOptions = sel => Object.keys(BRANDS).map(b => `<option${b === sel ? ' selected' : ''}>${b}</option>`).join('');
+function renderProfile() {
+  const el = $('profile'), c = cur.c, p = con(c), ref = refC(c);
+  $('stageRail').hidden = $('stageSec').hidden = !ref;
+  if (el.contains(document.activeElement) && el.dataset.c === c) return;   // don't rebuild under the cursor
+  el.dataset.c = c;
+  const links = (LINKS[c] || []).map(([t, u]) => `<a class="btn" href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join('');
+  if (c === 'ifx') { el.innerHTML = `<h3>iFixit reference</h3><p class="profile-note">The measured PS4 CUH-10xx board (SAA-001) from the iFixit teardown and the McMaster scans. Every CUH-10xx profile shows this 3D model and these photos until it has its own.</p>`; return; }
+  const brand = p.brand || FAM[famOf(p)]?.brand || 'PlayStation', fam = famOf(p);
+  el.innerHTML = `<h3>${esc(conName(c))}</h3>
+  <div class="fields">
+    <label class="field">Name<input data-f="name" value="${esc(p.name || conName(c))}" maxlength="40"></label>
+    <label class="field">Brand<select data-f="brand">${brandOptions(brand)}</select></label>
+    <label class="field">Model<select data-f="family"><option value="">Choose…</option>${famOptions(brand, fam)}</select></label>
+    <label class="field">Exact model (sticker)<input data-f="model" value="${esc(p.model)}" placeholder="e.g. CUH-1001A" maxlength="30"></label>
+    <label class="field">Board number<input data-f="board" value="${esc(p.board)}" placeholder="e.g. SAA-001 1-889-352-11" maxlength="40"></label>
+  </div>
+  <label class="field">Notes<textarea data-f="notes" rows="4" placeholder="Symptoms, what you tried, readings, parts ordered…">${esc(p.notes)}</textarea></label>
+  <p class="profile-note">${ref ? (ref === c ? 'Showing this console\'s own 3D model. ' + esc(p.board3d?.src || '') : `3D model and photos: the ${esc(conName(ref))} (same model). Notes and pin readings are this console's own.`)
+    : `No measured 3D model or teardown steps for ${esc(FAM[fam]?.label || 'this model')} yet. A model only appears once it has been measured from that board.`}</p>
+  ${links ? `<div class="rail">${links}</div>` : ''}
+  ${printsHtml(fam)}`;
+}
+$('profile').oninput = e => { const f = e.target.dataset?.f; if (!f || cur.c === 'ifx') return;
+  const p = con(cur.c); p[f] = e.target.value;
+  if (f === 'brand') { p.family = ''; $('profile').dataset.c = ''; e.target.blur(); }
+  if (f === 'family' && FAM[p.family]?.board && !p.board) p.board = FAM[p.family].board;
+  save('console:' + cur.c, f === 'notes' || f === 'name' || f === 'model' || f === 'board' ? 700 : 0);
+  if (f === 'brand' || f === 'family') { $('profile').dataset.c = ''; render(); } else renderConsoles(); };
+function renderStages() {
+  $('stageRail').innerHTML = STAGES.map((s, i) => {
+    const k = SC() + '-' + s.id, d = stages[k], n = (d?.markers?.length || 0) + (autos[k]?.list.length || 0);
+    return `<button class="btn" type="button" data-s="${s.id}" aria-pressed="${s.id === cur.s}">${String(i + 1).padStart(2, '0')} ${esc(s.name)}<small>${s.id === 'asm' && refC(cur.c) === 'ifx' ? '3D fit check' : ASM_STAGES[s.id] && refC(cur.c) === 'ifx' ? '3D (estimated assembly)' : has3d(c0 => c0, s.id) ? '3D model' : 'not modelled'} · ${n} part${n === 1 ? '' : 's'}</small></button>`;
+  }).join('');
+  const i = STAGES.findIndex(s => s.id === cur.s);
+  $('stageTitle').textContent = `${String(i + 1).padStart(2, '0')} · ${S[cur.s].name}${boardInfo() ? ' · both sides in 3D' : ''}`;
+  $('tbStage').textContent = `${i + 1} of ${STAGES.length}`;
+}
+function renderLayers() {
+  const ms = st(key()).markers, au = autos[key()]?.list || [];
+  $('layers').innerHTML = LAYERS.map(l => {
+    const n = ms.filter(m => m.layer === l.id).length + au.filter(a => AUTO[a.t][0] === l.id).length;
+    return `<button class="chip" type="button" style="--c:${l.color}" data-l="${l.id}" aria-pressed="${visible.has(l.id)}"><span class="sw"></span>${l.name}<b>${n}</b></button>`;
+  }).join('') + `<button class="btn" type="button" id="allBtn" aria-pressed="${visible.size === LAYERS.length}">All layers</button>` +
+  (au.length ? `<button class="btn" type="button" id="autoBtn" aria-pressed="${showAuto}">Auto-detected parts</button>` : '');
+}
+// a stage is shown only when it is part of a rebuilt (measured) 3D board; everything else stays undrawn
+function has3d(_, sid = cur.s) { const c = SC(), b = con(c).board3d; return !!(b?.tiles && (sid === b.top || sid === b.bottom) && stages[c + '-' + b.top]?.photo && stages[c + '-' + b.bottom]?.photo); }
+function renderPhoto() {
+  partsCache = null;
+  const asm = !!asmStage(), is3d = (asm || has3d()) && ensure3d();
+  $('view3dRail').hidden = !is3d; $('innerBtn').hidden = SC() !== 'ifx'; $('stage3d').hidden = !is3d; $('empty').hidden = is3d; $('asmRail').hidden = !(is3d && asm);
+  if (is3d && asm) buildAssembly(); else if (is3d) { buildScene(); highlight3d(relation()); }
+  $('hint').textContent = asm ? 'Toggle Shell / Chassis & shields / Board to see inside (the heatsink and fan sit under the board) · Explode pulls the layers apart · red = collision · left-drag pan · middle/right-drag orbit · scroll zoom'
+    : is3d ? 'Click a part to trace it · left-drag to pan · middle- or right-drag to orbit 360° · scroll to zoom' : '';
+}
+function renderTable() {
+  const ms = st(key()).markers, au = autos[key()]?.list.length || 0;
+  const rows = ms.filter(m => visible.has(m.layer)).sort((a, b) => LAYERS.indexOf(L[a.layer]) - LAYERS.indexOf(L[b.layer]) || a.n - b.n);
+  $('tableTitle').textContent = `Parts table · ${rows.length} mapped${au ? ` · plus ${au} auto-detected (click them on the board)` : ''}`;
+  $('tbody').innerHTML = rows.length ? rows.map(m => `<tr data-m="${m.id}" tabindex="0" class="${m.id === selected ? 'sel' : ''}">
+    <td class="r" style="--c:${L[m.layer].color}">${refOf(m)}</td><td>${esc(partName(m))}</td>
+    <td><code>${esc(m.label)}</code></td><td><code>${esc(m.value)}</code></td><td>${esc(m.note)}</td>
+    <td><span class="pill ${m.verified ? 'yes' : 'no'}">${m.verified ? 'verified' : 'unverified'}</span></td></tr>`).join('')
+    : `<tr><td colspan="6" class="note">No mapped parts on visible layers.</td></tr>`;
+}
+const pct = r => r ? Math.round(r.vis * 100) : 0;
+function renderLinks() {
+  const el = $('links'), sp = selP(), r = relation();
+  const toggle = `<label class="check"><input type="checkbox" id="guessBox"${showGuess ? ' checked' : ''}> Show unconfirmed links (my inferences, no source)</label>`;
+  const loc = part => { if (PARTS[part].offboard) return 'off the board'; const w = whereIs(part); if (!w.length) return 'not marked yet';
+    const b = boardInfo(); const here = w.includes(cur.s) || (b && w.some(s => s === b.top || s === b.bottom));
+    return here ? 'lit up on the board' : w.map(s => `<button class="linkbtn" type="button" data-goto="${s}" data-part="${part}">on ${esc(S[s].name)}</button>`).join(', '); };
+  const src = e => e[2] ? cite(e[4]) : `<span class="guess">unconfirmed: ${esc(e[4])}</span>`;
+  const trace = rt => rt ? `<span class="vis">traced along copper: ${pct(rt)}% of the way${rt.inner > .005 ? `, ${Math.round(rt.inner * 100)}% of it on inner layers (X-ray)` : ''}${copperJoined(rt.a, rt.b) ? ' · continuous copper confirmed on the scans' : ''}</span>` : '';
+  const cuHtml = r => { const c = r?.cu; if (!c) return '';
+    const shown = c.parts.map(findPart).filter(Boolean), more = c.parts.length - shown.length;
+    return `<h3>Copper (${c.n} piece${c.n === 1 ? '' : 's'})</h3><p><span class="dot" style="--c:var(--cu)"></span>Lit in violet on the board: the outer-layer copper its pads touch${c.planes ? `, including ${c.planes} power pour${c.planes === 1 ? '' : 's'}` : ''}${c.across ? `, plus <b>${c.across}</b> piece${c.across === 1 ? '' : 's'} on the other side reached through matched vias (turn the board over)` : ''}.</p>
+      ${c.parts.length ? `<p><b>${c.parts.length}</b> other part${c.parts.length === 1 ? '' : 's'} on that copper: ${shown.slice(0, 24).map(p => `<button class="linkbtn" type="button" data-sel="${esc(p.id)}">${esc(refOf(p.m))}</button>`).join(', ')}${shown.length > 24 ? ' …' : ''}${more > 0 ? ` (+${more} hidden: turn on auto-detected parts)` : ''}</p>` : '<p class="note">No other part sits on that copper on this side.</p>'}
+      <p class="note">From McMaster's 600 dpi bare-board scans. A via is followed to the other side only when the same hole is matched on both scans (drilled holes, or via barrels in the X-ray) and lands clearly on one trace each side; ambiguous vias and inner-layer runs aren't followed. Ground is left out.</p>`; };
+  const capsHtml = id => { const l = capsOf(id); if (!l.length) return '';
+    const by = {}; for (const [c, k] of l) (by[k] = by[k] || []).push(c);
+    const hidden = l.filter(([c]) => !findPart(c)).length;
+    return `<h3>Capacitors (${l.length})</h3><ul>${['net', 'decap', 'under', 'near'].filter(k => by[k]).map(k => `<li><span class="dot" style="--c:var(--${k === 'near' ? 'capn' : 'cap'})"></span><b>${by[k].length}</b> ${esc(CAPWHY[k])}</li>`).join('')}</ul>
+      <p class="note">Found on McMaster's bare-board scans: copper islands shared with the chip's pads, plus placement. ${by.under ? 'Turn the board over to see the ones behind it. ' : ''}${hidden ? `${hidden} are hidden: turn on auto-detected parts and the capacitor layer to see them.` : ''}</p>`; };
+  if (!sp) { el.innerHTML = `<h3>Trace a part</h3><p class="note">Click any part on the board. It lights up yellow, what it connects to lights up cyan, and its route to the APU runs in magenta along the copper you can see. Everything else fades to half opacity.</p>${toggle}`; }
+  else if (sp.m.auto) {
+    const a = sp.m;
+    el.innerHTML = `<h3>Trace a part</h3><p><span class="ref" style="--c:var(--accent)">${refOf(a)}</span> <b>${esc(AUTO[a.t][1])}</b></p>
+      <p class="note">Auto-detected from the photo by shape and its metal terminals, then checked by eye on zoomed crops of iFixit's full-size photo. Exact type and value can't be read at this resolution. About ${(a.L * PXK).toFixed(1)} × ${(a.S * PXK).toFixed(1)} mm, on the board ${sp.side === 'bot' ? 'bottom' : 'top'}.</p>
+      ${r.owner ? `<p>These are the through-hole pins of <b>${esc(partName(r.owner.m))}</b> (${refOf(r.owner.m)}) on the other side.</p>` : ''}
+      ${r.hosts?.length ? `<p>Capacitor serving: ${r.hosts.map(({h, k}) => { const hp = findPart(h); return `<b>${esc(hp ? partName(hp.m) : h)}</b> <span class="note">(${esc(CAPWHY[k])})</span>`; }).join('; ')}</p>` : ''}${capsHtml(sp.id)}${cuHtml(r)}
+      ${r.near ? `<p><span class="dot" style="--c:var(--guess)"></span>Nearest mapped part: <b>${esc(partName(r.near.m))}</b>, ${(dist(sp, r.near) * FRAME_MM).toFixed(1)} mm away. <span class="guess">unconfirmed: small parts usually serve the chip beside them, but this isn't traced.</span></p>`
+        : r.owner ? '' : `<p class="note">What it connects to isn't traced. Tick the box below to see the nearest mapped part.</p>`}
+      ${toggle}`;
+  }
+  else if (!PARTS[sp.m.part]) { el.innerHTML = `<h3>Trace a part</h3><p><b>${refOf(sp.m)}</b> isn't linked to a board part.</p><p class="note">What this part is hasn't been identified from a source yet.</p>${capsHtml(sp.id)}${cuHtml(r)}${toggle}`; }
+  else {
+    const m = sp.m, p = PARTS[m.part];
+    const nbHtml = r.nb.length ? `<ul>${r.nb.map(({e, other}) => { const lk = r.links.find(l => l.e === e); return `<li><span class="dot" style="--c:var(--${e[2] ? 'rel' : 'guess'})"></span><b>${esc(PARTS[other].name)}</b> · ${esc(e[3])} <small>${loc(other)} · ${src(e)}${lk?.route ? '<br>' + trace(lk.route) : ''}</small></li>`; }).join('')}</ul>`
+      : `<p class="note">${p.none ? esc(p.none) + (p.src ? ' ' + cite(p.src) : '') : 'No sourced connection.'}${!showGuess && EDGES.some(e => !e[2] && (e[0] === m.part || e[1] === m.part)) ? ' An unconfirmed link exists: tick the box below to see it.' : ''}</p>`;
+    let pathHtml;
+    if (m.part === 'apu') pathHtml = '<p class="note">This is the APU.</p>';
+    else if (!r.path) { showGuess = !showGuess; const g = !showGuess ? null : findPath(m.part); showGuess = !showGuess;
+      pathHtml = `<p class="note">No ${showGuess ? '' : 'sourced '}route to the APU.${g ? ' A likely route exists through unconfirmed links: tick the box below.' : ''}</p>`; }
+    else pathHtml = `<ol>${r.path.slice(1).map((step, i) => { const from = i === 0 ? m.part : r.path[i].part, e = step.edge, lk = r.links.find(l => l.kind === 'path' && l.e === e);
+      return `<li><b>${esc(PARTS[from].name)} → ${esc(PARTS[step.part].name)}</b> · ${esc(e[3])}<small>${esc(e[5])} ${src(e)}${lk?.route ? '<br>' + trace(lk.route) : lk ? '<br><span class="note">no visible copper between them in the photos (BGA fan-out, inner layer or via)</span>' : ''}</small></li>`; }).join('')}</ol>`;
+    el.innerHTML = `<h3>Trace a part</h3><p><span class="ref" style="--c:var(--accent)">${refOf(m)}</span> <b>${esc(p.name)}</b> <span class="note">· ${sp.side === 'bot' ? 'board bottom' : 'board top'}</span></p>${p.desc ? `<p class="note">${esc(p.desc)}</p>` : ''}
+      ${pinsHtml(m)}<h3>Connects to</h3>${nbHtml}${capsHtml(sp.id)}${cuHtml(r)}<h3>Route to the APU</h3>${pathHtml}
+      ${p.buy ? `<h3>Replacement</h3><p class="note">Search <code>${esc(p.buy)}</code>: ${buyLinks(p.buy)}${p.warn ? `<br>${esc(p.warn)}` : ''}</p>` : ''}${toggle}`;
+    wirePins(m);
+  }
+  $('guessBox').onchange = e => { showGuess = e.target.checked; try { localStorage.setItem('tracer.guess', showGuess ? '1' : '0'); } catch {} render(); };
+}
+// Pin list + the selected pin's details, expected reading and your own readings across consoles
+function pinsHtml(m) {
+  const D = PINDEF[m.part]; if (!D) return '';
+  const hasLegs = !!(con(SC()).legs || {})[m.id];
+  const meter = `<p class="note">Diode mode: red probe on ground, black on the pin, console unplugged ${cite('probe')}. Voltage: black probe on ground, console on. There is no published reference chart for this board, so the reliable "correct" value is the same pin on a working console: log it below and the consoles are compared.</p>`;
+  let box = '';
+  if (selPin && D.pins[selPin - 1]) {
+    const [name, func, expect] = D.pins[selPin - 1], k = pinKey(m.part, selPin), mine = rd(cur.c)[k] || {};
+    const others = consoleIds().filter(c => c !== cur.c && rd(c)[k] && (rd(c)[k].d || rd(c)[k].v))
+      .map(c => `${esc(conName(c))}: ${esc([rd(c)[k].d && rd(c)[k].d + ' diode', rd(c)[k].v && rd(c)[k].v + ' V'].filter(Boolean).join(' · '))}`);
+    box = `<div class="pinbox"><b>Pin ${selPin} · ${esc(name)}</b><span class="note">${esc(func)}</span><span>Expected: ${esc(expect)} ${cite(D.src)}</span>
+      <div class="pair"><label class="field">Diode mode reading<input id="pinD" value="${esc(mine.d || '')}" placeholder="e.g. 0.512" autocomplete="off"></label>
+      <label class="field">Voltage (V)<input id="pinV" value="${esc(mine.v || '')}" placeholder="e.g. 3.31" autocomplete="off"></label></div>
+      <label class="field">Note<input id="pinN" value="${esc(mine.n || '')}" placeholder="console state, probe point…" autocomplete="off"></label>
+      <span class="cmp">${others.length ? 'Other consoles: ' + others.join(' · ') : 'No other console has a reading for this pin yet.'}</span></div>`;
+  }
+  const rows = D.pins.map(([name, , expect], i) => { const v = rd(cur.c)[pinKey(m.part, i + 1)];
+    return `<tr data-pin="${i + 1}" class="${selPin === i + 1 ? 'sel' : ''}"><td>${i + 1}</td><td><code>${esc(name)}</code></td><td>${esc(expect.split(/[:.(;]/)[0])}</td><td>${esc([v?.d, v?.v && v.v + ' V'].filter(Boolean).join(' · '))}</td></tr>`; }).join('');
+  return `<h3>Pins · ${esc(D.pkg)}</h3>${D.nolegs ? `<p class="note">${esc(D.nolegs)}</p>` : hasLegs ? '<p class="note">Hover a leg on the model to see its pin; click it to log a reading. Pin 1 is taken from the chip\'s pin-1 mark in the photo: check the mark on your own board before probing.</p>' : ''}
+    ${box}<div class="pins"><table><thead><tr><th>#</th><th>Pin</th><th>Expect</th><th>Yours</th></tr></thead><tbody>${rows}</tbody></table></div>${meter}`;
+}
+function wirePins(m) {
+  for (const tr of $('links').querySelectorAll('tr[data-pin]')) tr.onclick = () => { selPin = +tr.dataset.pin; renderLinks(); highlight3d(relation()); };
+  for (const [id, f] of [['pinD', 'd'], ['pinV', 'v'], ['pinN', 'n']]) $(id)?.addEventListener('input', e => {
+    const k = pinKey(m.part, selPin), r = rd(cur.c); r[k] = {...(r[k] || {}), [f]: e.target.value.trim()}; save('read:' + cur.c, 700);
+  });
+}
+function renderEditor() {   // read-only details of the selected mapped part
+  const m = selM(), ed = $('editor');
+  ed.hidden = !m; if (!m) return;
+  const l = L[m.layer]; ed.style.setProperty('--c', l.color);
+  const row = (k, v) => v ? `<p><span class="note">${k}:</span> <code>${esc(v)}</code></p>` : '';
+  ed.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="ref">${refOf(m)}</span><span class="note">${l.name}</span></div>
+    ${row('Silkscreen', m.label)}${row('Marking / value', m.value)}${m.note ? `<p class="note">${esc(m.note)}</p>` : ''}
+    <span class="pill ${m.verified ? 'yes' : 'no'}" style="justify-self:start">${m.verified ? 'verified' : 'unverified'}</span>`;
+}
+function renderFacts() {
+  const s = S[cur.s];
+  if (SC() !== 'ifx') { $('facts').innerHTML = `<h3>Sourced facts</h3><p class="note">The step facts come from the iFixit CUH-10xx teardown and don't apply to ${esc(FAM[famOf(con(cur.c))]?.label || 'this model')}. Add what you find to this console's notes.</p>`; return; }
+  if (cur.s === 'asm') {
+    const icon = r => r.pass === true ? '<span class="pill yes">fits</span>' : r.pass === false ? '<span class="pill" style="color:var(--bad)">misfit</span>' : '<span class="pill no">open</span>';
+    $('facts').innerHTML = `<h3>Fit check</h3><p class="note">Each part carries its measuring uncertainty. A conflict smaller than that means "measure it"; a bigger one means a number is wrong.</p>
+      <ul>${fitChecks().map(r => `<li>${icon(r)} <b>${esc(r.text)}</b><br><span class="note">${esc(r.why)}</span></li>`).join('')}</ul>
+      <h3>Corrections made</h3><ul>${ASM.corrections.map(([w, a, b, why]) => `<li><b>${esc(w)}</b>: ${esc(a)} → <b>${esc(b)}</b><br><span class="note">${esc(why)}</span></li>`).join('')}</ul>
+      <h3>Sources</h3><ul><li class="note">Case: ${esc(ASM.caseSrc)}</li><li class="note">Board height and orientation: ${esc(ASM.boardSrc)}</li><li class="note">Disc slot: ${esc(ASM.slotSrc)}</li><li class="note">Side profile: ${esc(ASM.slantSrc)}</li><li class="note">Rear ports: ${esc(ASM.rearPortsSrc)}</li>${ASM.parts.map(q => `<li class="note"><b>${esc(q.name)}</b> (${({spec: 'official/standard', photo: 'photo ±3-5 %', est: 'estimate', low: 'rough'})[q.conf]}): ${esc(q.src)}</li>`).join('')}</ul>`;
+    return;
+  }
+  $('facts').innerHTML = `<h3>Sourced facts</h3>
+    <p class="note">From the <a href="${IFX}" target="_blank" rel="noopener">iFixit PlayStation 4 teardown</a> of a 2013 launch console. The guide doesn't print a model number, so check each fact against your own unit.</p>` +
+    (s.facts.length ? `<ul>${s.facts.map(([t, n]) => `<li>${t} <cite><a href="${IFX}" target="_blank" rel="noopener">iFixit step ${n}</a></cite></li>`).join('')}</ul>`
+      : `<p class="note">No sourced facts for this stage. Everything here comes from your own marks.</p>`);
+}
+function render() {
+  try { localStorage.setItem('tracer.cur2', JSON.stringify(cur)); } catch {}
+  $('credit').hidden = SC() !== 'ifx';
+  renderConsoles(); renderProfile(); renderStages(); renderLayers(); renderPhoto(); renderTable(); renderFacts(); if (!$('links').contains(document.activeElement)) renderLinks();
+  if (!$('editor').contains(document.activeElement)) renderEditor();
+}
+/* ---------- 3D ---------- */
+const mode = '3d', surf = 'rebuilt'; let three = null;
+// measured: corrected reference frame is 297.7 mm tall (iFixit photos registered to the McMaster 600-dpi bare-board scans; board = 261.4 x 250.1 mm, +-0.4% scanner scale)
+const FRAME_MM = 297.7;
+const MM = 1 / FRAME_MM;       // world units per mm
+const PXK = 300 / FRAME_MM;    // auto-part L/S were stored at 10 px/mm; this rescales them to true mm
+const T = 1.6 * MM;            // PCB thickness
+const MATS = {                 // body materials by kind
+  epoxy:   {color: 0x1d1e21, roughness: .55, metalness: .05},
+  metal:   {color: 0xd2d6db, roughness: .3, metalness: .85},
+  alum:    {color: 0xdcdfe2, roughness: .28, metalness: .8},
+  ferrite: {color: 0x77797c, roughness: .6, metalness: .25},
+  polymer: {color: 0x26272a, roughness: .45, metalness: .1},
+  plastic: {color: 0x18191b, roughness: .7, metalness: 0},
+  cream:   {color: 0xe9e1cc, roughness: .7, metalness: 0},
+  ceramic: {color: 0xc6a27a, roughness: .6, metalness: .05},
+  gold:    {color: 0xd4a24a, roughness: .35, metalness: .9},
+  grey:    {color: 0x8f969d, roughness: .5, metalness: .3},
+  solder:  {color: 0xd0d4d8, roughness: .25, metalness: .9},
+  label:   {color: 0xffffff, roughness: 1, metalness: 0},
+};
+function ensure3d() {
+  if (three) return true;
+  if (!window.THREE || !THREE.OrbitControls) { banner('The 3D library did not load. Reload the page.'); return false; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({canvas: $('gl'), antialias: true, alpha: true}); }
+  catch { banner('3D view needs WebGL. In Brave, turn on "Use graphics acceleration when available" in Settings → System.'); return false; }
+  // render above screen resolution so the 4000-px photos stay crisp at an angle (supersampling)
+  renderer.setPixelRatio(Math.min(2, Math.max(1.5, devicePixelRatio)));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene3 = new THREE.Scene();
+  scene3.add(new THREE.AmbientLight(0xffffff, 0.16));
+  scene3.add(new THREE.HemisphereLight(0xdfefff, 0x9aa6b4, 0.16));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.62); sun.position.set(-0.5, 1.6, -0.7); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, {left: -.8, right: .8, top: .8, bottom: -.8, near: .1, far: 4}); sun.shadow.bias = -0.0004; sun.shadow.radius = 3;
+  scene3.add(sun);
+  const under = new THREE.DirectionalLight(0xffffff, 0.62); under.position.set(0.4, -1.6, 0.6); scene3.add(under);
+  const camera = new THREE.PerspectiveCamera(36, 1, 0.002, 30);
+  const controls = new THREE.OrbitControls(camera, $('gl'));
+  controls.mouseButtons = {LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.ROTATE};
+  controls.touches = {ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN};
+  controls.minPolarAngle = 0; controls.maxPolarAngle = Math.PI; controls.minDistance = 0.03; controls.maxDistance = 6;
+  controls.screenSpacePanning = true; controls.zoomSpeed = 1.3; controls.rotateSpeed = 0.8;
+  controls.addEventListener('change', draw);
+  controls.addEventListener('start', () => $('gl').classList.add('panning'));
+  controls.addEventListener('end', () => $('gl').classList.remove('panning'));
+  // soft studio environment so metal parts reflect light instead of rendering dark grey
+  { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 256; const g = cv.getContext('2d');
+    const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#9aa3ab'); gr.addColorStop(.45, '#6d7781'); gr.addColorStop(.55, '#3a424b'); gr.addColorStop(1, '#14181d');
+    g.fillStyle = gr; g.fillRect(0, 0, 512, 256); g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(60, 30, 120, 26); g.fillRect(330, 40, 90, 20);
+    const et = new THREE.CanvasTexture(cv); et.mapping = THREE.EquirectangularReflectionMapping; et.encoding = THREE.sRGBEncoding;
+    const pm = new THREE.PMREMGenerator(renderer); scene3.environment = pm.fromEquirectangular(et).texture; et.dispose(); pm.dispose(); }
+  const root = new THREE.Group(), fx = new THREE.Group(); scene3.add(root, fx);
+  three = {renderer, scene: scene3, camera, controls, root, fx, tex: {}, sig: '', ray: new THREE.Raycaster(), labels: [], aspect: 4 / 3, meshes: [], autoMeshes: [], board: null, viewedFor: ''};
+  new ResizeObserver(() => { resize3d(); draw(); }).observe($('stage3d'));
+  // middle-button autoscroll and paste must not fire on the canvas
+  $('gl').addEventListener('mousedown', e => { if (e.button === 1) e.preventDefault(); });
+  $('gl').addEventListener('auxclick', e => e.preventDefault());
+  $('gl').addEventListener('contextmenu', e => e.preventDefault());
+  resize3d();
+  return true;
+}
+function resize3d() {
+  const el = $('stage3d'), w = el.clientWidth, h = el.clientHeight;
+  if (!three || !w || !h) return;
+  three.renderer.setSize(w, h, false); three.camera.aspect = w / h; three.camera.updateProjectionMatrix();
+}
+function view(name) {
+  if (!three) return;
+  const {camera, controls, aspect} = three;
+  const half = 0.56 * Math.max(1, aspect / camera.aspect);
+  const d = half / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const polar = {top: 0.0001, tilt: 0.7, bottom: Math.PI - 0.0001, btilt: Math.PI - 0.7, side: 1.45}[name];
+  const az = name === 'side' ? 0.6 : name === 'bottom' || name === 'btilt' ? Math.PI : 0;
+  camera.position.set(d * Math.sin(polar) * Math.sin(az), d * Math.cos(polar), d * Math.sin(polar) * Math.cos(az));
+  camera.up.set(0, 1, 0);
+  controls.target.set(0, 0, 0); controls.update(); draw();
+}
+function texture(id) {
+  if (three.tex[id]) return three.tex[id];
+  const t = new THREE.TextureLoader().load('/_blob/' + id, tx => { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = three.renderer.capabilities.getMaxAnisotropy(); tx.minFilter = THREE.LinearMipmapLinearFilter; tx.magFilter = THREE.LinearFilter; tx.generateMipmaps = true; tx.needsUpdate = true;
+    if (!boardInfo()) { three.aspect = tx.image.width / tx.image.height; three.sig = ''; } renderPhoto(); },
+    undefined, () => banner('A texture could not be loaded into the 3D view. Reload the page.'));
+  t.encoding = THREE.sRGBEncoding;
+  return three.tex[id] = t;
+}
+const W3c = (u, v, y) => new THREE.Vector3((u - 0.5) * three.aspect, y, v - 0.5);   // corrected coords -> world
+const W3 = (u, v, y) => fixOn() ? W3c(...fixTop(u, v), y) : W3c(u, v, y);           // raw top-photo coords -> world
+// photo coordinates of a board point on a given face
+function faceUV(b, side, u, v) { if (side === 'bot') { const [x, y] = topToBot(b, u, v); return [x, 1 - y]; } return [u, 1 - v]; }
+function buildBoard(b, topTex, botTex) {
+  // board outline (top-photo coords) -> top face, bottom face and edge wall
+  const out = b ? b.outline : [[0, 0], [1, 0], [1, 1], [0, 1]];
+  const mk = sign => { const sh = new THREE.Shape(out.map(([u, v]) => new THREE.Vector2((u - .5) * three.aspect, sign * (v - .5)))); return new THREE.ShapeGeometry(sh); };
+  const top = mk(-1); top.rotateX(-Math.PI / 2); top.translate(0, T / 2, 0);
+  const bot = mk(1); bot.rotateX(Math.PI / 2); bot.translate(0, -T / 2, 0);
+  for (const [g, side] of [[top, 'top'], [bot, 'bot']]) {
+    const pos = g.attributes.position, uv = g.attributes.uv;
+    for (let i = 0; i < pos.count; i++) { const u = pos.getX(i) / three.aspect + .5, v = pos.getZ(i) + .5; uv.setXY(i, ...(b ? faceUV(b, side, u, v) : [u, 1 - v])); }
+    uv.needsUpdate = true;
+  }
+  const wallPos = [];
+  for (let i = 0; i < out.length; i++) {
+    const [u0, v0] = out[i], [u1, v1] = out[(i + 1) % out.length];
+    const a = W3(u0, v0, T / 2), c = W3(u1, v1, T / 2), a2 = W3(u0, v0, -T / 2), c2 = W3(u1, v1, -T / 2);
+    wallPos.push(...a.toArray(), ...a2.toArray(), ...c.toArray(), ...c.toArray(), ...a2.toArray(), ...c2.toArray());
+  }
+  const wall = new THREE.BufferGeometry(); wall.setAttribute('position', new THREE.Float32BufferAttribute(wallPos, 3)); wall.computeVertexNormals();
+  const g = new THREE.Group();
+  const topMat = new THREE.MeshLambertMaterial({map: topTex}), botMat = new THREE.MeshLambertMaterial({map: botTex || topTex});
+  const tm = new THREE.Mesh(top, topMat), bm = new THREE.Mesh(bot, botMat);
+  tm.receiveShadow = true; bm.receiveShadow = true;
+  const wm = new THREE.Mesh(wall, new THREE.MeshStandardMaterial({color: 0x4f6b3a, roughness: .8, side: THREE.DoubleSide}));
+  g.add(tm, bm, wm);
+  return {group: g, topMat, botMat};
+}
+function chipMesh(p, b, texTop, texBot) {
+  const m = p.m, part = PARTS[m.part];
+  const useBody = m.body && p.side === 'top';
+  const [w, h] = useBody ? [m.body[2], m.body[3]] : m.auto ? [m.w, m.h] : sizeOf(m);
+  if (useBody) p = {...p, u: m.body[0], v: m.body[1]};
+  const [mm, kind] = part ? [part.mm, part.kind] : LAYER_MM[m.layer];
+  const ht = Math.max(mm, .05) * MM, shape = part?.shape || (m.layer === 'screws' ? 'cyl' : 'box');
+  const g = shape === 'cyl' ? new THREE.CylinderGeometry(.5, .5, 1, 32) : new THREE.BoxGeometry(1, 1, 1);
+  const face = shape === 'cyl' ? (p.side === 'bot' ? 2 : 1) : (p.side === 'bot' ? 3 : 2);
+  const grp = g.groups[face], idx = g.index.array, pos = g.attributes.position, uv = g.attributes.uv, seen = new Set();
+  for (let i = grp.start; i < grp.start + grp.count; i++) {
+    const vtx = idx[i]; if (seen.has(vtx)) continue; seen.add(vtx);
+    const u = p.u + pos.getX(vtx) * w, v = p.v + pos.getZ(vtx) * h;
+    uv.setXY(vtx, ...(b ? faceUV(b, p.side, u, v) : [u, 1 - v]));
+  }
+  uv.needsUpdate = true;
+  const body = new THREE.MeshStandardMaterial({...MATS[kind], transparent: kind === 'label', opacity: kind === 'label' ? 0 : 1});
+  const faceMat = new THREE.MeshLambertMaterial({map: p.side === 'bot' ? texBot : texTop, transparent: kind === 'label', opacity: kind === 'label' ? 0 : 1});
+  const mats = (shape === 'cyl' ? [body, body, body] : [body, body, body, body, body, body]); mats[face] = faceMat;
+  const mesh = new THREE.Mesh(g, mats);
+  mesh.scale.set(w * three.aspect, ht, h);
+  const y = p.side === 'bot' ? -T / 2 - ht / 2 : T / 2 + ht / 2;
+  mesh.position.copy(W3(p.u, p.v, y));
+  mesh.castShadow = kind !== 'label' && mm > .3; mesh.receiveShadow = true;
+  mesh.userData = {id: p.id, body, faceMat, label: kind === 'label', base: y};
+  return mesh;
+}
+// Auto-detected parts: merged into one mesh; the exposed face wears the photo, the sides take the part's body colour
+function autoMeshes(items, b, texTop, texBot) {
+  const tpl = new THREE.BoxGeometry(1, 1, 1).toNonIndexed(), tp = tpl.attributes.position;
+  const out = [];
+  for (const side of ['top', 'bot']) {
+    const list = items.filter(p => p.side === side); if (!list.length) continue;
+    const texFace = side === 'bot' ? 3 : 2;           // -y face for underside parts, +y for top
+    const A = {pos: [], nrm: [], uv: [], col: [], tri: []}, B = {pos: [], nrm: [], uv: [], col: [], tri: []};
+    const dummy = new THREE.Object3D(), v = new THREE.Vector3(), n = new THREE.Vector3(), c = new THREE.Color();
+    const tn = tpl.attributes.normal;
+    list.forEach((p, k) => {
+      const [, , mm, kind] = AUTO[p.m.t], ht = mm * MM, bot = side === 'bot';
+      dummy.position.copy(W3(p.u, p.v, bot ? -T / 2 - ht / 2 : T / 2 + ht / 2));
+      dummy.rotation.set(0, THREE.MathUtils.degToRad(bot ? p.m.a : -p.m.a), 0);
+      dummy.scale.set(Math.max(p.m.w, 3 / 4000) * three.aspect, ht, Math.max(p.m.h, 3 / 3000));
+      dummy.updateMatrix();
+      const nm = new THREE.Matrix3().getNormalMatrix(dummy.matrix);
+      c.set(MATS[kind].color);
+      for (let j = 0; j < 36; j++) {
+        const face = Math.floor(j / 6), dst = face === texFace ? A : B;
+        v.fromBufferAttribute(tp, j).applyMatrix4(dummy.matrix); n.fromBufferAttribute(tn, j).applyMatrix3(nm).normalize();
+        dst.pos.push(v.x, v.y, v.z); dst.nrm.push(n.x, n.y, n.z);
+        const [fu, fv] = face === texFace ? (b ? faceUV(b, side, v.x / three.aspect + .5, v.z + .5) : [v.x / three.aspect + .5, .5 - v.z]) : [0, 0];
+        dst.uv.push(fu, fv); dst.col.push(c.r, c.g, c.b);
+        if (j % 3 === 0) dst.tri.push(k);
+      }
+    });
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute([...A.pos, ...B.pos], 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute([...A.nrm, ...B.nrm], 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute([...A.uv, ...B.uv], 2));
+    g.setAttribute('color', new THREE.Float32BufferAttribute([...A.col, ...B.col], 3));
+    g.addGroup(0, A.pos.length / 3, 0); g.addGroup(A.pos.length / 3, B.pos.length / 3, 1);
+    const faceMat = new THREE.MeshLambertMaterial({map: side === 'bot' ? texBot : texTop, transparent: true, opacity: 1});
+    const bodyMat = new THREE.MeshStandardMaterial({vertexColors: true, roughness: .5, metalness: .2, transparent: true, opacity: 1});
+    const mesh = new THREE.Mesh(g, [faceMat, bodyMat]);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    mesh.userData = {list, tri: [...A.tri, ...B.tri], mats: [faceMat, bodyMat]};
+    out.push(mesh);
+  }
+  return out;
+}
+// Package legs as separate tinned-metal parts, one instance per pin, hoverable and clickable
+function legMeshes(items) {
+  const out = [], dummy = new THREE.Object3D(), all = con(SC()).legs || {};
+  for (const p of items) {
+    const L = all[p.id]; if (!L || p.side !== 'top' || !p.m.body) continue;
+    const [bx, by, bw, bh] = p.m.body, qfp = L.pkg === 'QFP100';
+    const wid = (qfp ? .22 : .45) * MM, len = (qfp ? 1.0 : 1.3) * MM, ht = .22 * MM;
+    const mat = new THREE.MeshStandardMaterial({color: 0xcfd3d8, metalness: .9, roughness: .28, transparent: true, opacity: 1});
+    const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat, L.pts.length);
+    const pins = [];
+    L.pts.forEach(([x, y], i) => {
+      const horiz = Math.abs(x - bx) / bw > Math.abs(y - by) / bh;
+      dummy.position.copy(W3(x, y, T / 2 + ht / 2)); dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(horiz ? len : wid, ht, horiz ? wid : len); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix);
+      pins.push({mid: p.id, n: i + 1, part: p.m.part, x, y, horiz, wid, len, ht});
+    });
+    im.castShadow = true; im.receiveShadow = true;
+    im.userData = {pins, mat};
+    out.push(im);
+  }
+  return out;
+}
+/* ---------- rebuilt surface: board tiles + modelled parts, no photo pixels ---------- */
+const MMt = mm => mm * MM;
+function std(o) { const m = new THREE.MeshStandardMaterial(o); if (o.color != null) m.color.convertSRGBToLinear(); return m; }
+function tileTex(path) {
+  if (three.tex[path]) return three.tex[path];
+  const t = new THREE.TextureLoader().load(path, tx => { tx.needsUpdate = true; draw(); }, undefined, () => banner('A board tile could not be loaded. Reload the page.'));
+  t.encoding = THREE.sRGBEncoding; t.anisotropy = three.renderer.capabilities.getMaxAnisotropy(); t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter;
+  return three.tex[path] = t;
+}
+// island-id tiles (RGB = id) + a 256x256 on/off table per side; the shader lights the pixels whose island is switched on
+function selTex() { const t = new THREE.DataTexture(new Uint8Array(65536), 256, 256, THREE.LuminanceFormat); t.magFilter = t.minFilter = THREE.NearestFilter; t.needsUpdate = true; return t; }
+function islMat(path, side) {
+  three.isl = three.isl || {btop: selTex(), bbot: selTex()};
+  let lab = three.tex[path];
+  if (!lab) { lab = three.tex[path] = new THREE.TextureLoader().load(path, () => draw()); lab.magFilter = lab.minFilter = THREE.NearestFilter; lab.generateMipmaps = false; }
+  return new THREE.ShaderMaterial({uniforms: {lab: {value: lab}, sel: {value: three.isl[side === 'top' ? 'btop' : 'bbot']}, col: {value: new THREE.Color(COL.cu)}},
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform sampler2D lab; uniform sampler2D sel; uniform vec3 col; varying vec2 vUv; void main(){ vec3 c = floor(texture2D(lab, vUv).rgb * 255.0 + 0.5); float id = c.r + c.g * 256.0 + c.b * 65536.0; if (id < 0.5 || id > 65535.5) discard; if (texture2D(sel, (vec2(mod(id, 256.0), floor(id / 256.0)) + 0.5) / 256.0).r < 0.5) discard; gl_FragColor = vec4(col, 0.92); }',
+    transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2});
+}
+function buildBoardRB(b) {
+  const g = new THREE.Group(), mats = [], N = 3, islOn = /^tiles\/(btop|bbot)_$/.test(b.tiles.top) && /^tiles\/(btop|bbot)_$/.test(b.tiles.bottom);
+  if (islOn) loadIsl(b);
+  for (const [side, pre] of [['top', b.tiles.top], ['bot', b.tiles.bottom]]) {
+    for (let ty = 0; ty < N; ty++) for (let tx = 0; tx < N; tx++) {
+      const u0 = tx / N, v0 = ty / N, y = side === 'top' ? T / 2 : -T / 2, G = 24, pos = [], uvs = [], idx = [];
+      // bottom tiles hold the bottom photo resampled through the old affine; send each vertex back to its bottom-photo point, then correct it
+      const at = (u, v) => side === 'top' || !fixOn() ? W3(u, v, y) : W3c(...fixBot(...topToBot(b, u, v)), y);
+      for (let j = 0; j <= G; j++) for (let i = 0; i <= G; i++) { pos.push(...at(u0 + i / G / N, v0 + j / G / N).toArray()); uvs.push(i / G, 1 - j / G); }
+      for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) { const a = j * (G + 1) + i, bq = a + 1, c = a + G + 2, d = a + G + 1;
+        idx.push(...(side === 'top' ? [a, d, c, a, c, bq] : [a, bq, c, a, c, d])); }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(idx); geo.computeVertexNormals();
+      const mt = new THREE.MeshStandardMaterial({map: tileTex(`${pre}${tx}${ty}.png`), alphaTest: .5, roughness: .85, metalness: 0, envMapIntensity: .05});
+      const mesh = new THREE.Mesh(geo, mt); mesh.receiveShadow = true; g.add(mesh); mats.push(mt);
+      if (islOn) { const om = new THREE.Mesh(geo, islMat(`${pre.replace(/(btop|bbot)_$/, 'isl_$1_')}${tx}${ty}.png`, side)); om.renderOrder = 2; g.add(om); }
+    }
+  }
+  // inner-layer copper (X-ray, xr/inner.py) as a pale-blue overlay on both faces, in board coordinates; off until toggled
+  const inner = new THREE.Group(); inner.visible = showInner && islOn;
+  for (const y of [T / 2 + .0003, -T / 2 - .0003]) for (let ty = 0; ty < N; ty++) for (let tx = 0; tx < N; tx++) {
+    const u0 = tx / N, v0 = ty / N, G = 24, pos = [], uvs = [], idx = [];
+    for (let j = 0; j <= G; j++) for (let i = 0; i <= G; i++) { pos.push(...W3(u0 + i / G / N, v0 + j / G / N, y).toArray()); uvs.push(i / G, 1 - j / G); }
+    for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) { const a = j * (G + 1) + i; idx.push(a, a + G + 1, a + G + 2, a, a + G + 2, a + 1); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); geo.setIndex(idx);
+    inner.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({map: tileTex(`${b.tiles.top.replace('btop_', 'binr_')}${tx}${ty}.png`), transparent: true, depthWrite: false, side: THREE.DoubleSide})));
+  }
+  g.add(inner);
+  const wall = buildBoard(b, null, null).group.children[2]; g.add(wall);
+  return {group: g, mats, inner};
+}
+// crisp top-face artwork: base colour, fine grain, optional marking lines and extras, drawn at 40 px/mm
+function topCanvas(wmm, hmm, o) {
+  const k = 40, W = Math.min(2048, Math.max(64, Math.round(wmm * k))), H = Math.min(2048, Math.max(64, Math.round(hmm * k)));
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  g.fillStyle = o.base; g.fillRect(0, 0, W, H);
+  if (o.grain) { for (let i = 0; i < W * H / 60; i++) { g.fillStyle = `rgba(${o.grain},${Math.random() * .08})`; g.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5); } }
+  g.save(); g.translate(W / 2, H / 2); g.rotate(-(o.rot || 0) * Math.PI / 180);
+  const rw = (o.rot || 0) % 180 ? H : W, rh = (o.rot || 0) % 180 ? W : H;
+  if (o.draw) o.draw(g, rw, rh);
+  if (o.lines?.length) {
+    let fs = rh / (o.lines.length + 1.4);
+    g.font = `600 ${fs}px "IBM Plex Mono", ui-monospace, monospace`;
+    while (fs > 6 && Math.max(...o.lines.map(l => g.measureText(l).width)) > rw * (o.fill || .84)) { fs *= .93; g.font = `600 ${fs}px "IBM Plex Mono", ui-monospace, monospace`; }
+    g.fillStyle = o.ink || 'rgba(220,222,224,.9)'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const lh = fs * 1.18, y0 = -(o.lines.length - 1) * lh / 2;
+    o.lines.forEach((l, i) => g.fillText(l, 0, y0 + i * lh));
+  }
+  g.restore();
+  if (o.flip) { const c2 = document.createElement('canvas'); c2.width = W; c2.height = H; const g2 = c2.getContext('2d'); g2.translate(W, H); g2.rotate(Math.PI); g2.drawImage(cv, 0, 0); return mkTex(c2); }
+  return mkTex(cv);
+}
+function mkTex(cv) { const t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; t.anisotropy = three.renderer.capabilities.getMaxAnisotropy(); return t; }
+const HEX = {epoxy: '#1d1e21', metal: '#c3c8ce', alum: '#d5d8dc', ferrite: '#8a8c8e', polymer: '#26272a', plastic: '#18191b', cream: '#e9e1cc', grey: '#8f969d'};
+// texture helpers (fractions of the part's top face, canvas origin at its centre)
+const rbox = (g, w, h) => (x0, y0, x1, y1, r, c) => { g.fillStyle = c; g.beginPath(); g.roundRect((x0 - .5) * w, (y0 - .5) * h, (x1 - x0) * w, (y1 - y0) * h, r * w); g.fill(); };
+function brushed(g, w, h, x0, y0, x1, y1) { for (let i = 0; i < 900; i++) { const y = (y0 + Math.random() * (y1 - y0) - .5) * h; g.fillStyle = `rgba(${Math.random() < .5 ? '255,255,255' : '0,0,0'},${Math.random() * .05})`; g.fillRect((x0 - .5) * w, y, (x1 - x0) * w, 1); } }
+// marking text of a measured width and cap height (condensed or stretched to fit)
+function fitText(g, t, x, y, wd, ch, align = 'left', wt = 600) {
+  const fs = ch / .72; g.font = `${wt} ${fs}px Arial, Helvetica, sans-serif`; const sx = wd / Math.max(1, g.measureText(t).width);
+  g.save(); g.translate(x, y); g.scale(sx, 1); g.textAlign = align; g.textBaseline = 'middle'; g.fillText(t, 0, 0); g.restore();
+}
+function arcText(g, t, rad, a0, a1, size, outward) {
+  g.font = `700 ${size}px Arial, Helvetica, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  [...t].forEach((ch, i) => { const th = (a0 + (a1 - a0) * (t.length > 1 ? i / (t.length - 1) : 0)) * Math.PI / 180;
+    g.save(); g.translate(rad * Math.cos(th), rad * Math.sin(th)); g.rotate(th + (outward ? 1 : -1) * Math.PI / 2); g.fillText(ch, 0, 0); g.restore(); });
+}
+// 2D code: finder edges + a fixed pseudo-random fill (the real code isn't readable at photo resolution)
+function dmx(g, x, y, s, n, seed) {
+  const c = s / n; let q = seed * 9301 + 49297;
+  g.fillStyle = '#f3f3f1'; g.fillRect(x, y, s, s); g.fillStyle = '#111';
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { q = (q * 9301 + 49297) % 233280;
+    const on = i === 0 || j === n - 1 || (j === 0 && i % 2 === 0) || (i === n - 1 && j % 2 === 1) || (i > 0 && j < n - 1 && q / 233280 < .5); if (on) g.fillRect(x + i * c, y + j * c, c + .5, c + .5); }
+}
+// measured: painted epoxy tops render ~1.2x the photo colour under this lighting
+const shade = (hex, f) => '#' + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * f).toString(16).padStart(2, '0')).join('');
+function topArt(m, part, wmm, hmm, bot) {
+  const kind = part?.kind, rot = m.trot || 0, flip = bot;
+  if (m.part === 'apu') return topCanvas(wmm, hmm, {base: '#b9a24e', flip, draw: (g, w, h) => {
+    // measured on a 2x crop of the iFixit photo: lid with 16 windows onto the substrate caps, die in a glue bead, marking upside down
+    const R = rbox(g, w, h);
+    R(.02, .004, .995, .9975, .004, '#c4c7ca'); brushed(g, w, h, .02, .004, .995, .9975);
+    const slots = [[.162, .029, .47, .079, 5], [.532, .029, .84, .079, 5], [.19, .1125, .464, .16, 5], [.541, .1125, .816, .16, 5],
+      [.19, .829, .464, .8725, 5], [.541, .829, .816, .8725, 5], [.162, .904, .47, .9575, 5], [.532, .904, .84, .9575, 5],
+      [.057, .154, .081, .329, 3], [.057, .404, .081, .585, 3], [.057, .654, .081, .835, 3], [.112, .204, .149, .329, 2], [.112, .404, .149, .579, 3], [.112, .654, .149, .779, 2],
+      [.849, .204, .886, .329, 2], [.849, .404, .886, .579, 3], [.849, .654, .886, .779, 2], [.919, .154, .958, .329, 3], [.919, .404, .958, .585, 3], [.919, .654, .958, .835, 3]];
+    for (const [x0, y0, x1, y1, n] of slots) {
+      R(x0 - .003, y0 - .003, x1 + .003, y1 + .003, .012, '#8e9296'); R(x0, y0, x1, y1, .01, '#1b2922');
+      const horiz = (x1 - x0) * w > (y1 - y0) * h;
+      for (let i = 0; i < n; i++) { const t = (i + .5) / n;
+        if (horiz) { const cx = x0 + (x1 - x0) * t, hw = (x1 - x0) / n * .3, hh = (y1 - y0) * .26; R(cx - hw, (y0 + y1) / 2 - hh, cx + hw, (y0 + y1) / 2 + hh, 0, '#c9a978'); R(cx - hw * .4, (y0 + y1) / 2 - hh, cx + hw * .4, (y0 + y1) / 2 + hh, 0, '#8f877b'); }
+        else { const cy = y0 + (y1 - y0) * t, hh = (y1 - y0) / n * .3, hw = (x1 - x0) * .26; R((x0 + x1) / 2 - hw, cy - hh, (x0 + x1) / 2 + hw, cy + hh, 0, '#c9a978'); R((x0 + x1) / 2 - hw, cy - hh * .4, (x0 + x1) / 2 + hw, cy + hh * .4, 0, '#8f877b'); } }
+    }
+    R(.19, .195, .816, .7975, .03, '#1e2c28'); R(.26, .26, .758, .7375, .006, '#43464a'); R(.266, .266, .752, .7315, .004, '#0a0b0d');
+    g.fillStyle = '#2a2c2e'; g.beginPath(); g.arc((.964 - .5) * w, (.029 - .5) * h, w * .008, 0, 7); g.fill();
+    dmx(g, (.294 - .5) * w, (.3 - .5) * h, .078 * w, 16, 7);
+    g.save(); g.rotate(Math.PI); g.fillStyle = 'rgba(222,225,228,.93)'; const kx = w / 810, ky = h / 800;
+    for (const [t, x, y, wd, ch] of [['SONY COMPUTER', 648, 600, 258, 36], ['ENTERTAINMENT INC.', 648, 540, 318, 36], ['CXD90026G', 648, 475, 203, 24], ['D61000F6F84HT', 650, 381, 138, 11],
+      ['WC00280H30445', 650, 361, 180, 11], ['DIFFUSED IN TAIWAN', 650, 341, 180, 11], ['MADE IN MALAYSIA', 650, 321, 155, 11]])
+      fitText(g, t, -(x - 479) * kx, -(y - 472) * ky, wd * kx, ch * ky, 'left');
+    g.restore(); }});
+  if (m.part === 'wifi') return topCanvas(wmm, hmm, {base: '#b8bcc0', grain: '255,255,255', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h);
+    R(.01, .061, .93, .94, .004, '#1a1b1d');
+    for (let i = 0; i < 4; i++) R(.94, .12 + i * .2, .98, .27 + i * .2, .01, '#d7dadd');
+    for (let i = 0; i < 5; i++) R(.03 + i * .19, .02, .19 + i * .19, .05, .005, '#d7dadd');
+    R(.0536, .1271, .9058, .9208, .004, '#f3f3f1');
+    dmx(g, (.572 - .5) * w, (.54 - .5) * h, .211 * w, 18, 3);
+    g.save(); g.rotate(Math.PI); g.fillStyle = '#1c1c1c'; const kx = w / 690, ky = h / 543;
+    for (const [t, y, wd, ch] of [['SP88W8797-MA0-2E2T00-001', 203, 478, 26], ['Rev.1.0', 297, 133, 34], ['CO-D83003W', 384, 228, 28], ['B00659416AED', 492, 273, 30]])
+      fitText(g, t, -(157 - 420) * kx, -(y - 343.5) * ky, wd * kx, ch * ky, 'right', 500);
+    g.restore(); }});
+  if (m.part === 'cell') return topCanvas(wmm, hmm, {base: '#8e7a5f', flip, draw: (g, w) => {
+    const r = w / 2, gr = g.createRadialGradient(-r * .3, -r * .35, r * .1, 0, 0, r * .95); gr.addColorStop(0, '#4a4c50'); gr.addColorStop(1, '#1b1c1e');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r * .93, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(205,205,205,.35)'; g.lineWidth = r * .02; g.beginPath(); g.arc(0, 0, r * .9, 0, 7); g.stroke();
+    g.fillStyle = '#d6d8da';
+    arcText(g, 'CR2032', r * .72, -176, -70, r * .17, true); arcText(g, 'E', r * .66, -60, -60, r * .09, true);
+    arcText(g, 'LITHIUM', r * .47, -168, -70, r * .09, true);
+    g.save(); g.translate(-r * .17, -r * .22); g.rotate(-35 * Math.PI / 180); fitText(g, '3V', 0, 0, r * .16, r * .08, 'center', 700); g.restore();
+    g.save(); g.rotate(-28 * Math.PI / 180); fitText(g, 'MITSUBISHI', 0, r * .02, w * .74, w * .085, 'center', 800); g.restore();
+    g.fillRect(r * .08, r * .27, r * .16, r * .02); g.fillRect(r * .15, r * .2, r * .02, r * .16);
+    arcText(g, 'MADEINCHINA', r * .68, 135, -8, r * .11, false); }});
+  if (m.part === 'cellclip') return topCanvas(wmm, hmm, {base: '#9a8566', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); R(0, .32, .32, .75, .02, '#d2d4d6'); R(.42, .18, .9, .86, .02, '#c8b06a'); R(.5, .3, .82, .74, .01, '#a8955e'); }});
+  if (m.part === 'fusb') return topCanvas(wmm, hmm, {base: '#2c2e31', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h);
+    R(.375, 0, .62, .769, 0, '#3a3c40'); R(.425, 0, .44, .769, 0, '#4c4f53'); R(.555, 0, .57, .769, 0, '#4c4f53');
+    R(0, .769, 1, 1, 0, '#2a2c2f'); R(.07, .84, .35, .98, 0, '#4a4d51'); R(.65, .84, .94, .98, 0, '#4a4d51'); R(.42, .84, .58, 1, 0, '#35373a');
+    for (const o of [0, .593]) {
+      R(.037 + o, .018, .367 + o, .769, .01, '#141517'); R(.037 + o, .01, .367 + o, .035, .003, '#8f9296');
+      g.strokeStyle = '#b9a87e'; g.lineWidth = w * .006;
+      for (const [x0, x1] of [[.089, .175], [.243, .323]]) { g.beginPath(); g.moveTo((x0 + o - .5) * w, (.316 - .5) * h); g.lineTo((x0 + o - .5) * w, (.08 - .5) * h); g.arcTo(((x0 + x1) / 2 + o - .5) * w, (.04 - .5) * h, (x1 + o - .5) * w, (.08 - .5) * h, w * .02); g.lineTo((x1 + o - .5) * w, (.316 - .5) * h); g.stroke(); }
+      g.beginPath(); g.moveTo((.185 + o - .5) * w, (.25 - .5) * h); g.lineTo((.2 + o - .5) * w, (.1 - .5) * h); g.lineTo((.215 + o - .5) * w, (.2 - .5) * h); g.lineTo((.23 + o - .5) * w, (.1 - .5) * h); g.stroke();
+      g.fillStyle = '#e8e8e6'; for (const x of [.107, .144, .262, .299]) { g.beginPath(); g.arc((x + o - .5) * w, (.503 - .5) * h, w * .007, 0, 7); g.fill(); }
+      g.strokeStyle = '#9c9fa3'; g.lineWidth = w * .004; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc((.07 + i * .066 + o - .5) * w, (.69 - .5) * h, w * .014, Math.PI, 2 * Math.PI); g.stroke(); }
+    } }});
+  // rear ports, each measured on a 3x crop of the iFixit photo (fractions of the measured outline)
+  if (m.part === 'lan') return topCanvas(wmm, hmm, {base: '#a3a5a7', grain: '0,0,0', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); brushed(g, w, h, 0, 0, 1, 1); R(0, 0, 1, .012, 0, '#cfd1d3'); R(.387, .937, .631, .962, 0, '#2a2b2d'); R(0, .962, 1, 1, 0, '#8d8f91');
+    g.fillStyle = '#1d1e20'; fitText(g, '3B21A5Λ', (.117 - .5) * w, (.139 - .5) * h, .72 * w, .1 * h, 'left', 700); }});
+  if (m.part === 'hdmi') return topCanvas(wmm, hmm, {base: '#c5c7c9', grain: '0,0,0', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); R(.177, 0, .865, .405, 0, '#3a8f4f');
+    R(.229, .203, .813, .291, 0, '#c9cbcd'); for (let i = 0; i < 19; i++) R(.235 + i * .03, .203, .25 + i * .03, .291, 0, '#7d7f81');
+    R(.2, .291, .84, .405, .01, '#2a2b2d'); R(.177, .405, .865, 1, .01, '#b8babc');
+    for (const x of [.292, .615]) { R(x, .519, x + .156, .937, .01, '#3a3b3e'); R(x + .04, .56, x + .116, .9, .01, '#9a9da0'); }
+    R(.43, .45, .46, .5, .01, '#3a3b3e'); R(.48, .45, .51, .5, .01, '#3a3b3e');
+    R(0, 0, .177, 1, .02, '#d4d6d8'); R(.865, 0, 1, 1, .02, '#d4d6d8'); }});
+  if (m.part === 'optical') return topCanvas(wmm, hmm, {base: '#1f2022', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); R(.095, 0, .215, 1, 0, '#141517'); R(.79, 0, .91, 1, 0, '#141517'); R(.215, .655, .79, 1, 0, '#252629');
+    R(.324, .161, .486, .276, .01, '#050506'); R(.595, .161, .757, .276, .01, '#050506');
+    g.fillStyle = '#4a4b4e'; fitText(g, 'A932C', (.297 - .5) * w, (.373 - .5) * h, .446 * w, .08 * h, 'left', 700); }});
+  if (m.part === 'aux') return topCanvas(wmm, hmm, {base: '#55575a', grain: '255,255,255', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); R(0, 0, 1, .045, 0, '#8a8c8f'); for (const x of [.28, .48, .68]) R(x, 0, x + .1, .045, 0, '#3a3b3d');
+    g.fillStyle = '#c9cbcc'; fitText(g, '38A06', (.329 - .5) * w, (.213 - .5) * h, .316 * w, .07 * h, 'left', 500);
+    g.strokeStyle = '#2b2c2e'; g.lineWidth = w * .03;
+    for (const [x0, x1] of [[.1, .4], [.59, .89]]) { g.beginPath(); g.moveTo((x0 - .5) * w, (.46 - .5) * h); g.lineTo((x0 - .5) * w, (.84 - .5) * h); g.lineTo((x1 - .5) * w, (.84 - .5) * h); g.lineTo((x1 - .5) * w, (.46 - .5) * h); g.stroke();
+      R(x0 + .07, .7, x1 - .07, .78, .01, '#cfcfcc'); }
+    R(.45, .52, .55, .85, .01, '#2b2c2e'); R(.48, .56, .52, .8, .01, '#9a9c9e'); }});
+  if (m.part === 'hdmienc') return topCanvas(wmm, hmm, {base: '#8f9398', grain: '0,0,0', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); brushed(g, w, h, 0, 0, 1, 1); R(0, 0, 1, .015, 0, '#c3c6c9'); R(.985, 0, 1, 1, 0, '#c3c6c9');
+    if (m.notch) { const [a, b, c, d] = m.notch; R(a, b, c, d, 0, '#1c853f'); } }});
+  if (m.part === 'usbhub') return topCanvas(wmm, hmm, {base: m.col || '#3c3d40', grain: '255,255,255', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); g.save(); g.rotate(Math.PI); R(.06, .06, .94, .94, .01, '#45464a');
+    g.strokeStyle = 'rgba(205,207,210,.8)'; g.lineWidth = w * .02; g.beginPath(); g.moveTo(0, -h * .37); g.lineTo(w * .14, -h * .23); g.lineTo(0, -h * .09); g.lineTo(-w * .14, -h * .23); g.closePath(); g.stroke();
+    g.fillStyle = 'rgba(205,207,210,.85)'; fitText(g, 'GL3520', 0, h * .05, w * .5, h * .1, 'center', 500);
+    fitText(g, (m.text || [])[1] || '', 0, h * .19, w * .5, h * .065, 'center', 500); fitText(g, (m.text || [])[2] || '', 0, h * .3, w * .5, h * .065, 'center', 500); g.restore(); }});
+  if (m.part === 'gddr5') return topCanvas(wmm, hmm, {base: '#5c5e61', grain: '255,255,255', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); R(.07, .06, .93, .94, .03, '#46474b');
+    for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(${Math.random() < .5 ? '255,255,255' : '0,0,0'},${Math.random() * .06})`; g.fillRect((Math.random() * .84 - .42) * w, (Math.random() * .86 - .43) * h, w * .006, w * .006); } }});
+  if (m.part === 'conn' && m.cells) return topCanvas(wmm, hmm, {base: '#ece3c6', flip, draw: (g, w, h) => {
+    const R = rbox(g, w, h); R(.04, .2, .9, .88, .01, '#d9cca6');
+    for (let i = 1; i < m.cells; i++) R(.04 + .86 * i / m.cells - .008, .2, .04 + .86 * i / m.cells + .008, .88, 0, '#ece3c6');
+    R(.92, .1, .99, .9, .01, '#c4c7ca'); }});
+  if (m.part === 'buzzer') return topCanvas(wmm, hmm, {base: '#2b2c2f', flip, draw: (g, w, h) => { g.fillStyle = '#060607'; g.beginPath(); g.arc(0, h * .03, w * .14, 0, 7); g.fill(); }});
+  if (m.part === 'vrmcapin') return capTop(wmm, m.ma, '#8a8d90', m.text || ['3T', '220', 'CLA'], flip, 90);
+  if (m.part === 'vrmcapout') return topCanvas(wmm, hmm, {base: m.col || '#2a2b2e', grain: '255,255,255', rot, flip, draw: (g, w, h) => {
+    // as printed: polarity band at one end, value, small lot code and a large letter
+    g.fillStyle = '#8f9397'; g.fillRect(w * .3, -h / 2, w * .16, h); g.fillStyle = '#5d6064'; g.fillRect(w * .46, -h / 2, w * .04, h); g.fillRect(-w * .5, -h / 2, w * .03, h);
+    const t = m.text || ['470']; g.fillStyle = 'rgba(200,202,205,.85)';
+    fitText(g, t[0], -w * .02, -h * .17, w * .26, h * .3, 'center', 500);
+    if (t[1]) fitText(g, t[1], -w * .17, h * .24, w * .22, h * .12, 'center', 500);
+    if (t[2]) fitText(g, t[2], w * .19, h * .19, w * .08, h * .3, 'center', 400); }});
+  if (m.text) return topCanvas(wmm, hmm, {base: kind === 'epoxy' && m.col ? shade(m.col, .84) : m.col || HEX[kind] || '#1d1e21', grain: kind === 'ferrite' ? '0,0,0' : '255,255,255', rot, flip, lines: m.text,
+    ink: kind === 'ferrite' ? 'rgba(40,40,40,.85)' : 'rgba(215,217,220,.82)'});
+  return null;
+}
+function capTop(dmm, ang, markCol, lines, flip, trot = 0) {
+  return topCanvas(dmm, dmm, {base: '#bfc3c7', grain: '255,255,255', flip, draw: (g, w) => {
+    if (markCol && ang != null) { g.fillStyle = markCol; g.beginPath(); const a = ang * Math.PI / 180; g.arc(0, 0, w * .5, a - .9, a + .9); g.closePath(); g.fill();
+      g.fillStyle = '#bfc3c7'; g.beginPath(); g.arc(0, 0, w * .3, 0, 7); g.fill(); }
+    g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = w * .012; g.beginPath(); g.moveTo(-w * .35, 0); g.lineTo(w * .35, 0); g.moveTo(0, -w * .35); g.lineTo(0, w * .35); g.stroke();
+    if (lines) { g.save(); g.rotate(-trot * Math.PI / 180); g.fillStyle = 'rgba(40,40,44,.8)'; g.textAlign = 'center'; g.textBaseline = 'middle'; const fs = w * .16; g.font = `600 ${fs}px "IBM Plex Mono", monospace`; lines.forEach((l, i) => g.fillText(l, 0, (i - (lines.length - 1) / 2) * fs * 1.15)); g.restore(); }
+  }});
+}
+// cylinder caps: same planar UV layout as a box top (u = x + .5, v = .5 - z; bottom v = .5 + z) so artwork faces the same way
+function cylPlanar(g) {
+  const pos = g.attributes.position, uv = g.attributes.uv;
+  for (const gi of [1, 2]) { const gr = g.groups[gi], idx = g.index.array;
+    for (let i = gr.start; i < gr.start + gr.count; i++) { const k = idx[i], x = pos.getX(k), z = pos.getZ(k); uv.setXY(k, x + .5, gi === 1 ? .5 - z : .5 + z); } }
+  uv.needsUpdate = true; return g;
+}
+function handMeshRB(p, b) {
+  const m = p.m, part = PARTS[m.part];
+  let u = p.u, v = p.v, w, h;
+  if (m.body) { [u, v] = p.side === 'bot' && b ? botToTop(b, m.body[0], m.body[1]) : [m.body[0], m.body[1]]; [w, h] = [m.body[2], m.body[3]]; }
+  else [w, h] = sizeOf(m);
+  const [mm, kind] = part ? [part.mm, part.kind] : LAYER_MM[m.layer];
+  const label = kind === 'label', ht = Math.max(mm, .05) * MM, shape = m.shape || part?.shape || (m.layer === 'screws' ? 'cyl' : 'box');
+  const wmm = w * FRAME_MM * 4 / 3, hmm = h * FRAME_MM, bot = p.side === 'bot';
+  const g = shape === 'oct' ? cylPlanar(new THREE.CylinderGeometry(.5 / Math.cos(Math.PI / 8), .5 / Math.cos(Math.PI / 8), 1, 8).rotateY(Math.PI / 8))
+    : shape === 'cyl' ? cylPlanar(new THREE.CylinderGeometry(.5, .5, 1, 48)) : new THREE.BoxGeometry(1, 1, 1);
+  const body = std({...MATS[kind], ...(m.col ? {color: m.col} : {}), transparent: label, opacity: label ? 0 : 1});
+  const art = label ? null : topArt(m, part, wmm, hmm, bot);
+  const faceMat = art ? new THREE.MeshStandardMaterial({map: art, roughness: Math.max(.6, MATS[kind].roughness), metalness: Math.min(.6, MATS[kind].metalness), envMapIntensity: MATS[kind].metalness > .5 ? .7 : .25}) : body;
+  const face = shape !== 'box' ? (bot ? 2 : 1) : (bot ? 3 : 2);
+  const mats = shape !== 'box' ? [body, body, body] : [body, body, body, body, body, body]; mats[face] = faceMat;
+  // rear ports: seen from below the board, the LAN and AUX jacks are black plastic underneath (bottom photo)
+  if (shape === 'box' && /^(lan|aux)$/.test(m.part)) mats[bot ? 2 : 3] = std({color: '#1b1c1e', roughness: .7, metalness: 0, transparent: true, opacity: 1});
+  const mesh = new THREE.Mesh(g, mats);
+  mesh.scale.set(w * three.aspect, ht, h);
+  const y = bot ? -T / 2 - ht / 2 : T / 2 + ht / 2;
+  mesh.position.copy(W3(u, v, y));
+  mesh.castShadow = !label && mm > .3; mesh.receiveShadow = true;
+  mesh.userData = {id: p.id, body, faceMat, label, base: y};
+  return mesh;
+}
+// auto parts: merged boxes (bodies + metal terminals) per side; electrolytics and joints as their own small meshes
+const AUTO_HT = {c: S => Math.min(1.6, Math.max(.3, S * .85)), t: () => .3, r: () => .35, i: (S, L) => L > 4 ? 1.5 : 1.0, n: () => .9, l: S => Math.min(2.5, Math.max(1, S * .35)), e: S => S > 5.6 ? 5.8 : 5.4, j: S => Math.min(.9, Math.max(.15, S * .35))};
+function autoMeshesRB(items, b) {
+  const out = [], box = new THREE.BoxGeometry(1, 1, 1).toNonIndexed(), bp = box.attributes.position, bn = box.attributes.normal;
+  const dummy = new THREE.Object3D(), v = new THREE.Vector3(), n = new THREE.Vector3(), c = new THREE.Color();
+  for (const side of ['top', 'bot']) {
+    const list = items.filter(p => p.side === side && !/^[ej]$/.test(p.m.t)); if (!list.length) continue;
+    const B = {pos: [], nrm: [], col: [], tri: []}, M = {pos: [], nrm: [], col: [], tri: []}, sgn = side === 'bot' ? -1 : 1;
+    const push = (dst, k, u, vv, wpx, hpx, a, ht, colr, lift = 0) => {
+      dummy.position.copy(W3(u, vv, sgn * (T / 2 + lift + ht / 2))); dummy.rotation.set(0, THREE.MathUtils.degToRad(side === 'bot' ? a : -a), 0);
+      dummy.scale.set(Math.max(wpx, 2) / 3000, ht, Math.max(hpx, 2) / 3000); dummy.updateMatrix();
+      const nm = new THREE.Matrix3().getNormalMatrix(dummy.matrix); c.set(colr).convertSRGBToLinear();
+      for (let j = 0; j < 36; j++) { v.fromBufferAttribute(bp, j).applyMatrix4(dummy.matrix); n.fromBufferAttribute(bn, j).applyMatrix3(nm).normalize();
+        dst.pos.push(v.x, v.y, v.z); dst.nrm.push(n.x, n.y, n.z); dst.col.push(c.r, c.g, c.b); if (j % 3 === 0) dst.tri.push(k); }
+    };
+    list.forEach((p, k) => {
+      const m = p.m, ht = MMt(AUTO_HT[m.t](m.S * PXK, m.L * PXK)), bodyCol = m.c || MATS[AUTO[m.t][3]].color;
+      push(B, k, p.u, p.v, m.w * 4000, m.h * 3000, m.a, ht, bodyCol);
+      for (const t of m.T || []) {
+        const [tu, tv] = side === 'bot' && b ? botToTop(b, t[0], t[1]) : [t[0], t[1]];
+        const legs = m.t === 'i', th = legs ? MMt(.25) : ht * 1.04;
+        push(M, k, tu, tv, t[2] * 4000, t[3] * 3000, t[4], th, legs ? '#c9cdd2' : '#d3d6da');
+      }
+    });
+    const mk = (S, mat) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(S.pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(S.nrm, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(S.col, 3));
+      const me = new THREE.Mesh(g, mat); me.castShadow = true; me.receiveShadow = true; me.userData = {list, tri: S.tri, mats: [mat]}; return me; };
+    out.push(mk(B, new THREE.MeshStandardMaterial({vertexColors: true, roughness: .55, metalness: .05, transparent: true, opacity: 1})));
+    if (M.pos.length) out.push(mk(M, new THREE.MeshStandardMaterial({vertexColors: true, roughness: .3, metalness: .85, transparent: true, opacity: 1})));
+  }
+  for (const p of items.filter(p => /^[ej]$/.test(p.m.t))) {
+    const m = p.m, sgn = p.side === 'bot' ? -1 : 1, rad = m.w * 4000 / 3000 / 2, mats = [];
+    const grp = new THREE.Group();
+    if (m.t === 'j') {
+      const mat = std({color: 0xd0d4d8, metalness: .9, roughness: .22, transparent: true, opacity: 1}); mats.push(mat);
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), mat);
+      dome.scale.set(rad, MMt(AUTO_HT.j(m.S * PXK)) * sgn, m.h / 2); dome.position.copy(W3(p.u, p.v, sgn * T / 2)); grp.add(dome);
+    } else {
+      const H = MMt(AUTO_HT.e(m.S * PXK)), base = MMt(.6);
+      const bm = std({color: 0x15161a, roughness: .7, transparent: true, opacity: 1});
+      const am = std({color: 0xdcdfe2, roughness: .28, metalness: .8, transparent: true, opacity: 1});
+      const tm = new THREE.MeshStandardMaterial({map: capTop(m.S * PXK, m.ma, m.m, m.text, p.side === 'bot', m.text ? 90 : 0), roughness: .45, metalness: .15, transparent: true, opacity: 1});
+      mats.push(bm, am, tm);
+      const plinth = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), bm); plinth.scale.set(rad * 2.02, base, rad * 2.02); plinth.position.copy(W3(p.u, p.v, sgn * (T / 2 + base / 2)));
+      const can = new THREE.Mesh(cylPlanar(new THREE.CylinderGeometry(.5, .5, 1, 48)), [am, sgn > 0 ? tm : am, sgn > 0 ? am : tm]); can.scale.set(rad * 2, 1, rad * 2); can.scale.y = H - base; can.position.copy(W3(p.u, p.v, sgn * (T / 2 + base + (H - base) / 2)));
+      grp.add(plinth, can);
+    }
+    grp.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.userData = {list: [p], mats}; } });
+    grp.userData = {list: [p], mats};
+    out.push(grp);
+  }
+  return out;
+}
+/* ---------- physical models for the assembly (all sizes in mm; procedural, from the reference photos) ---------- */
+function canvasTex(w, h, draw) { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h); return mkTex(cv); }
+const ventTex = (cols, rows, base = '#141518') => canvasTex(1024, 256, (g, w, h) => { g.fillStyle = base; g.fillRect(0, 0, w, h);
+  const cw = w / cols, rh = h / rows; g.fillStyle = '#020203'; for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) g.fillRect(i * cw + cw * .12, j * rh + rh * .18, cw * .76, rh * .64); });
+function mbox(grp, P, x, y, z, w, d, h, mat) { const m = new THREE.Mesh(new THREE.BoxGeometry(w * MM, h * MM, d * MM), mat); m.position.copy(P(x + w / 2, y + d / 2, z + h / 2)); m.castShadow = m.receiveShadow = true; grp.add(m); return m; }
+function mcyl(grp, P, x, y, z, r, h, mat, seg = 48) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r * MM, r * MM, h * MM, seg), mat); m.position.copy(P(x, y, z + h / 2)); m.castShadow = m.receiveShadow = true; grp.add(m); return m; }
+const MAT = () => ({
+  black: std({color: '#18191b', roughness: .75}), matte: std({color: '#222326', roughness: .9}), alum: std({color: '#cdd1d5', roughness: .35, metalness: .8}),
+  steel: std({color: '#b9bec4', roughness: .45, metalness: .7}), copper: std({color: '#c27b47', roughness: .35, metalness: .9}), white: std({color: '#e8e8e4', roughness: .6}),
+  pcbG: std({color: '#2f7a46', roughness: .7}), gold: std({color: '#d4a24a', roughness: .3, metalness: .9}), dark: std({color: '#0a0a0b', roughness: .8}),
+});
+function modelPSU(q, P, M) {   // black housing, vent grille on the rear face, IEC C8 inlet, label on top
+  const g = new THREE.Group(), x = q.x, y = q.y, z = q.z, w = q.w, d = q.d, h = q.h;
+  const vents = ventTex(26, 3), body = new THREE.Mesh(new THREE.BoxGeometry(w * MM, h * MM, d * MM), [M.black, M.black, M.black, M.black, M.black, std({map: vents, roughness: .8})]);
+  body.position.copy(P(x + w / 2, y + d / 2, z + h / 2)); g.add(body);
+  mbox(g, P, x + 12, y + d - .1, z + h * .45, 14, 1, 9, M.dark);                         // C8 inlet recess on the rear face
+  for (const dx of [16.5, 21.5]) mcyl(g, P, x + dx, y + d + .4, z + h * .45 + 2.5, 1.1, 4, M.alum).rotation.x = Math.PI / 2;
+  const lbl = canvasTex(512, 160, (c, W, Hh) => { c.fillStyle = '#d9d9d6'; c.fillRect(0, 0, W, Hh); c.fillStyle = '#222'; c.font = '600 38px Arial'; c.fillText('ADP-240AR', 20, 60); c.font = '24px Arial'; c.fillText('Sony Computer Entertainment Inc.  12 V 17 A', 20, 110); });
+  const lab = new THREE.Mesh(new THREE.PlaneGeometry(60 * MM, 19 * MM), std({map: lbl, roughness: .8})); lab.rotation.x = Math.PI / 2; lab.position.copy(P(x + 40, y + 30, z - .05)); g.add(lab);  // faces down (seen from below)
+  for (const ex of [x - 3, x + w]) mbox(g, P, ex, y + d / 2 - 4, z + h - 2, 3, 8, 1.5, M.black);   // screw tabs
+  return g;
+}
+function modelFan(q, P, M) {   // centrifugal blower: scroll housing opening into a straight duct toward the heatsink (+y), bladed impeller, hub
+  const g = new THREE.Group(), [cx, cy] = q.hub, r0 = 36, r1 = Math.min(cx - q.x, q.x + q.w - cx, cy - q.y) - 1.5, pts = [];
+  const t0 = Math.PI / 2 + .35, t1 = Math.PI / 2 - .35 + 2 * Math.PI;              // starts and ends on the outlet (+y) side
+  for (let i = 0; i <= 72; i++) { const f = i / 72, t = t0 + f * (t1 - t0), r = r0 + f * (r1 - r0); pts.push([cx + r * Math.cos(t), cy + r * Math.sin(t)]); }
+  const yEnd = q.y + q.d, S = ([x, y]) => new THREE.Vector2((x - ASM.caseW / 2) * MM, (y - ASM.caseD / 2) * MM);
+  const outline = [...pts, [pts[pts.length - 1][0], yEnd], [pts[0][0], yEnd]];
+  const plate = new THREE.Shape(outline.map(S)); plate.holes.push(new THREE.Path().absarc((cx - ASM.caseW / 2) * MM, (cy - ASM.caseD / 2) * MM, (r0 - 6) * MM, 0, Math.PI * 2, true));
+  for (const [zz, mat] of [[q.z, M.matte], [q.z + q.h - 1.2, M.white]]) { const ge = new THREE.ExtrudeGeometry(plate, {depth: 1.2 * MM, bevelEnabled: false}); ge.rotateX(Math.PI / 2); ge.translate(0, (zz + 1.2) * MM, 0); g.add(new THREE.Mesh(ge, mat)); }
+  const wallPts = outline.slice(0, pts.length + 1);                                   // scroll wall + outer duct side
+  for (let i = 1; i < wallPts.length; i++) { const [x0, y0] = wallPts[i - 1], [x1, y1] = wallPts[i], L = Math.hypot(x1 - x0, y1 - y0);
+    const w = new THREE.Mesh(new THREE.BoxGeometry(L * MM, (q.h - 2.4) * MM, 1.4 * MM), M.matte); w.position.copy(P((x0 + x1) / 2, (y0 + y1) / 2, q.z + q.h / 2)); w.rotation.y = -Math.atan2(y1 - y0, x1 - x0); g.add(w); }
+  { const [x0, y0] = pts[0], w = new THREE.Mesh(new THREE.BoxGeometry(1.4 * MM, (q.h - 2.4) * MM, (yEnd - y0) * MM), M.matte); w.position.copy(P(x0, (y0 + yEnd) / 2, q.z + q.h / 2)); g.add(w); }   // tongue side of the duct
+  mcyl(g, P, cx, cy, q.z + 1.2, 14, q.h - 3, M.dark);                                  // hub / motor
+  for (let i = 0; i < 31; i++) { const t = i / 31 * Math.PI * 2, bl = new THREE.Mesh(new THREE.BoxGeometry(12 * MM, (q.h - 4) * MM, .6 * MM), M.dark);
+    bl.position.copy(P(cx + 23 * Math.cos(t), cy + 23 * Math.sin(t), q.z + q.h / 2)); bl.rotation.y = -t - .55; g.add(bl); }
+  return g;
+}
+function modelHeatsink(q, P, M, apu) {   // copper base under the APU, two heat pipes, aluminium fin stack across the fan outlet
+  const g = new THREE.Group(), base = ASM.boardBottom - 2.6;
+  mbox(g, P, apu.x + 2, apu.y + 2, base - 4, apu.w - 4, apu.d - 4, 4, M.copper);
+  const finZ = q.z, finH = q.h - 4, n = 46;
+  for (let i = 0; i < n; i++) mbox(g, P, q.x + i * q.w / n, q.y + 2, finZ, .35, q.d * .55, finH, M.alum);
+  mbox(g, P, q.x, q.y + 2, finZ + finH, q.w, q.d * .55, .8, M.alum);
+  for (const k of [0, 1]) { const path = new THREE.CatmullRomCurve3([P(apu.x + apu.w / 2 + (k - .5) * 12, apu.y + apu.d / 2, base - 3), P(apu.x + apu.w / 2 + (k - .5) * 30, q.y + q.d * .35, finZ + finH * .5), P(q.x + 10 + k * (q.w - 20), q.y + q.d * .3, finZ + finH * .5)]);
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(path, 40, 3 * MM, 12, false), M.copper)); }
+  return g;
+}
+function modelBD(q, P, M) {   // slim drive: steel top plate with stamped ribs, black front bezel with disc slot, spindle window
+  const g = new THREE.Group();
+  mbox(g, P, q.x, q.y + 4, q.z, q.w, q.d - 4, q.h, M.steel);
+  mbox(g, P, q.x, q.y, q.z, q.w, 4, q.h, M.black);                                       // bezel (front)
+  mbox(g, P, q.x + 8, q.y - .1, q.z + q.h / 2 - 1, q.w - 16, 1, 2, M.dark);              // disc slot
+  for (const [a, b, c2, d2] of [[20, 25, 90, 3], [20, 60, 90, 3], [20, 95, 90, 3], [100, 20, 3, 90]]) mbox(g, P, q.x + a, q.y + b, q.z - .5, c2, d2, .5, M.alum);   // ribs (underside)
+  mcyl(g, P, q.x + q.w / 2, q.y + q.d / 2, q.z - .3, 15, .3, M.dark);
+  const warn = canvasTex(128, 96, (c, W, Hh) => { c.fillStyle = '#f2d21b'; c.fillRect(0, 0, W, Hh); c.fillStyle = '#111'; c.beginPath(); c.moveTo(64, 10); c.lineTo(110, 86); c.lineTo(18, 86); c.closePath(); c.lineWidth = 6; c.strokeStyle = '#111'; c.stroke(); });
+  const lw = new THREE.Mesh(new THREE.PlaneGeometry(14 * MM, 10 * MM), std({map: warn})); lw.rotation.x = Math.PI / 2; lw.position.copy(P(q.x + 25, q.y + 40, q.z - .6)); g.add(lw);
+  return g;
+}
+function modelHDD(q, P, M) {   // SFF-8201 2.5" drive: cast body, top cover with label, PCB + SATA connector at one end, M3 side holes
+  const g = new THREE.Group();
+  mbox(g, P, q.x, q.y, q.z, q.w, q.d, q.h - .6, M.alum);
+  const lbl = canvasTex(512, 360, (c, W, Hh) => { c.fillStyle = '#eeeeea'; c.fillRect(0, 0, W, Hh); c.fillStyle = '#111'; c.font = '700 52px Arial'; c.fillText('HGST', 24, 70); c.font = '28px Arial'; c.fillText('Travelstar  500 GB', 24, 120); c.fillText('5400 RPM  SATA', 24, 160);
+    for (let i = 0; i < 40; i++) c.fillRect(260 + i * 5, 220, i % 3 ? 2 : 4, 90); });
+  const top = new THREE.Mesh(new THREE.PlaneGeometry((q.d > q.w ? q.d : q.w) * MM - 6 * MM, (q.d > q.w ? q.w : q.d) * MM - 6 * MM), std({map: lbl, roughness: .7})); top.rotation.x = -Math.PI / 2; if (q.d > q.w) top.rotation.z = Math.PI / 2; top.position.copy(P(q.x + q.w / 2, q.y + q.d / 2, q.z + q.h - .55)); g.add(top);
+  mbox(g, P, q.x + 1, q.y + 1, q.z + q.h - .6, q.w - 2, q.d - 2, .6, M.steel);
+  const alongY = q.d > q.w;
+  if (alongY) mbox(g, P, q.x + q.w / 2 - 16, q.y + q.d - .5, q.z + 1, 32, 1.5, 5, M.dark); else mbox(g, P, q.x + q.w - .5, q.y + q.d / 2 - 16, q.z + 1, 1.5, 32, 5, M.dark);   // SATA 7+15 (end)
+  for (const s1 of [14, 14 + 61.72]) for (const s2 of [-.1, (alongY ? q.w : q.d) - .5]) { const c = alongY ? mcyl(g, P, q.x + s2, q.y + s1, q.z + 3, 1.5, .6, M.dark) : mcyl(g, P, q.x + s1, q.y + s2, q.z + 3, 1.5, .6, M.dark); c.rotation[alongY ? 'z' : 'x'] = Math.PI / 2; }   // A28/A29 side holes
+  return g;
+}
+function honeycombTex() { return canvasTex(1024, 1024, (g, w, h) => { g.fillStyle = '#c9cdd1'; g.fillRect(0, 0, w, h); g.fillStyle = '#2a2d31';
+  for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) { const x = c * 16 + (r % 2) * 8 + 8, y = r * 14 + 8; if ((Math.floor(c / 12) + Math.floor(r / 14)) % 3) continue; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); }
+  g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 6; for (const [x0, y0, x1, y1] of [[120, 900, 520, 500], [520, 500, 900, 900], [520, 500, 520, 120]]) { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); } }); }
+function buildAssembly() {
+  const st = asmStage() || ASM_STAGES.asm, sig = 'asm:' + cur.s;
+  if (three.sig === sig) return;
+  three.sig = sig; three.viewedFor = '';
+  for (const g of [three.root, three.fx]) for (const c of [...g.children]) { g.remove(c); c.traverse(o => o.geometry?.dispose()); }
+  three.board = null; three.meshes = []; three.autoMeshes = []; three.legs = []; three.labels = [];
+  const P = (x, y, z) => new THREE.Vector3((x - ASM.caseW / 2) * MM, z * MM, (y - ASM.caseD / 2) * MM), M = MAT();
+  const layer = (name, zc, key = name) => { const g = new THREE.Group(); g.userData = {layer: name, zc, key}; three.root.add(g); return g; };
+  const bad = new Set(); for (const r of fitChecks()) if (r.pass === false) for (const q of ASM.parts) if (r.text.includes(q.name)) bad.add(q.id);
+  const shapeOf = (pts, holes = []) => { const sh = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2((x - ASM.caseW / 2) * MM, (y - ASM.caseD / 2) * MM)));
+    for (const [x0, y0, x1, y1] of holes) sh.holes.push(new THREE.Path([[x0, y0], [x0, y1], [x1, y1], [x1, y0]].map(([x, y]) => new THREE.Vector2((x - ASM.caseW / 2) * MM, (y - ASM.caseD / 2) * MM)))); return sh; };
+  const slab = (grp, sh, z, h, mat) => { const ge = new THREE.ExtrudeGeometry(sh, {depth: h * MM, bevelEnabled: false}); ge.rotateX(Math.PI / 2); ge.translate(0, (z + h) * MM, 0); const m = new THREE.Mesh(ge, mat); m.castShadow = m.receiveShadow = true; grp.add(m); return m; };
+  // outer shell in removable pieces, sheared into the PS4's parallelogram profile: y_case = y_body + slant * (53 - z)
+  const op = st.solid ? 1 : .3, t = ASM.slant, Dh = ASM.caseD - t * ASM.caseH, W = ASM.wall, cw = ASM.caseW, [s0, s1] = ASM.split, GW = ASM.glossW;
+  const shear = new THREE.Matrix4().set(1, 0, 0, 0, 0, 1, 0, 0, 0, -t, 1, t * ASM.caseH * MM, 0, 0, 0, 1);
+  const smat = (c = '#1f2023', r = .85, extra = {}) => std({color: c, roughness: r, transparent: op < 1, opacity: op, depthWrite: op >= 1, side: THREE.DoubleSide, ...extra});
+  const sbox = (g, x, y, z, w, d, h, mat) => { const ge = new THREE.BoxGeometry(w * MM, h * MM, d * MM); ge.translate(...P(x + w / 2, y + d / 2, z + h / 2).toArray()); ge.applyMatrix4(shear);
+    const m = new THREE.Mesh(ge, mat); m.castShadow = m.receiveShadow = true; g.add(m);
+    const ed = new THREE.LineSegments(new THREE.EdgesGeometry(ge, 30), new THREE.LineBasicMaterial({color: 0x9fc3ff, transparent: true, opacity: st.solid ? .18 : .6})); g.add(ed); return m; };
+  const vent = ventTex(30, 3, '#1c1d20'); vent.wrapS = THREE.RepeatWrapping;
+  const ventMat = smat('#ffffff', .85, {map: vent});
+  // bottom plate (+ feet), lower walls, recessed band, upper walls, matte top, glossy top
+  { const g = layer('shell', 1, 'bottomPlate'); sbox(g, 0, 0, 0, cw, Dh, W, smat());
+    for (const [fx, fy2] of [[20, 25], [cw - 20, 25], [20, Dh - 25], [cw - 20, Dh - 25]]) { const f = new THREE.Mesh(new THREE.CylinderGeometry(4 * MM, 4 * MM, .8 * MM, 24), smat('#0a0a0a', .95)); f.geometry.translate(...P(fx, fy2, -.4).toArray()); f.geometry.applyMatrix4(shear); g.add(f); } }
+  const walls = (key, z0, z1) => { const g = layer('shell', (z0 + z1) / 2, key), m = smat();
+    sbox(g, 0, 0, z0, cw, W, z1 - z0, m); sbox(g, 0, Dh - W, z0, cw, W, z1 - z0, ventMat); sbox(g, 0, W, z0, W, Dh - 2 * W, z1 - z0, ventMat); sbox(g, cw - W, W, z0, W, Dh - 2 * W, z1 - z0, m); return g; };
+  const lw = walls('lowerWalls', W, s0), uw = walls('upperWalls', s1, ASM.caseH - W);
+  { const g = layer('shell', (s0 + s1) / 2, 'band'), m = smat('#0b0b0c', .6);
+    sbox(g, 3, 3, s0, cw - 6, W, s1 - s0, m); sbox(g, 3, Dh - 3 - W, s0, cw - 6, W, s1 - s0, m); sbox(g, 3, 3, s0, W, Dh - 6, s1 - s0, m); sbox(g, cw - 3 - W, 3, s0, W, Dh - 6, s1 - s0, m);
+    const dark = std({color: '#000000', roughness: .9});
+    sbox(g, 8, 2.6, s0 + 1.2, 129, .6, 1.6, dark);                                         // disc slot (front band, left)
+    const us = ASM.boardParts.find(c => c.part === 'fusb'); if (us) for (const k of [0, 1]) sbox(g, us.x + 4 + k * (us.w / 2), 2.4, s0 + .4, us.w / 2 - 8, .8, s1 - s0 - .8, dark);   // USB openings
+    const lb = std({color: '#4aa8ff', emissive: '#2f8cff', emissiveIntensity: 1.2, roughness: .4}); sbox(g, GW - .6, 2.4, s0 + .3, 1.2, .5, s1 - s0 - .6, lb); }   // light bar at the glossy/matte split
+  { const g = layer('shell', ASM.caseH - 1, 'topMatte'); sbox(g, GW, 0, ASM.caseH - W, cw - GW, Dh, W, smat('#232427', .95)); }
+  { const g = layer('shell', ASM.caseH - 1, 'glossy'); sbox(g, 0, 0, ASM.caseH - W, GW, Dh, W, smat('#0c0d0f', .1, {metalness: .25}));
+    const lb = std({color: '#4aa8ff', emissive: '#2f8cff', emissiveIntensity: 1.2}); sbox(g, GW - .5, 0, ASM.caseH - .2, 1, Dh, .3, lb); }      // light bar along the top split
+  { const dark = std({color: '#000000', roughness: .9});   // rear openings: ports (where the model's ports end) and the power inlet
+    for (const c of ASM.boardParts.filter(c => /lan|hdmi|aux|optical/.test(c.part))) sbox(uw, c.x + 1, Dh - W - .2, Math.max(s1, ASM.boardBottom - c.h), c.w - 2, W + .4, Math.min(c.h, 9), dark);
+    const psu = ASM.parts.find(q => q.id === 'psu'); sbox(lw, psu.x + 10, Dh - W - .2, psu.z + psu.h * .45 - 2, 16, W + .4, 10, dark); }
+  three.labels.push({pos: P(ASM.caseW / 2, 0, ASM.caseH + 4), text: `outer shell ${ASM.caseW} x ${ASM.caseD.toFixed(0)} x ${ASM.caseH} mm (front edge)`, kind: 'rel'});
+  // internal chassis (estimated): honeycomb top shield over the board, lower steel frame under it with openings for the heatsink and the drive bay
+  const bd = ASM.parts.find(q => q.level === 'board'), hs = ASM.parts.find(q => q.id === 'heatsink'), cut = ASM.cutout;
+  const topSh = layer('shield', ASM.boardTop + 2.5, 'topShield'), hc = honeycombTex(); hc.wrapS = hc.wrapT = THREE.RepeatWrapping;
+  const tsm = std({map: hc, roughness: .45, metalness: .6}); slab(topSh, shapeOf(bd.outline), ASM.boardTop + 2.2, .6, tsm);
+  for (const ge of topSh.children.map(m => m.geometry)) { const uv = ge.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 4, uv.getY(i) * 4); }
+  three.labels.push({pos: P(bd.x + bd.w * .8, bd.y + bd.d * .25, ASM.boardTop + 6), text: 'Top EMI shield (est.)', kind: 'sel'});
+  // lower frame (HOW-FIXIT 19.png): steel plate under the board with a raised rim, thermal pads touching the eight GDDR5,
+  // a window over the APU (copper heatsink base), diagonal stiffening ribs, and openings wherever tall board parts hang down
+  const loSh = layer('shield', 31, 'lowerFrame'), fz = 30.6;
+  const apu0 = ASM.boardParts.find(c => c.part === 'apu');
+  const holes = [[hs.x, hs.y, hs.x + hs.w, hs.y + hs.d], [cut.x0, cut.y0, cut.x1, cut.y1], [apu0.x, apu0.y, apu0.x + apu0.w, apu0.y + apu0.d],
+    ...ASM.tall.filter(([x, y, h, n]) => !/lan|hdmi|aux|optical|fusb/.test(n)).map(([x, y]) => [x - 4.5, y - 4.5, x + 4.5, y + 4.5])];
+  slab(loSh, shapeOf(bd.outline, holes), fz, .6, M.steel);
+  const pad = std({color: '#8d9196', roughness: .95});
+  for (const [x, y] of ASM.gddr5) mbox(loSh, P, x - 6, y - 7, fz + .6, 12, 14, ASM.boardBottom - 1.1 - (fz + .6), pad);   // pads fill the gap to the GDDR5 underside
+  const ol = bd.outline; for (let i = 0; i < ol.length; i++) { const [x0, y0] = ol[i], [x1, y1] = ol[(i + 1) % ol.length], L = Math.hypot(x1 - x0, y1 - y0); if (L < 3) continue;
+    const r = new THREE.Mesh(new THREE.BoxGeometry(L * MM, 2.5 * MM, .8 * MM), M.steel); r.position.copy(P((x0 + x1) / 2, (y0 + y1) / 2, fz - 2.5 / 2 + .6)); r.rotation.y = -Math.atan2(y1 - y0, x1 - x0); loSh.add(r); }
+  for (const [x0, y0, x1, y1] of [[40, 160, 120, 240], [60, 150, 150, 230], [120, 200, 180, 150], [200, 210, 250, 250], [30, 250, 100, 190]]) {   // embossed ribs
+    const L = Math.hypot(x1 - x0, y1 - y0), r = new THREE.Mesh(new THREE.BoxGeometry(L * MM, .8 * MM, 4 * MM), M.alum); r.position.copy(P((x0 + x1) / 2, (y0 + y1) / 2, fz + 1)); r.rotation.y = -Math.atan2(y1 - y0, x1 - x0); loSh.add(r); }
+  three.labels.push({pos: P(bd.x + bd.w * .15, bd.y + bd.d * .7, 26), text: 'Lower frame with thermal pads (est.)', kind: 'sel'});
+  // board + its APU-side parts
+  const bg = layer('board', ASM.boardBottom);
+  slab(bg, shapeOf(bd.outline), bd.z, bd.h, M.pcbG);
+  for (const c of ASM.boardParts) { const mat = /lan|hdmi|fusb|aux|cell/.test(c.part) ? M.steel : c.part === 'optical' ? M.black : c.part === 'apu' ? M.alum : M.dark;
+    let y0 = c.y, d = c.d; if (c.part === 'fusb') { const f = ASM.slant * (ASM.caseH - (ASM.boardBottom - c.h / 2)) + 3.5; if (f > y0) { d -= f - y0; y0 = f; } }   // USB mouths sit recessed in the band, behind the slanted face
+    mbox(bg, P, c.x, y0, ASM.boardBottom - c.h, c.w, d, c.h, mat); }
+  if (!st.gone.includes('board')) three.labels.push({pos: P(bd.x + bd.w * .55, bd.y + bd.d * .55, ASM.boardTop + 4), text: `Motherboard (APU side down), ${ASM.boardBottom}-${ASM.boardTop} mm`, kind: 'rel'});
+  // parts
+  const apu = ASM.boardParts.find(c => c.part === 'apu');
+  for (const q of ASM.parts.filter(q => !q.outline)) {
+    const grp = q.model === 'psu' ? modelPSU(q, P, M) : q.model === 'fan' ? modelFan(q, P, M) : q.model === 'heatsink' ? modelHeatsink(q, P, M, apu) : q.model === 'bd' ? modelBD(q, P, M) : modelHDD(q, P, M);
+    if (bad.has(q.id)) grp.traverse(o => { if (o.isMesh) o.material = std({color: '#ff2b2b', transparent: true, opacity: .7}); });
+    grp.userData = {layer: q.id, zc: q.z + q.h / 2, key: q.id}; three.root.add(grp);
+    if (!st.gone.includes(q.id)) three.labels.push({pos: P(q.x + q.w / 2, q.y + q.d / 2, q.z + q.h + 2), text: `${q.name.split(' (')[0]}${st.removed.includes(q.id) ? ' (removed)' : ''}${bad.has(q.id) ? ' · COLLISION' : ''}`, kind: bad.has(q.id) ? 'guess' : st.removed.includes(q.id) ? 'path' : q.conf === 'est' ? 'sel' : 'path'});
+  }
+  if (st.gone.length || st.removed.length || st.solid) three.labels = st.solid ? three.labels.filter(l => /outer shell/.test(l.text)) : three.labels.filter(l => !/outer shell|est\.\)/.test(l.text));
+  view(st.view); applyAsmUI();
+}
+function buildScene() {
+  const b = boardInfo(), s = st(key());
+  const topId = b ? stages[SC() + '-' + b.top].photo : s.photo, botId = b ? stages[SC() + '-' + b.bottom].photo : null;
+  if (b) three.aspect = b.iw / b.ih;
+  const items = scene();
+  const sig = [surf, SC(), b ? 'board' : cur.s, topId, botId, three.aspect, items.length, Object.keys(con(SC()).legs || {}).length, JSON.stringify(items.filter(p => !p.m.auto).map(p => [p.id, p.m.x, p.m.y, p.m.w, p.m.h, p.m.part, p.m.layer]))].join('|');
+  if (sig === three.sig) return;
+  three.sig = sig;
+  for (const c of [...three.root.children]) { three.root.remove(c); c.traverse(o => { o.geometry?.dispose(); }); }
+  const rb = !!(b && b.tiles && surf === 'rebuilt');
+  if (rb) {
+    three.board = buildBoardRB(b); three.root.add(three.board.group);
+    three.meshes = items.filter(p => !p.m.auto).map(p => handMeshRB(p, b));
+    three.autoMeshes = autoMeshesRB(items.filter(p => p.m.auto), b);
+  } else {
+    const texTop = texture(topId), texBot = botId ? texture(botId) : null;
+    three.board = buildBoard(b, texTop, texBot); three.root.add(three.board.group);
+    three.meshes = items.filter(p => !p.m.auto).map(p => chipMesh(p, b, texTop, texBot));
+    three.autoMeshes = autoMeshes(items.filter(p => p.m.auto && !/^[ej]$/.test(p.m.t) || p.m.auto && !rb), b, texTop, texBot);
+  }
+  three.legs = legMeshes(items);
+  three.root.add(...three.meshes, ...three.autoMeshes, ...three.legs);
+  const want = SC() + (b ? 'board' : cur.s);
+  if (three.viewedFor !== want) { three.viewedFor = want; view(b && cur.s === b.bottom ? 'btilt' : 'tilt'); }
+  else if (b && three.lastStage !== cur.s) view(cur.s === b.bottom ? 'btilt' : 'tilt');
+  three.lastStage = cur.s;
+}
+const COL = {sel: 0xffd166, rel: 0x00e5ff, guess: 0xff9a3c, path: 0xff2bd6, cap: 0x5dff8a, capn: 0xd2f55a, cu: 0xb794ff};
+const KINDVAR = {sel: 'accent'};
+function surfacePoint(side, u, v, lift = 0.0009) { return W3(u, v, side === 'bot' ? -T / 2 - lift : T / 2 + lift); }
+function addTube(points, color, radius, opacity) {
+  if (points.length < 2) return;
+  const path = new THREE.CurvePath();
+  for (let i = 1; i < points.length; i++) path.add(new THREE.LineCurve3(points[i - 1], points[i]));
+  const mesh = new THREE.Mesh(new THREE.TubeGeometry(path, Math.max(8, points.length * 6), radius, 8, false),
+    new THREE.MeshBasicMaterial({color, transparent: opacity < 1, opacity, depthWrite: false}));
+  three.fx.add(mesh);
+}
+// one stretch of a route: outer copper bright, inner-layer copper (X-ray) with a pale-blue core, nothing seen thin and faint
+function tubeRun(run, col) { const f = run[run.length - 1].f, P = run.map(q => q.p);
+  if (f === 2) { addTube(P, col, .0013, .4); addTube(P, INNER_INK, .0006, .95); } else addTube(P, col, f ? .0016 : .001, f ? .55 : .28); }
+const INNER_INK = 0x78cdff;
+function highlight3d(rel) {
+  if (!three || three.sig.startsWith('asm')) return;
+  const fx = three.fx;
+  for (const c of [...fx.children]) { fx.remove(c); c.geometry?.dispose(); }
+  three.labels = [];
+  const active = !!rel, b = boardInfo();
+  if (three.board) { const c = active ? 0xb4bcc6 : 0xffffff; for (const mt of three.board.mats || [three.board.topMat, three.board.botMat]) mt.color.set(c); }
+  if (three.isl) { for (const t of Object.values(three.isl)) { t.image.data.fill(0); t.needsUpdate = true; }
+    if (rel?.cu) for (const s of ['btop', 'bbot']) { const d = three.isl[s].image.data; for (const i of rel.cu.ids[s]) if (i < d.length) d[i] = 255; } }
+  for (const mesh of three.meshes) {
+    const {id, body, faceMat, label, base} = mesh.userData, stt = rel?.state.get(id);
+    const op = label ? (stt ? .35 : 0) : !active || stt ? 1 : .5;   // non-interacting parts fade to 50%
+    for (const mt of [body, faceMat]) { mt.transparent = op < 1; mt.opacity = op; mt.depthWrite = op === 1; }
+    body.emissive?.set(stt ? COL[stt] : 0x000000); body.emissiveIntensity = stt ? .55 : 0;
+    if (label && stt) body.color.set(COL[stt]);
+    mesh.position.y = base;
+    if (stt) {
+      const ol = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), new THREE.LineBasicMaterial({color: COL[stt]}));
+      ol.scale.copy(mesh.scale).multiplyScalar(1.06); ol.scale.y = Math.max(ol.scale.y, .0008); ol.position.copy(mesh.position); fx.add(ol);
+    }
+  }
+  for (const am of three.autoMeshes) for (const mt of am.userData.mats) { mt.opacity = active ? .5 : 1; mt.depthWrite = !active; }
+  for (const lg of three.legs || []) { const on = rel?.state.has(lg.userData.pins[0].mid); lg.userData.mat.opacity = !active || on ? 1 : .5; lg.userData.mat.depthWrite = !active || on; }
+  if (selPin) for (const lg of three.legs || []) {
+    const q = lg.userData.pins[selPin - 1]; if (!q || q.mid !== selected) continue;
+    const mk = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: 0xffd166}));
+    mk.scale.set((q.horiz ? q.len : q.wid) * 1.25, q.ht * 2.2, (q.horiz ? q.wid : q.len) * 1.25); mk.position.copy(W3(q.x, q.y, T / 2 + q.ht)); fx.add(mk);
+    three.labels.push({pos: W3(q.x, q.y, T / 2 + q.ht * 3), text: 'pin ' + selPin, kind: 'sel'});
+  }
+  if (rel) {
+    // highlighted auto parts get their own glowing box
+    for (const [id, stt] of rel.state) {
+      const p = findPart(id); if (!p?.m.auto) continue;
+      const ht = AUTO[p.m.t][2] * MM, w = Math.max(p.m.w * 4000, 3) / 3000, h = Math.max(p.m.h * 3000, 3) / 3000;
+      const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: COL[stt]}));
+      box.scale.set(w * 1.5, ht * 1.5 + .0006, h * 1.5); box.position.copy(W3(p.u, p.v, p.side === 'bot' ? -T / 2 - ht / 2 : T / 2 + ht / 2));
+      box.rotation.y = THREE.MathUtils.degToRad(p.side === 'bot' ? p.m.a : -p.m.a); fx.add(box);
+    }
+    for (const lk of rel.links) {
+      const col = COL[lk.kind], r = lk.route;
+      if (r && b) {
+        const side = r.side === b.bottom ? 'bot' : 'top';
+        // start and end the trail at each package's edge instead of crossing its top
+        const boxOf = e => { const m = e.m, bd = m.body && e.side === 'top' ? m.body : null; const [w, h] = bd ? [bd[2], bd[3]] : m.auto ? [m.w, m.h] : sizeOf(m); return {u: bd ? bd[0] : e.u, v: bd ? bd[1] : e.v, w, h, side: e.side}; };
+        const boxes = [boxOf(lk.a), boxOf(lk.b)].filter(q => q.side === side);
+        const inside = (u, v) => boxes.some(q => Math.abs(u - q.u) < q.w / 2 && Math.abs(v - q.v) < q.h / 2);
+        let pts = r.pts.map(([x, y, f]) => { const [u, v] = side === 'bot' ? botToTop(b, x, y) : [x, y]; return {u, v, p: surfacePoint(side, u, v), f}; });
+        const kept = pts.filter(q => !inside(q.u, q.v)); if (kept.length >= 2) pts = kept;
+        // visible-copper stretches bright and thick, hidden stretches thin and faint
+        let run = [pts[0]];
+        for (let i = 1; i < pts.length; i++) {
+          if (pts[i].f !== run[run.length - 1].f && run.length > 1) { tubeRun(run, col); run = [run[run.length - 1]]; }
+          run.push(pts[i]);
+        }
+        tubeRun(run, col);
+        // ends on the other side of the board: draw the via through the board
+        for (const end of [lk.a, lk.b]) if (end.side !== side) {
+          const q = surfacePoint(side, end.u, end.v), q2 = surfacePoint(end.side, end.u, end.v);
+          addTube([q, q2], col, .0014, .5);
+        }
+        const mid = pts[Math.min(pts.length - 1, Math.floor(pts.length * .6))].p;
+        if (!three.labels.some(l => l.text === lk.label)) three.labels.push({pos: mid, text: lk.label, kind: lk.kind});
+      } else {
+        // leave each package from its edge, heading toward the other end
+        const edgeOf = (e, o) => { const m = e.m, bd = m.body && e.side === 'top' ? m.body : null; const [w, h] = bd ? [bd[2], bd[3]] : m.auto ? [m.w, m.h] : sizeOf(m);
+          const cu = bd ? bd[0] : e.u, cv = bd ? bd[1] : e.v, du = o.u - cu, dv = o.v - cv; const t = Math.min(Math.abs(w / 2 / (du || 1e-9)), Math.abs(h / 2 / (dv || 1e-9)), 1);
+          return [cu + du * t, cv + dv * t]; };
+        const [au, av] = edgeOf(lk.a, lk.b), [bu, bv] = edgeOf(lk.b, lk.a);
+        const A = surfacePoint(lk.a.side, au, av, .002), B = surfacePoint(lk.b.side, bu, bv, .002);
+        const up = lk.a.side === 'bot' && lk.b.side === 'bot' ? -1 : 1;
+        const mid = A.clone().add(B).multiplyScalar(.5); mid.y += up * (.012 + A.distanceTo(B) * .18);
+        const curve = new THREE.QuadraticBezierCurve3(A, mid, B);
+        three.fx.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 32, .001, 6), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: .3, depthWrite: false})));
+        if (!three.labels.some(l => l.text === lk.label)) three.labels.push({pos: curve.getPoint(.5), text: lk.label + (b ? ' · no visible trace' : ''), kind: lk.kind});
+      }
+    }
+  }
+  draw();
+}
+let drawQueued = false;
+function draw() {
+  if (!three || mode !== '3d' || drawQueued) return;
+  drawQueued = true;
+  requestAnimationFrame(() => {
+    drawQueued = false;
+    three.renderer.render(three.scene, three.camera);
+    const el = $('stage3d'), w = el.clientWidth, h = el.clientHeight;
+    const camY = three.camera.position.y;
+    // labels on the face turned away from the camera stay hidden; overlapping ones are pushed apart
+    const placed = three.labels.filter(l => three.sig.startsWith('asm') || !(Math.abs(l.pos.y) > T / 2 && Math.sign(l.pos.y) !== Math.sign(camY)))
+      .map(l => { const v = l.pos.clone().project(three.camera); return {l, x: (v.x + 1) / 2 * w, y: (1 - v.y) / 2 * h, ok: v.z <= 1 && Math.abs(v.x) <= 1 && Math.abs(v.y) <= 1}; })
+      .filter(q => q.ok).sort((a, b) => a.y - b.y);
+    for (let i = 0; i < placed.length; i++) for (let j = 0; j < i; j++) {
+      const a = placed[j], q = placed[i], wa = a.l.text.length * 7 + 12, wq = q.l.text.length * 7 + 12;
+      if (Math.abs(q.x - a.x) < (wa + wq) / 2 && Math.abs(q.y - a.y) < 19) q.y = a.y + 19;
+    }
+    $('labels3d').innerHTML = placed.map(q => `<span class="lbl" style="left:${q.x}px;top:${q.y}px;--c:var(--${KINDVAR[q.l.kind] || q.l.kind})">${esc(q.l.text)}</span>`).join('');
+    const c = three.camera.position;
+    $('hud').textContent = `${c.y >= 0 ? 'viewing top' : 'viewing bottom'} · ${scene().length} parts`;
+  });
+}
+function castFrom(cx, cy) {
+  const r = $('gl').getBoundingClientRect();
+  three.ray.setFromCamera({x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1}, three.camera);
+  return three.ray;
+}
+function pick(cx, cy) {
+  const hits = castFrom(cx, cy).intersectObjects([...(three.legs || []), ...three.meshes, ...three.autoMeshes, ...(three.board ? [three.board.group] : [])], true);
+  for (const h of hits) {
+    if (h.object.userData.pins) { const q = h.object.userData.pins[h.instanceId]; return 'pin:' + q.mid + ':' + q.n; }
+    if (h.object.userData.id) return h.object.userData.id;
+    if (h.object.userData.list) return h.object.userData.list[h.object.userData.tri ? h.object.userData.tri[h.faceIndex] : 0].id;
+    return null; // the board itself is in front
+  }
+  return null;
+}
+/* ---------- interactions ---------- */
+$('consoleRail').onclick = e => {
+  if (e.target.closest('#newConBtn')) { const f = $('newCon'); f.hidden = false; $('ncName').value = ''; $('ncModel').value = '';
+    $('ncBrand').innerHTML = brandOptions('PlayStation'); $('ncFam').innerHTML = famOptions('PlayStation'); $('ncName').focus(); return; }
+  const b = e.target.closest('[data-c]'); if (!b) return; cur = {c: b.dataset.c, s: firstStage(b.dataset.c)}; selected = null; render(); };
+$('ncBrand').onchange = () => { $('ncFam').innerHTML = famOptions($('ncBrand').value); };
+$('ncCancel').onclick = () => { $('newCon').hidden = true; };
+$('newCon').onsubmit = e => { e.preventDefault();
+  const id = 'p' + uid().replace(/[^a-z0-9]/gi, '').slice(0, 10), fam = FAM[$('ncFam').value];
+  consoles[id] = {profile: true, name: $('ncName').value.trim() || 'Console', brand: $('ncBrand').value, family: fam?.id || '', model: $('ncModel').value.trim(), board: fam?.board || '', notes: '', created: Date.now()};
+  save('console:' + id); $('newCon').hidden = true; cur = {c: id, s: STAGES[0].id}; selected = null; render(); $('profile').scrollIntoView({block: 'start'}); };
+$('stageRail').onclick = e => { const b = e.target.closest('[data-s]'); if (!b) return; cur.s = b.dataset.s; selected = null; render(); };
+$('layers').onclick = e => {
+  const c = e.target.closest('[data-l]');
+  if (c) { visible.has(c.dataset.l) ? visible.delete(c.dataset.l) : visible.add(c.dataset.l); }
+  else if (e.target.closest('#allBtn')) LAYERS.forEach(l => visible.add(l.id));
+  else if (e.target.closest('#autoBtn')) showAuto = !showAuto;
+  else return;
+  partsCache = null;
+  if (selected && !selP()) selected = null;
+  render();
+};
+$('links').addEventListener('click', e => {
+  const sb = e.target.closest('[data-sel]'); if (sb) return select(sb.dataset.sel);
+  const b = e.target.closest('[data-goto]'); if (!b) return;
+  cur.s = b.dataset.goto; selected = st(key()).markers.find(x => x.part === b.dataset.part)?.id || null; render();
+});
+function select(id) {
+  if ($('links').contains(document.activeElement)) document.activeElement.blur();   // a new selection always redraws the panel
+  if (id && id.startsWith('pin:')) { const [, mid, n] = id.match(/^pin:(.+):(\d+)$/); selected = mid; selPin = +n; }
+  else { if (id !== selected) selPin = null; selected = id; }
+  render();
+}
+// press on a part = select; press on empty board = pan (left) / orbit (middle, right); click on empty = deselect
+let press = null;
+function onUp(e) {
+  if (!press) return;
+  const p = press; press = null;
+  if (Math.hypot(e.clientX - p.x, e.clientY - p.y) >= 5) return;
+  if (p.id) select(p.id); else if (e.button === 0 && selected) select(null);
+}
+const gl = $('gl');
+gl.addEventListener('pointerdown', e => { if (!three) return; if (e.button === 0) press = {x: e.clientX, y: e.clientY, id: pick(e.clientX, e.clientY)}; });
+gl.addEventListener('pointermove', e => {
+  if (!three || e.buttons) { $('tip').hidden = true; return; }
+  const id = pick(e.clientX, e.clientY), pin = id && id.startsWith('pin:') && id.match(/^pin:(.+):(\d+)$/);
+  const p = id && findPart(pin ? pin[1] : id);
+  gl.classList.toggle('over', !!p);
+  const tip = $('tip'); tip.hidden = !p;
+  if (p) {
+    const r = $('stage3d').getBoundingClientRect();
+    if (pin) {
+      const n = +pin[2], def = PINDEF[p.m.part]?.pins[n - 1], mine = rd(cur.c)[pinKey(p.m.part, n)];
+      tip.innerHTML = `<b>${esc(refOf(p.m))} pin ${n}</b> · ${esc(def ? def[0] : '?')}<br>${esc(def ? def[2] : 'No pin data.')}${mine?.d || mine?.v ? `<br>Your reading: ${esc([mine.d && mine.d + ' (diode)', mine.v && mine.v + ' V'].filter(Boolean).join(' · '))}` : ''}`;
+    } else if (p.m.auto && /^(c|r|e|l|t)$/.test(p.m.t)) {
+      tip.innerHTML = `<b>${esc(refOf(p.m))} · ${esc(partName(p.m))}</b><br>Value unmarked. Test: resistance to ground; about 0 Ω = shorted.`;
+    } else tip.textContent = `${refOf(p.m)} · ${partName(p.m)}${p.m.value ? ' · ' + p.m.value : ''}${p.side === 'bot' ? ' · bottom' : ''}`;
+    tip.style.left = e.clientX - r.left + 'px'; tip.style.top = e.clientY - r.top + 'px';
+  }
+});
+gl.addEventListener('pointerleave', () => { $('tip').hidden = true; });
+gl.addEventListener('pointerup', onUp); gl.addEventListener('pointercancel', onUp);
+for (const b of document.querySelectorAll('[data-view]')) b.onclick = () => view(b.dataset.view);
+$('innerBtn').onclick = () => { showInner = !showInner; $('innerBtn').setAttribute('aria-pressed', showInner); $('innerBtn').classList.toggle('on', showInner); if (three?.board?.inner) three.board.inner.visible = showInner; draw(); };
+const asmUI = {shell: true, shield: true, board: true, explode: false};
+function applyAsmUI() {   // layer visibility + exploded view (each layer lifted by its height above/below the board)
+  if (!three || !three.sig.startsWith('asm')) return;
+  const st = asmStage() || ASM_STAGES.asm;
+  for (const o of three.root.children) { const L = o.userData.layer, K = o.userData.key; if (!L) continue;
+    const gone = st.gone.includes(K), rem = st.removed.includes(K), g = rem ? GHOST[K] || [0, 0, 30] : [0, 0, 0];
+    o.visible = !gone && (L === 'shell' ? asmUI.shell : L === 'shield' ? asmUI.shield : L === 'board' ? asmUI.board : true);
+    o.position.set(g[0] * MM, (g[2] + (asmUI.explode && L !== 'shell' ? (o.userData.zc - ASM.boardBottom) * 1.6 : 0)) * MM, g[1] * MM);
+    o.traverse(m => { if (!m.isMesh || !m.material) return; const mats = Array.isArray(m.material) ? m.material : [m.material];
+      for (const mt of mats) { if (mt.userData.op0 == null) mt.userData.op0 = mt.opacity; mt.transparent = true; mt.opacity = rem ? Math.min(.35, mt.userData.op0) : mt.userData.op0; mt.depthWrite = !rem && mt.userData.op0 >= 1; mt.needsUpdate = true; } }); }
+  for (const b of document.querySelectorAll('[data-asm]')) b.setAttribute('aria-pressed', asmUI[b.dataset.asm]);
+  draw();
+}
+for (const b of document.querySelectorAll('[data-asm]')) b.onclick = () => { asmUI[b.dataset.asm] = !asmUI[b.dataset.asm]; applyAsmUI(); };
+$('tbody').onclick = e => { const tr = e.target.closest('tr[data-m]'); if (tr) select(tr.dataset.m); };
+$('tbody').onkeydown = e => { const tr = e.target.closest('tr[data-m]'); if (tr && e.key === 'Enter') select(tr.dataset.m); };
+addEventListener('keydown', e => { if (e.key === 'Escape' && selected && !e.target.closest?.('input,textarea,select')) select(null); });
+
+/* ---------- connect ---------- */
+render();
+(async () => {
+  [db, assets] = await Promise.all([window.claude?.use?.('db') ?? null, window.claude?.use?.('assets') ?? null]);
+  ready = true;
+  if (!db) { banner('Saving is off: no data server. Start the app with: ps4fab serve'); showSave(); render(); return; }
+  const late = setTimeout(() => banner('Saved data can\'t be reached yet. Edits stay on screen and save once the connection returns.'), 10000);
+  const got = {stages: false, consoles: false, auto: false, readings: false};
+  const onErr = e => { clearTimeout(late); banner(`Saved data stopped syncing (${esc(e?.code || 'error')}). Reload the page to reconnect.`); };
+  const done = () => { if (got.stages && got.consoles && got.auto && got.readings) { clearTimeout(late); loaded = true; if (!failed.size && $('banner').textContent.startsWith('Saved data can')) banner(''); } };
+  const busyDoc = k => timers[k] || writing[k] || failed.has(k);
+  db.collection('stages').onSnapshot(snap => {
+    for (const d of snap.docs) { if (busyDoc(d.id)) continue;
+      const v = structuredClone(d.data()); stages[d.id] = {photo: v.photo || null, markers: Array.isArray(v.markers) ? v.markers : []}; }
+    if (!snap.metadata.fromCache) got.stages = true; done(); render(); showSave();
+  }, onErr);
+  db.collection('consoles').onSnapshot(snap => {
+    for (const d of snap.docs) { if (busyDoc('console:' + d.id)) continue; consoles[d.id] = structuredClone(d.data()); }
+    if (!snap.metadata.fromCache) got.consoles = true; done(); if (three) three.sig = ''; render(); showSave();
+  }, onErr);
+  db.collection('readings').onSnapshot(snap => {
+    for (const d of snap.docs) { if (busyDoc('read:' + d.id)) continue; readings[d.id] = structuredClone(d.data().v || {}); }
+    if (!snap.metadata.fromCache) got.readings = true; done(); if (!$('links').contains(document.activeElement)) renderLinks(); showSave();
+  }, onErr);
+  db.collection('auto').onSnapshot(snap => {
+    for (const d of snap.docs) { if (busyDoc('auto:' + d.id)) continue; parseAuto(d.id, structuredClone(d.data())); }
+    if (!snap.metadata.fromCache) got.auto = true; done(); render(); showSave();
+  }, onErr);
+})();
+</script>
+
+</body></html>

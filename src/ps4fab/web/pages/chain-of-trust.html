@@ -1,0 +1,232 @@
+<title>PS4 Chain of Trust</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column like a service manual page, the boot-chain schematic as the centrepiece, numbered only where order is real */
+:root {
+  --bg: #f3f5f1; --panel: #ffffff; --fg: #17201b; --muted: #56635b; --line: #cfd8d1;
+  --mask: #1f6b45;       /* solder-mask green */
+  --copper: #b8692e;     /* copper / per-console */
+  --lock: #7a3e9d;       /* fused, unreachable */
+  --tint-mask: #e3efe7; --tint-copper: #f6e9de; --tint-lock: #efe4f5;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1512; --panel: #161e1a; --fg: #e4ebe6; --muted: #9aa8a0; --line: #2b3832;
+  --mask: #4fbf85; --copper: #e09a5f; --lock: #c38ce0;
+  --tint-mask: #16301f; --tint-copper: #33231a; --tint-lock: #2a1d33; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1512; --panel: #161e1a; --fg: #e4ebe6; --muted: #9aa8a0; --line: #2b3832;
+  --mask: #4fbf85; --copper: #e09a5f; --lock: #c38ce0;
+  --tint-mask: #16301f; --tint-copper: #33231a; --tint-lock: #2a1d33; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+h1, h2 { font-family: var(--display); font-weight: 700; letter-spacing: .01em; line-height: 1.1; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1rem; margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.tag { font: 500 .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+header { display: grid; gap: 10px; }
+header p { color: var(--muted); font-size: 1.05rem; }
+section { display: grid; gap: 14px; }
+.diagram { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .85rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.legend .l1::before { background: var(--tint-mask); border: 1.5px solid var(--mask); }
+.legend .l2::before { background: var(--tint-copper); border: 1.5px solid var(--copper); }
+.legend .l3::before { background: var(--tint-lock); border: 1.5px solid var(--lock); }
+.layers { display: grid; gap: 10px; }
+.layer { display: grid; grid-template-columns: 9rem 1fr; gap: 14px; padding: 12px 14px; border-left: 4px solid; background: var(--panel); border-radius: 0 4px 4px 0; }
+.layer > div { min-width: 0; }
+.layer .name { font: 600 .95rem var(--body); }
+.layer.fused { border-color: var(--lock); } .layer.wrapped { border-color: var(--copper); } .layer.shared { border-color: var(--mask); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.box ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 6px; }
+.yes h3 { color: var(--mask); } .no h3 { color: var(--lock); }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+.tablewrap { overflow-x: auto; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.now { display: grid; gap: 10px; }
+.now .box { grid-template-columns: 7.5rem 1fr; gap: 12px; }
+.chip { font: 500 .7rem var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; justify-self: start; align-self: start; }
+.have { background: var(--tint-mask); color: var(--mask); }
+.later { background: var(--tint-copper); color: var(--copper); }
+ol.q { margin: 0; padding-left: 1.3rem; display: grid; gap: 8px; max-width: 65ch; }
+.refs { display: grid; gap: 6px; font-size: .93rem; }
+a { color: var(--mask); }
+a:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+code { font: .88em var(--mono); }
+.note { font-size: .88rem; color: var(--muted); }
+@media (max-width: 620px) {
+  .cols { grid-template-columns: 1fr; }
+  .layer, .now .box { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="tag">SAA-001 · CUH-1001A · notes for the bench</span>
+    <h1>How a PS4 decides what to trust</h1>
+    <p>From the moment you press power, each stage checks the next one before handing over control. This page follows that chain, shows where a jailbreak gets in, and what you can study on your own boards with the gear on the bench today.</p>
+  </header>
+
+  <section>
+    <h2>The boot chain</h2>
+    <div class="diagram" role="img" aria-label="Boot chain: syscon powers the board, the APU security processor boots from its own ROM using fused keys, decrypts and verifies the NOR loader, which verifies the kernel, which loads system software from the hard drive using a per-console key. A jailbreak enters at the system software stage, after boot.">
+      <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, system-ui, sans-serif">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--fg)"/></marker>
+          <marker id="arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--copper)"/></marker>
+        </defs>
+        <!-- stage boxes -->
+        <g font-size="13">
+          <rect x="10" y="40" width="150" height="110" rx="6" fill="var(--tint-mask)" stroke="var(--mask)" stroke-width="1.5"/>
+          <text x="85" y="66" text-anchor="middle" font-weight="600" fill="var(--fg)">1 · Syscon</text>
+          <text x="85" y="88" text-anchor="middle" fill="var(--muted)">Renesas RL78</text>
+          <text x="85" y="106" text-anchor="middle" fill="var(--muted)">power sequencing,</text>
+          <text x="85" y="122" text-anchor="middle" fill="var(--muted)">version records,</text>
+          <text x="85" y="138" text-anchor="middle" fill="var(--muted)">error log</text>
+
+          <rect x="190" y="40" width="160" height="110" rx="6" fill="var(--tint-lock)" stroke="var(--lock)" stroke-width="1.5"/>
+          <text x="270" y="66" text-anchor="middle" font-weight="600" fill="var(--fg)">2 · Security processor</text>
+          <text x="270" y="88" text-anchor="middle" fill="var(--muted)">inside the APU</text>
+          <text x="270" y="106" text-anchor="middle" fill="var(--muted)">boots from its own ROM</text>
+          <text x="270" y="122" text-anchor="middle" fill="var(--lock)" font-weight="600">fused root keys</text>
+          <text x="270" y="138" text-anchor="middle" fill="var(--muted)">never leave the chip</text>
+
+          <rect x="380" y="40" width="150" height="110" rx="6" fill="var(--tint-copper)" stroke="var(--copper)" stroke-width="1.5"/>
+          <text x="455" y="66" text-anchor="middle" font-weight="600" fill="var(--fg)">3 · NOR flash</text>
+          <text x="455" y="88" text-anchor="middle" fill="var(--muted)">MX25L25635F, 32 MB</text>
+          <text x="455" y="106" text-anchor="middle" fill="var(--muted)">encrypted loader</text>
+          <text x="455" y="122" text-anchor="middle" fill="var(--copper)" font-weight="600">per-console data</text>
+          <text x="455" y="138" text-anchor="middle" fill="var(--muted)">(wrapped keys, IDs)</text>
+
+          <rect x="560" y="40" width="140" height="110" rx="6" fill="var(--tint-mask)" stroke="var(--mask)" stroke-width="1.5"/>
+          <text x="630" y="66" text-anchor="middle" font-weight="600" fill="var(--fg)">4 · Kernel</text>
+          <text x="630" y="88" text-anchor="middle" fill="var(--muted)">signed, same on</text>
+          <text x="630" y="106" text-anchor="middle" fill="var(--muted)">every console of</text>
+          <text x="630" y="122" text-anchor="middle" fill="var(--muted)">that firmware</text>
+
+          <rect x="730" y="40" width="160" height="110" rx="6" fill="var(--tint-copper)" stroke="var(--copper)" stroke-width="1.5"/>
+          <text x="810" y="66" text-anchor="middle" font-weight="600" fill="var(--fg)">5 · System software</text>
+          <text x="810" y="88" text-anchor="middle" fill="var(--muted)">on the hard drive</text>
+          <text x="810" y="106" text-anchor="middle" fill="var(--copper)" font-weight="600">drive encrypted with</text>
+          <text x="810" y="122" text-anchor="middle" fill="var(--copper)" font-weight="600">a per-console key</text>
+          <text x="810" y="138" text-anchor="middle" fill="var(--muted)">games, browser, UI</text>
+        </g>
+        <!-- verify arrows -->
+        <g stroke="var(--fg)" stroke-width="1.5" fill="none" marker-end="url(#ar)">
+          <path d="M160 95 H186"/><path d="M350 95 H376"/><path d="M530 95 H556"/><path d="M700 95 H726"/>
+        </g>
+        <g font-size="11" fill="var(--muted)" text-anchor="middle">
+          <text x="173" y="30">powers on</text><text x="363" y="30">decrypts +</text><text x="363" y="18">checks</text>
+          <text x="543" y="30">checks</text><text x="713" y="30">checks</text>
+        </g>
+        <!-- failure line -->
+        <g font-size="12" fill="var(--muted)">
+          <text x="10" y="182">A failed check stops the boot right there. A UART log shows the last stage that ran; without one, the symptom (light bar, beeps, no picture) is your clue.</text>
+        </g>
+        <!-- jailbreak entry -->
+        <g>
+          <path d="M810 270 V156" stroke="var(--copper)" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#arc)"/>
+          <rect x="640" y="270" width="250" height="48" rx="6" fill="var(--panel)" stroke="var(--copper)" stroke-width="1.5"/>
+          <text x="765" y="290" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">A jailbreak enters here</text>
+          <text x="765" y="308" text-anchor="middle" font-size="12" fill="var(--muted)">a bug in software that already booted</text>
+        </g>
+        <!-- what can't be reached -->
+        <g>
+          <path d="M270 270 V156" stroke="var(--lock)" stroke-width="2" stroke-dasharray="2 4" fill="none"/>
+          <rect x="150" y="270" width="250" height="48" rx="6" fill="var(--panel)" stroke="var(--lock)" stroke-width="1.5"/>
+          <text x="275" y="290" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">Out of reach from software</text>
+          <text x="275" y="308" text-anchor="middle" font-size="12" fill="var(--muted)">fused keys inside the security processor</text>
+        </g>
+        <g font-size="12" fill="var(--muted)"><text x="10" y="236">Board-locked: the copper-coloured parts only decrypt on the APU they were made for.</text></g>
+      </svg>
+    </div>
+    <div class="legend"><span class="l1">Same on every console</span><span class="l2">Per-console, locked to the APU</span><span class="l3">Fused in silicon</span></div>
+    <p class="note">Simplified. The southbridge chip has two small processors of its own, EMC and EAP. The EMC loads its first loader from the NOR, and that loader starts the EAP kernel loader and the APU's boot ROM (<a href="https://psdevwiki.com/ps4/MediaCon">MediaCon</a>, <a href="https://psdevwiki.com/ps4/Southbridge">Southbridge</a>). The secure loader is stored in the NOR as <code>sflash0s1.cryptx2</code> (<a href="https://psdevwiki.com/ps4/Codenames">Codenames</a>). The wiki is community-written and marks parts of this as incomplete.</p>
+  </section>
+
+  <section>
+    <h2>Three layers of keys</h2>
+    <div class="layers">
+      <div class="layer fused"><div class="name">Fused root keys</div><div><p>Burned into the security processor at the factory. They are used inside the chip and never written to the NOR, RAM or anywhere a probe can reach. Fuses sit inside the die and are read only by the chip's own logic.</p></div></div>
+      <div class="layer wrapped"><div class="name">Wrapped per-console keys</div><div><p>Derived from the root keys and stored encrypted in the NOR. They unlock this console's identity data and its hard drive. Only this APU can unwrap them, which is why one console's NOR won't boot on another board.</p></div></div>
+      <div class="layer shared"><div class="name">Shared firmware keys</div><div><p>Sign and encrypt the system software, the same on every console. This layer has been studied publicly in depth.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What a jailbreak can and can't do</h2>
+    <div class="cols">
+      <div class="box yes"><h3>Can</h3><ul>
+        <li>Run with full kernel control on that console</li>
+        <li>Ask its own security processor to unwrap its own keys</li>
+        <li>Make decrypted backups of its own NOR data and drive key</li>
+      </ul></div>
+      <div class="box no"><h3>Can't</h3><ul>
+        <li>Read the fused root keys from software (on the PS5 they reportedly leaked anyway, see the table)</li>
+        <li>Make one console's identity work on another board</li>
+        <li>Run at all on a console that doesn't boot, or on firmware newer than the bug it uses</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>PS4 vs PS5</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Layer</th><th>PS4</th><th>PS5</th></tr></thead>
+      <tbody>
+        <tr><td>Root of trust</td><td>Security processor in the APU, fused keys</td><td>Same idea. Reports from 31 Dec 2025 say its Level 0 boot ROM keys leaked (not independently confirmed). Burned into silicon, so a software update can't change them on existing consoles (<a href="https://hothardware.com/news/sony-faces-unpatchable-ps5-jailbreak-threat-after-rom-keys-leak">HotHardware</a>, <a href="https://www.techspot.com/news/110778-playstation-5-rom-keys-may-out-wild-opening.html">TechSpot</a>)</td></tr>
+        <tr><td>Above the kernel</td><td>Nothing; kernel control is the top</td><td>A hypervisor supervises the kernel</td></tr>
+        <tr><td>Kernel code</td><td>Readable once you have kernel access</td><td>Execute-only: it runs but can't be read</td></tr>
+        <tr><td>Public jailbreaks</td><td>Many, on older firmware</td><td>As of Nov 2026: a hypervisor exploit was reported for firmware 13.20/13.60 in Oct 2026, a base for developers and not a full jailbreak (<a href="https://wccftech.com/byepervisor-reborn-cracks-ps5-hypervisor-13-60-not-useful-regular-users-yet/">Wccftech</a>). A community status report lists nothing public for 14.00/14.10 (<a href="https://github.com/ZigZagBoi1/PS5-14.10-Research/blob/master/PS5-FW-14.10-Jailbreak-Status-Report.md">GitHub</a>). Earlier hypervisor work: <a href="https://hardwear.io/talks/byepervisor-how-we-broke-the-ps5-hypervisor/">Byepervisor talk</a></td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The PS5 column changes month to month. Checked 4 Nov 2026; check again before relying on it.</p>
+  </section>
+
+  <section>
+    <h2>What you can learn with what's on the bench</h2>
+    <div class="now">
+      <div class="box"><span class="chip have">have it</span><div><h3>Watch the symptom</h3><p>Power each console and write down what happens: light bar colour and pattern, beeps, fan spin, picture or not. That's a crude view of how far the chain got.</p></div></div>
+      <div class="box"><span class="chip have">have it</span><div><h3>Multimeter on the power side</h3><p>With the console unplugged, check rails for shorts to ground (a shorted capacitor is a common fault) and check the power supply outputs against its label. If power never comes up, stage 1 never starts.</p></div></div>
+      <div class="box"><span class="chip have">have it</span><div><h3>Look closely</h3><p>Phone macro photos of the HDMI port pins, the APU edge and burnt or cracked parts. Compare against the Teardown Tracer.</p></div></div>
+      <div class="box"><span class="chip have">have it</span><div><h3>Hard drive health on a PC</h3><p>The contents are encrypted, but a PC can still read the drive's SMART health. That rules the drive in or out.</p></div></div>
+      <div class="box"><span class="chip later">~$5 later</span><div><h3>USB-UART adapter (CP2102)</h3><p>Optional. Reads the boot log from the pads on the board bottom, so you see the chain line by line. It only listens. Plugs into the diag tool's UART tab.</p></div></div>
+      <div class="box"><span class="chip later">~$10 later</span><div><h3>CH341A v1.7 + SOIC16 clip</h3><p>Reads a backup of each NOR. Open it in the diag tool to see which parts are per-console. Do this before any repair that risks the board.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Questions to work through together</h2>
+    <ol class="q">
+      <li>Where does each of your three consoles stop, judging by the symptom? Same place, or three different faults?</li>
+      <li>How would you tell a hardware fault (a power rail, a cracked solder ball) from a firmware fault (bad NOR data, syscon mismatch)?</li>
+      <li>If the root key is burned into the chip, why can't you just measure it with a probe?</li>
+      <li>Why does the hard drive have its own per-console encryption, when the NOR is already protected?</li>
+      <li>What would a "repair" look like at each stage: a replaced part, a rewritten chip, or nothing you can fix?</li>
+    </ol>
+    <p class="note">The order here is the boot order: answering 1 first makes the others easier.</p>
+  </section>
+
+  <section>
+    <h2>Reading and watching</h2>
+    <div class="refs">
+      <p><strong><a href="https://media.ccc.de/v/33c3-7946-console_hacking_2016">fail0verflow, “Console Hacking 2016” (33C3)</a>.</strong> How they ran Linux on a PS4: the hardware, how it differs from a PC, and the reverse engineering it took.</p>
+      <p><strong>PS4 Developer Wiki:</strong> <a href="https://www.psdevwiki.com/ps4/" target="_blank" rel="noopener">psdevwiki.com/ps4</a>. Pages on the syscon, the NOR (flash) layout and the boot process. The diag tool's decoders follow these.</p>
+      <p><strong>PS5 Developer Wiki:</strong> <a href="https://www.psdevwiki.com/ps5/" target="_blank" rel="noopener">psdevwiki.com/ps5</a>. Start with the security and boot pages.</p>
+      <p><strong>Any intro to "secure boot" or "chain of trust".</strong> Phones and PCs work the same way.</p>
+    </div>
+  </section>
+</div>

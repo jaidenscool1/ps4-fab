@@ -1,0 +1,1695 @@
+{
+ "markers": [
+  {
+   "body": [
+    0.61062,
+    0.44717,
+    0.02925,
+    0.04567
+   ],
+   "col": "#47474a",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-1",
+   "label": "",
+   "layer": "ics",
+   "n": 1,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.61,
+   "y": 0.445
+  },
+  {
+   "body": [
+    0.66463,
+    0.44717,
+    0.02975,
+    0.04633
+   ],
+   "col": "#454446",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-2",
+   "label": "",
+   "layer": "ics",
+   "n": 2,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.665,
+   "y": 0.445
+  },
+  {
+   "body": [
+    0.71913,
+    0.44767,
+    0.02975,
+    0.046
+   ],
+   "col": "#4b4c4d",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-3",
+   "label": "",
+   "layer": "ics",
+   "n": 3,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.72,
+   "y": 0.445
+  },
+  {
+   "body": [
+    0.74775,
+    0.54233,
+    0.035,
+    0.03933
+   ],
+   "col": "#505154",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-4",
+   "label": "",
+   "layer": "ics",
+   "n": 4,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.745,
+   "y": 0.53
+  },
+  {
+   "body": [
+    0.7475,
+    0.616,
+    0.035,
+    0.03933
+   ],
+   "col": "#484a4b",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-5",
+   "label": "",
+   "layer": "ics",
+   "n": 5,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.745,
+   "y": 0.615
+  },
+  {
+   "body": [
+    0.60987,
+    0.70917,
+    0.02925,
+    0.04567
+   ],
+   "col": "#424445",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-6",
+   "label": "",
+   "layer": "ics",
+   "n": 6,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.61,
+   "y": 0.705
+  },
+  {
+   "body": [
+    0.66357,
+    0.70965,
+    0.02944,
+    0.0457
+   ],
+   "col": "#414345",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-7",
+   "label": "",
+   "layer": "ics",
+   "n": 7,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.665,
+   "y": 0.705
+  },
+  {
+   "body": [
+    0.71813,
+    0.71033,
+    0.02975,
+    0.046
+   ],
+   "col": "#434447",
+   "h": 0.0467,
+   "id": "ifx-btop-ics-8",
+   "label": "",
+   "layer": "ics",
+   "n": 8,
+   "note": "Source: iFixit step 19, orange box (iFixit colour key).",
+   "part": "gddr5",
+   "value": "Samsung K4G41325FC-HC03 GDDR5",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.72,
+   "y": 0.705
+  },
+  {
+   "body": [
+    0.657375,
+    0.578667,
+    0.10125,
+    0.133333
+   ],
+   "h": 0.143,
+   "id": "ifx-btop-ics-9",
+   "label": "",
+   "layer": "ics",
+   "n": 9,
+   "note": "Source: iFixit step 19, red box (iFixit colour key).",
+   "part": "apu",
+   "value": "SCEI CXD90026G APU",
+   "verified": false,
+   "w": 0.107,
+   "x": 0.6565,
+   "y": 0.5755
+  },
+  {
+   "body": [
+    0.40796,
+    0.70985,
+    0.04163,
+    0.05553
+   ],
+   "col": "#3e4144",
+   "h": 0.0567,
+   "id": "ifx-btop-ics-10",
+   "label": "",
+   "layer": "ics",
+   "n": 10,
+   "note": "Source: iFixit step 19, yellow box (iFixit colour key). Photo also reads 88EC120-BNS2.",
+   "part": "sb",
+   "text": [
+    "SCE I",
+    "CXD90025G",
+    "88EC120-BNS2"
+   ],
+   "trot": 90,
+   "value": "SCEI CXD90025G southbridge",
+   "verified": false,
+   "w": 0.0437,
+   "x": 0.41,
+   "y": 0.71
+  },
+  {
+   "body": [
+    0.34412,
+    0.705,
+    0.01798,
+    0.04355
+   ],
+   "col": "#4e5053",
+   "h": 0.0517,
+   "id": "ifx-btop-ics-11",
+   "label": "",
+   "layer": "ics",
+   "n": 11,
+   "note": "Source: iFixit step 19, green box (iFixit colour key).",
+   "part": "ddr3",
+   "text": [
+    "SAMSUNG",
+    "K4B2G1646E-BCK0"
+   ],
+   "trot": 90,
+   "value": "Samsung K4B2G1646E-BCK0 DDR3",
+   "verified": false,
+   "w": 0.02,
+   "x": 0.3462,
+   "y": 0.705
+  },
+  {
+   "body": [
+    0.47496,
+    0.77254,
+    0.01805,
+    0.03341
+   ],
+   "col": "#464744",
+   "h": 0.0433,
+   "id": "ifx-btop-ics-12",
+   "label": "",
+   "layer": "ics",
+   "n": 12,
+   "note": "Source: iFixit step 19, blue box (iFixit colour key). SOP16. Dump this before any heat work.",
+   "part": "nor",
+   "text": [
+    "MXIC",
+    "MX25L25635FMI-10G"
+   ],
+   "trot": 90,
+   "value": "Macronix MX25L25635FMI NOR flash",
+   "verified": false,
+   "w": 0.025,
+   "x": 0.4738,
+   "y": 0.7767
+  },
+  {
+   "body": [
+    0.41825,
+    0.791,
+    0.017,
+    0.02267
+   ],
+   "col": "#524e42",
+   "h": 0.02167,
+   "id": "ifx-btop-ics-13",
+   "label": "",
+   "layer": "ics",
+   "n": 13,
+   "note": "Source: iFixit step 19, violet box (iFixit colour key).",
+   "part": "eth",
+   "value": "Marvell 88EC060-NN82 Ethernet",
+   "verified": false,
+   "w": 0.0155,
+   "x": 0.41825,
+   "y": 0.79183
+  },
+  {
+   "body": [
+    0.44068,
+    0.55307,
+    0.03465,
+    0.0452
+   ],
+   "col": "#494b4b",
+   "h": 0.0567,
+   "id": "ifx-btop-ics-14",
+   "label": "",
+   "layer": "ics",
+   "n": 14,
+   "note": "Source: iFixit step 19, black box (iFixit colour key). iFixit gives no description. The photo marking reads \"(C)2013 SCEI / 1327KM449 / A01-COL\"; A01-COL is the SAA syscon (#8 in your blueprint).",
+   "part": "syscon",
+   "text": [
+    "(C)2013 SCEI",
+    "1327KM44S",
+    "A01-COL"
+   ],
+   "trot": 90,
+   "value": "SCEI 1327KM44S syscon",
+   "verified": false,
+   "w": 0.045,
+   "x": 0.44,
+   "y": 0.5567
+  },
+  {
+   "body": [
+    0.50462,
+    0.73183,
+    0.01725,
+    0.023
+   ],
+   "col": "#303334",
+   "h": 0.023,
+   "id": "ifx-btop-ics-15",
+   "label": "",
+   "layer": "ics",
+   "n": 15,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marking reads \"IDT6V4 1265NLG\". Clock generator (#9 in your blueprint).",
+   "part": "clk",
+   "text": [
+    "IDT6V4",
+    "1265NLG"
+   ],
+   "trot": 0,
+   "value": "IDT 6V41265NLG clock",
+   "verified": false,
+   "w": 0.01425,
+   "x": 0.50313,
+   "y": 0.73217
+  },
+  {
+   "body": [
+    0.31,
+    0.814833,
+    0.0575,
+    0.060333
+   ],
+   "h": 0.0583,
+   "id": "ifx-btop-ics-16",
+   "label": "",
+   "layer": "ics",
+   "n": 16,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Sticker reads SP88W8797-MA0-2E2T00-001. Step 21 shows the Marvell 88W8797 inside it.",
+   "part": "wifi",
+   "value": "Wi-Fi/BT module SP88W8797-MA0",
+   "verified": false,
+   "w": 0.0575,
+   "x": 0.3113279339298143,
+   "y": 0.8158822947660651
+  },
+  {
+   "body": [
+    0.48975,
+    0.25383,
+    0.0145,
+    0.019
+   ],
+   "col": "#292a24",
+   "h": 0.01967,
+   "id": "ifx-btop-mosfets-1",
+   "label": "",
+   "layer": "mosfets",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. One of 6 identical power-stage chips in the APU VRM.",
+   "part": "vrmstage",
+   "value": "VRM power stage (marking not legible)",
+   "verified": false,
+   "w": 0.01475,
+   "x": 0.48988,
+   "y": 0.25383
+  },
+  {
+   "body": [
+    0.52775,
+    0.25417,
+    0.0145,
+    0.019
+   ],
+   "col": "#2c2c27",
+   "h": 0.01967,
+   "id": "ifx-btop-mosfets-2",
+   "label": "",
+   "layer": "mosfets",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. One of 6 identical power-stage chips in the APU VRM.",
+   "part": "vrmstage",
+   "value": "VRM power stage (marking not legible)",
+   "verified": false,
+   "w": 0.01475,
+   "x": 0.52762,
+   "y": 0.25417
+  },
+  {
+   "body": [
+    0.56875,
+    0.25417,
+    0.0145,
+    0.01967
+   ],
+   "col": "#2e2f2d",
+   "h": 0.01967,
+   "id": "ifx-btop-mosfets-3",
+   "label": "",
+   "layer": "mosfets",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. One of 6 identical power-stage chips in the APU VRM.",
+   "part": "vrmstage",
+   "value": "VRM power stage (marking not legible)",
+   "verified": false,
+   "w": 0.01475,
+   "x": 0.56888,
+   "y": 0.2545
+  },
+  {
+   "body": [
+    0.61138,
+    0.2545,
+    0.01425,
+    0.019
+   ],
+   "col": "#2a2c26",
+   "h": 0.01967,
+   "id": "ifx-btop-mosfets-4",
+   "label": "",
+   "layer": "mosfets",
+   "n": 4,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. One of 6 identical power-stage chips in the APU VRM.",
+   "part": "vrmstage",
+   "value": "VRM power stage (marking not legible)",
+   "verified": false,
+   "w": 0.01475,
+   "x": 0.61187,
+   "y": 0.2545
+  },
+  {
+   "body": [
+    0.6545,
+    0.2545,
+    0.0145,
+    0.01967
+   ],
+   "col": "#30312d",
+   "h": 0.02,
+   "id": "ifx-btop-mosfets-5",
+   "label": "",
+   "layer": "mosfets",
+   "n": 5,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. One of 6 identical power-stage chips in the APU VRM.",
+   "part": "vrmstage",
+   "value": "VRM power stage (marking not legible)",
+   "verified": false,
+   "w": 0.01475,
+   "x": 0.65488,
+   "y": 0.25467
+  },
+  {
+   "body": [
+    0.69737,
+    0.25467,
+    0.01475,
+    0.01933
+   ],
+   "col": "#2b2c28",
+   "h": 0.01967,
+   "id": "ifx-btop-mosfets-6",
+   "label": "",
+   "layer": "mosfets",
+   "n": 6,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. One of 6 identical power-stage chips in the APU VRM.",
+   "part": "vrmstage",
+   "value": "VRM power stage (marking not legible)",
+   "verified": false,
+   "w": 0.01475,
+   "x": 0.69788,
+   "y": 0.25483
+  },
+  {
+   "body": [
+    0.491,
+    0.28883,
+    0.0175,
+    0.029
+   ],
+   "col": "#898475",
+   "h": 0.0267,
+   "id": "ifx-btop-inductors-1",
+   "label": "",
+   "layer": "inductors",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. APU VRM output choke. On a 1-889-352-21 board (seller photos) this part reads 'R22H M058': same value, later revision.",
+   "part": "vrmchoke",
+   "text": [
+    "R22H",
+    "6248"
+   ],
+   "trot": 270,
+   "value": "R22H",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.491,
+   "y": 0.29
+  },
+  {
+   "body": [
+    0.52438,
+    0.28933,
+    0.01725,
+    0.02933
+   ],
+   "col": "#878273",
+   "h": 0.0267,
+   "id": "ifx-btop-inductors-2",
+   "label": "",
+   "layer": "inductors",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. APU VRM output choke. On a 1-889-352-21 board (seller photos) this part reads 'R22H M058': same value, later revision.",
+   "part": "vrmchoke",
+   "text": [
+    "R22H",
+    "6248"
+   ],
+   "trot": 270,
+   "value": "R22H",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.524,
+   "y": 0.29
+  },
+  {
+   "body": [
+    0.57038,
+    0.29333,
+    0.02575,
+    0.03933
+   ],
+   "col": "#8f8978",
+   "h": 0.035,
+   "id": "ifx-btop-inductors-3",
+   "label": "",
+   "layer": "inductors",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. APU VRM output choke. On a 1-889-352-21 board (seller photos) this part reads 'R18H M05F': same value, later revision.",
+   "part": "vrmchoke",
+   "text": [
+    "R18H",
+    "F18F"
+   ],
+   "trot": 270,
+   "value": "R18H",
+   "verified": false,
+   "w": 0.025,
+   "x": 0.5675,
+   "y": 0.29
+  },
+  {
+   "body": [
+    0.61362,
+    0.29367,
+    0.02575,
+    0.04
+   ],
+   "col": "#908a7a",
+   "h": 0.035,
+   "id": "ifx-btop-inductors-4",
+   "label": "",
+   "layer": "inductors",
+   "n": 4,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. APU VRM output choke. On a 1-889-352-21 board (seller photos) this part reads 'R18H M05F': same value, later revision.",
+   "part": "vrmchoke",
+   "text": [
+    "R18H",
+    "F18F"
+   ],
+   "trot": 270,
+   "value": "R18H",
+   "verified": false,
+   "w": 0.025,
+   "x": 0.6125,
+   "y": 0.29
+  },
+  {
+   "body": [
+    0.65638,
+    0.29433,
+    0.02625,
+    0.04067
+   ],
+   "col": "#928c7a",
+   "h": 0.035,
+   "id": "ifx-btop-inductors-5",
+   "label": "",
+   "layer": "inductors",
+   "n": 5,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. APU VRM output choke. On a 1-889-352-21 board (seller photos) this part reads 'R18H M05F': same value, later revision.",
+   "part": "vrmchoke",
+   "text": [
+    "R18H",
+    "F18F"
+   ],
+   "trot": 270,
+   "value": "R18H",
+   "verified": false,
+   "w": 0.025,
+   "x": 0.655,
+   "y": 0.29
+  },
+  {
+   "body": [
+    0.7,
+    0.2945,
+    0.026,
+    0.041
+   ],
+   "col": "#918a7a",
+   "h": 0.035,
+   "id": "ifx-btop-inductors-6",
+   "label": "",
+   "layer": "inductors",
+   "n": 6,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. APU VRM output choke. On a 1-889-352-21 board (seller photos) this part reads 'R18H M05F': same value, later revision.",
+   "part": "vrmchoke",
+   "text": [
+    "R18H",
+    "F18F"
+   ],
+   "trot": 270,
+   "value": "R18H",
+   "verified": false,
+   "w": 0.025,
+   "x": 0.6988,
+   "y": 0.29
+  },
+  {
+   "body": [
+    0.47787,
+    0.20617,
+    0.0172,
+    0.02293
+   ],
+   "h": 0.0217,
+   "id": "ifx-btop-capacitors-1",
+   "label": "",
+   "layer": "capacitors",
+   "ma": 75.7,
+   "mf": 0.11,
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM input capacitor. On a 1-889-352-21 board (seller photos) this part reads 'L1 220C CM': same value, later revision.",
+   "part": "vrmcapin",
+   "text": [
+    "3T",
+    "220",
+    "CLA"
+   ],
+   "value": "3T 220 CLA (polymer)",
+   "verified": false,
+   "w": 0.0163,
+   "x": 0.4775,
+   "y": 0.205
+  },
+  {
+   "body": [
+    0.51587,
+    0.20683,
+    0.01655,
+    0.02207
+   ],
+   "h": 0.0217,
+   "id": "ifx-btop-capacitors-2",
+   "label": "",
+   "layer": "capacitors",
+   "ma": 84.2,
+   "mf": 0.19,
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM input capacitor. On a 1-889-352-21 board (seller photos) this part reads 'L1 220C CM': same value, later revision.",
+   "part": "vrmcapin",
+   "text": [
+    "3T",
+    "220",
+    "CLA"
+   ],
+   "value": "3T 220 CLA (polymer)",
+   "verified": false,
+   "w": 0.0163,
+   "x": 0.516,
+   "y": 0.205
+  },
+  {
+   "body": [
+    0.55763,
+    0.20683,
+    0.01645,
+    0.02193
+   ],
+   "h": 0.0217,
+   "id": "ifx-btop-capacitors-3",
+   "label": "",
+   "layer": "capacitors",
+   "ma": 93.2,
+   "mf": 0.2,
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM input capacitor. On a 1-889-352-21 board (seller photos) this part reads 'L1 220C CM': same value, later revision.",
+   "part": "vrmcapin",
+   "text": [
+    "3T",
+    "220",
+    "CLA"
+   ],
+   "value": "3T 220 CLA (polymer)",
+   "verified": false,
+   "w": 0.0163,
+   "x": 0.5575,
+   "y": 0.205
+  },
+  {
+   "body": [
+    0.60113,
+    0.20717,
+    0.01685,
+    0.02247
+   ],
+   "h": 0.0217,
+   "id": "ifx-btop-capacitors-4",
+   "label": "",
+   "layer": "capacitors",
+   "ma": 109.7,
+   "mf": 0.07,
+   "n": 4,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM input capacitor. On a 1-889-352-21 board (seller photos) this part reads 'L1 220C CM': same value, later revision.",
+   "part": "vrmcapin",
+   "text": [
+    "3T",
+    "220",
+    "CLA"
+   ],
+   "value": "3T 220 CLA (polymer)",
+   "verified": false,
+   "w": 0.0163,
+   "x": 0.6,
+   "y": 0.205
+  },
+  {
+   "body": [
+    0.64387,
+    0.20683,
+    0.01635,
+    0.0218
+   ],
+   "h": 0.0217,
+   "id": "ifx-btop-capacitors-5",
+   "label": "",
+   "layer": "capacitors",
+   "ma": 90.0,
+   "mf": 0.15,
+   "n": 5,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM input capacitor. On a 1-889-352-21 board (seller photos) this part reads 'L1 220C CM': same value, later revision.",
+   "part": "vrmcapin",
+   "text": [
+    "3T",
+    "220",
+    "CLA"
+   ],
+   "value": "3T 220 CLA (polymer)",
+   "verified": false,
+   "w": 0.0163,
+   "x": 0.6438,
+   "y": 0.205
+  },
+  {
+   "body": [
+    0.68837,
+    0.20683,
+    0.0154,
+    0.02053
+   ],
+   "h": 0.0217,
+   "id": "ifx-btop-capacitors-6",
+   "label": "",
+   "layer": "capacitors",
+   "ma": 90.0,
+   "mf": 0.15,
+   "n": 6,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM input capacitor. On a 1-889-352-21 board (seller photos) this part reads 'L1 220C CM': same value, later revision.",
+   "part": "vrmcapin",
+   "text": [
+    "3T",
+    "220",
+    "CLA"
+   ],
+   "value": "3T 220 CLA (polymer)",
+   "verified": false,
+   "w": 0.0163,
+   "x": 0.6863,
+   "y": 0.205
+  },
+  {
+   "band": "right",
+   "col": "#373936",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-7",
+   "label": "",
+   "layer": "capacitors",
+   "n": 7,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.4775,
+   "y": 0.34
+  },
+  {
+   "band": "right",
+   "col": "#474945",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-8",
+   "label": "",
+   "layer": "capacitors",
+   "n": 8,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.5013,
+   "y": 0.34
+  },
+  {
+   "band": "right",
+   "col": "#3c3d39",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-9",
+   "label": "",
+   "layer": "capacitors",
+   "n": 9,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.5225,
+   "y": 0.34
+  },
+  {
+   "band": "right",
+   "col": "#3d403e",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-10",
+   "label": "",
+   "layer": "capacitors",
+   "n": 10,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.6038,
+   "y": 0.3467
+  },
+  {
+   "band": "right",
+   "col": "#383b36",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-11",
+   "label": "",
+   "layer": "capacitors",
+   "n": 11,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.625,
+   "y": 0.3467
+  },
+  {
+   "band": "right",
+   "col": "#383a37",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-12",
+   "label": "",
+   "layer": "capacitors",
+   "n": 12,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 0,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.645,
+   "y": 0.3467
+  },
+  {
+   "band": "right",
+   "col": "#393b36",
+   "h": 0.015,
+   "id": "ifx-btop-capacitors-13",
+   "label": "",
+   "layer": "capacitors",
+   "n": 13,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. VRM output capacitor bank.",
+   "part": "vrmcapout",
+   "text": [
+    "470",
+    "3730P",
+    "d"
+   ],
+   "trot": 180,
+   "value": "470 (rectangular polymer)",
+   "verified": false,
+   "w": 0.0187,
+   "x": 0.6663,
+   "y": 0.3467
+  },
+  {
+   "body": [
+    0.2044,
+    0.5411,
+    0.026,
+    0.039
+   ],
+   "col": "#a9a7a2",
+   "h": 0.0367,
+   "id": "ifx-btop-inductors-7",
+   "label": "",
+   "layer": "inductors",
+   "n": 7,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "text": [
+    "4R7",
+    "328S"
+   ],
+   "trot": 270,
+   "value": "4R7",
+   "verified": false,
+   "w": 0.0238,
+   "x": 0.205,
+   "y": 0.54
+  },
+  {
+   "body": [
+    0.2655,
+    0.5532,
+    0.0176,
+    0.0208
+   ],
+   "col": "#5b5d60",
+   "h": 0.0367,
+   "id": "ifx-btop-inductors-8",
+   "label": "",
+   "layer": "inductors",
+   "n": 8,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "shape": "oct",
+   "text": [
+    "4R7"
+   ],
+   "trot": 0,
+   "value": "4R7",
+   "verified": false,
+   "w": 0.0238,
+   "x": 0.265,
+   "y": 0.553
+  },
+  {
+   "body": [
+    0.216,
+    0.582083,
+    0.01375,
+    0.020833
+   ],
+   "col": "#5b5d60",
+   "h": 0.0233,
+   "id": "ifx-btop-inductors-9",
+   "label": "",
+   "layer": "inductors",
+   "n": 9,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "shape": "oct",
+   "text": [
+    "1R0"
+   ],
+   "trot": 90,
+   "value": "1R0",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.216,
+   "y": 0.585
+  },
+  {
+   "body": [
+    0.71725,
+    0.843,
+    0.026,
+    0.03
+   ],
+   "col": "#8c8780",
+   "h": 0.0267,
+   "id": "ifx-btop-inductors-10",
+   "label": "",
+   "layer": "inductors",
+   "n": 10,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. On a 1-889-352-21 board (seller photos) this part reads 'R68 030': same value, later revision.",
+   "part": "inductor",
+   "text": [
+    "R68",
+    "3265"
+   ],
+   "trot": 0,
+   "value": "R68",
+   "verified": false,
+   "w": 0.0225,
+   "x": 0.7175,
+   "y": 0.8417
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-1",
+   "label": "TH3202",
+   "layer": "thermistors",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.5225,
+   "y": 0.17
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-2",
+   "label": "TH3203",
+   "layer": "thermistors",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.6475,
+   "y": 0.1467
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-3",
+   "label": "TH5201",
+   "layer": "thermistors",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.47,
+   "y": 0.243
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-4",
+   "label": "TH5202",
+   "layer": "thermistors",
+   "n": 4,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.6775,
+   "y": 0.293
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-5",
+   "label": "TH3304",
+   "layer": "thermistors",
+   "n": 5,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.345,
+   "y": 0.51
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-6",
+   "label": "TH3301",
+   "layer": "thermistors",
+   "n": 6,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.2075,
+   "y": 0.648
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-7",
+   "label": "TH3303",
+   "layer": "thermistors",
+   "n": 7,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.255,
+   "y": 0.72
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-8",
+   "label": "TH3302",
+   "layer": "thermistors",
+   "n": 8,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.2075,
+   "y": 0.733
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-thermistors-9",
+   "label": "TH2001",
+   "layer": "thermistors",
+   "n": 9,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "therm",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.615,
+   "y": 0.84
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-fuses-1",
+   "label": "F5103",
+   "layer": "fuses",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "fuse",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.735,
+   "y": 0.25
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-fuses-2",
+   "label": "F5102",
+   "layer": "fuses",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "fuse",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.2175,
+   "y": 0.6
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-fuses-3",
+   "label": "F5101",
+   "layer": "fuses",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "fuse",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.241,
+   "y": 0.6
+  },
+  {
+   "h": 0.0133,
+   "id": "ifx-btop-fuses-4",
+   "label": "F5104",
+   "layer": "fuses",
+   "n": 4,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Marker sits on the silkscreen label; the part is beside it.",
+   "part": "fuse",
+   "value": "",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.64,
+   "y": 0.78
+  },
+  {
+   "h": 0.075,
+   "id": "ifx-btop-connectors-1",
+   "label": "",
+   "layer": "connectors",
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Housing reads 13354DM.",
+   "part": "sata",
+   "value": "HDD SATA connector",
+   "verified": false,
+   "w": 0.1075,
+   "x": 0.285,
+   "y": 0.4767
+  },
+  {
+   "body": [
+    0.475875,
+    0.935667,
+    0.03175,
+    0.053333
+   ],
+   "h": 0.0533,
+   "id": "ifx-btop-connectors-2",
+   "label": "",
+   "layer": "connectors",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Rear edge; identified using the step 4 port list.",
+   "part": "aux",
+   "value": "AUX port (USB-A shaped)",
+   "verified": false,
+   "w": 0.0275,
+   "x": 0.4738,
+   "y": 0.9333
+  },
+  {
+   "body": [
+    0.536375,
+    0.908833,
+    0.04625,
+    0.087667
+   ],
+   "h": 0.0883,
+   "id": "ifx-btop-connectors-3",
+   "label": "",
+   "layer": "connectors",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Shield reads 3B21A5N.",
+   "part": "lan",
+   "value": "Ethernet jack",
+   "verified": false,
+   "w": 0.045,
+   "x": 0.5372658581304874,
+   "y": 0.9087651908265739
+  },
+  {
+   "body": [
+    0.59675,
+    0.940333,
+    0.04,
+    0.044
+   ],
+   "h": 0.0467,
+   "id": "ifx-btop-connectors-4",
+   "label": "",
+   "layer": "connectors",
+   "n": 4,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Check for bent pins and a lifted shell tab (step 5).",
+   "part": "hdmi",
+   "value": "HDMI port",
+   "verified": false,
+   "w": 0.04,
+   "x": 0.595,
+   "y": 0.94
+  },
+  {
+   "body": [
+    0.65875,
+    0.9415,
+    0.03075,
+    0.048333
+   ],
+   "h": 0.0483,
+   "id": "ifx-btop-connectors-5",
+   "label": "",
+   "layer": "connectors",
+   "n": 5,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "optical",
+   "value": "Optical audio out",
+   "verified": false,
+   "w": 0.03,
+   "x": 0.6575,
+   "y": 0.94
+  },
+  {
+   "body": [
+    0.569125,
+    0.06975,
+    0.10125,
+    0.0755
+   ],
+   "h": 0.0567,
+   "id": "ifx-btop-connectors-6",
+   "label": "",
+   "layer": "connectors",
+   "n": 6,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Board edge opposite the rear ports, so most likely the two front USB 3.0 ports (step 3).",
+   "part": "fusb",
+   "value": "Dual USB-A (front)",
+   "verified": false,
+   "w": 0.0988,
+   "x": 0.5695,
+   "y": 0.078
+  },
+  {
+   "body": [
+    0.209375,
+    0.66,
+    0.0325,
+    0.016667
+   ],
+   "cells": 4,
+   "h": 0.0333,
+   "id": "ifx-btop-connectors-7",
+   "label": "",
+   "layer": "connectors",
+   "n": 7,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Purpose not identified.",
+   "part": "conn",
+   "value": "Board-to-wire connector",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.21,
+   "y": 0.658
+  },
+  {
+   "h": 0.0333,
+   "id": "ifx-btop-connectors-8",
+   "label": "",
+   "layer": "connectors",
+   "n": 8,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Purpose not identified.",
+   "part": "conn",
+   "value": "Board-to-wire connector",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.255,
+   "y": 0.685
+  },
+  {
+   "h": 0.0333,
+   "id": "ifx-btop-connectors-9",
+   "label": "",
+   "layer": "connectors",
+   "n": 9,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Purpose not identified.",
+   "part": "conn",
+   "value": "Board-to-wire connector",
+   "verified": false,
+   "w": 0.0175,
+   "x": 0.2025,
+   "y": 0.77
+  },
+  {
+   "body": [
+    0.7227,
+    0.156,
+    0.0511,
+    0.0692
+   ],
+   "h": 0.07,
+   "id": "ifx-btop-other-1",
+   "label": "",
+   "layer": "other",
+   "mask": [
+    0.7224,
+    0.156,
+    0.0864,
+    0.042
+   ],
+   "n": 1,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "cell",
+   "value": "CR2032 coin cell (Mitsubishi)",
+   "verified": false,
+   "w": 0.05,
+   "x": 0.7225,
+   "y": 0.157
+  },
+  {
+   "body": [
+    0.7265,
+    0.8862,
+    0.033,
+    0.0413
+   ],
+   "h": 0.0417,
+   "id": "ifx-btop-other-2",
+   "label": "",
+   "layer": "other",
+   "n": 2,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Round black part. Most likely the beeper.",
+   "part": "buzzer",
+   "value": "Piezo buzzer",
+   "verified": false,
+   "w": 0.0325,
+   "x": 0.7263,
+   "y": 0.8867
+  },
+  {
+   "h": 0.1667,
+   "id": "ifx-btop-other-3",
+   "label": "SAA-001 1-889-352-11",
+   "layer": "other",
+   "n": 3,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. Same board as your CUH-1001A.",
+   "part": "silk",
+   "value": "Board silkscreen",
+   "verified": false,
+   "w": 0.015,
+   "x": 0.43,
+   "y": 0.3
+  },
+  {
+   "body": [
+    0.31438,
+    0.5575,
+    0.01475,
+    0.01967
+   ],
+   "col": "#545558",
+   "h": 0.0203,
+   "id": "ifx-btop-ics-satabridge",
+   "label": "",
+   "layer": "ics",
+   "n": 17,
+   "note": "My reading of the iFixit step 19 photo at full zoom: \"MB86C311B · TAIWAN · 1323 Z00 · E3\" with an ARM logo. The PS4 Dev Wiki lists MB86C311B as the SAA-001 SATA bridge. iFixit did not box it.",
+   "part": "satabridge",
+   "text": [
+    "MB86C311B"
+   ],
+   "trot": 0,
+   "value": "Fujitsu MB86C311B (SATA bridge)",
+   "verified": false,
+   "w": 0.0155,
+   "x": 0.3151,
+   "y": 0.5577
+  },
+  {
+   "body": [
+    0.41287,
+    0.12883,
+    0.00975,
+    0.013
+   ],
+   "col": "#53524b",
+   "h": 0.0142,
+   "id": "ifx-btop-ics-stm8",
+   "label": "",
+   "layer": "ics",
+   "n": 18,
+   "note": "My reading of the iFixit step 19 photo at full zoom: \"STM8… / …A11 / … MY5 / 331 X\". Sits near the front USB edge. Its job is not documented in my sources.",
+   "part": "stm8",
+   "value": "STM8-family microcontroller (marking partly legible)",
+   "verified": false,
+   "w": 0.0108,
+   "x": 0.413,
+   "y": 0.1292
+  },
+  {
+   "body": [
+    0.43862,
+    0.75517,
+    0.0205,
+    0.015
+   ],
+   "col": "#4a4c4f",
+   "h": 0.015,
+   "id": "ifx-btop-crystals-rtc",
+   "label": "",
+   "layer": "crystals",
+   "n": 1,
+   "note": "My reading of the FastTech SAA-001 listing photo (this spot is under an iFixit frame): a metal-can crystal marked \"32.768\", i.e. a 32.768 kHz watch crystal. What it clocks is not documented in my sources.",
+   "part": "xtal",
+   "text": [
+    "32.768"
+   ],
+   "trot": 0,
+   "value": "32.768 crystal",
+   "verified": false,
+   "w": 0.0205,
+   "x": 0.43862,
+   "y": 0.75517
+  },
+  {
+   "body": [
+    0.714625,
+    0.3555,
+    0.02325,
+    0.030333
+   ],
+   "col": "#9a958c",
+   "h": 0.030333,
+   "id": "ifx-btop-inductors-19",
+   "label": "",
+   "layer": "inductors",
+   "n": 19,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board. On a 1-889-352-21 board (seller photos) this part reads 'R68 030': same value, later revision.",
+   "part": "inductor",
+   "text": [
+    "R68",
+    "3265"
+   ],
+   "trot": 90,
+   "value": "R68",
+   "verified": false,
+   "w": 0.02325,
+   "x": 0.714625,
+   "y": 0.3555
+  },
+  {
+   "body": [
+    0.62475,
+    0.181333,
+    0.0165,
+    0.025667
+   ],
+   "col": "#b3a78f",
+   "h": 0.025667,
+   "id": "ifx-btop-inductors-20",
+   "label": "",
+   "layer": "inductors",
+   "n": 20,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "shape": "oct",
+   "text": [
+    "1R0",
+    "FKD"
+   ],
+   "trot": 270,
+   "value": "1R0",
+   "verified": false,
+   "w": 0.0165,
+   "x": 0.62475,
+   "y": 0.181333
+  },
+  {
+   "body": [
+    0.741375,
+    0.2865,
+    0.01425,
+    0.021667
+   ],
+   "col": "#5b5d60",
+   "h": 0.021667,
+   "id": "ifx-btop-inductors-21",
+   "label": "",
+   "layer": "inductors",
+   "n": 21,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "shape": "oct",
+   "text": [
+    "1R0"
+   ],
+   "trot": 270,
+   "value": "1R0",
+   "verified": false,
+   "w": 0.01425,
+   "x": 0.741375,
+   "y": 0.2865
+  },
+  {
+   "body": [
+    0.498437,
+    0.185417,
+    0.015625,
+    0.024167
+   ],
+   "col": "#5b5d60",
+   "h": 0.024167,
+   "id": "ifx-btop-inductors-22",
+   "label": "",
+   "layer": "inductors",
+   "n": 22,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "shape": "oct",
+   "text": [
+    "1R0"
+   ],
+   "trot": 270,
+   "value": "1R0",
+   "verified": false,
+   "w": 0.015625,
+   "x": 0.498437,
+   "y": 0.185417
+  },
+  {
+   "body": [
+    0.689,
+    0.155667,
+    0.0195,
+    0.023333
+   ],
+   "h": 0.023333,
+   "id": "ifx-btop-other-23",
+   "label": "",
+   "layer": "other",
+   "n": 23,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "cellclip",
+   "value": "Coin cell holder clip",
+   "verified": false,
+   "w": 0.0195,
+   "x": 0.689,
+   "y": 0.155667
+  },
+  {
+   "body": [
+    0.67475,
+    0.797167,
+    0.0155,
+    0.022333
+   ],
+   "col": "#5b5d60",
+   "h": 0.022333,
+   "id": "ifx-btop-inductors-24",
+   "label": "",
+   "layer": "inductors",
+   "n": 24,
+   "note": "My reading of the iFixit step 19 photo, not stated by iFixit. Confirm on your board.",
+   "part": "inductor",
+   "shape": "oct",
+   "text": [
+    "1R0"
+   ],
+   "trot": 270,
+   "value": "1R0",
+   "verified": false,
+   "w": 0.0155,
+   "x": 0.67475,
+   "y": 0.797167
+  }
+ ],
+ "photo": "968a5da61dc8e0f385512d8519d5dd82"
+}

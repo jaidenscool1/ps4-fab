@@ -1,0 +1,70 @@
+{
+ "markers": [
+  {
+   "h": 0.3333,
+   "id": "ifx-bd-other-1",
+   "label": "",
+   "layer": "other",
+   "n": 1,
+   "note": "My reading of the iFixit step 15 photo, not stated by iFixit. Confirm on your board. Step 16 lists its ICs: Renesas RJ832841FP1, Mitsumi 312 3536A, ROHM BD7763EFV, STM8ED.",
+   "value": "BD drive board",
+   "verified": false,
+   "w": 0.1,
+   "x": 0.4,
+   "y": 0.25
+  },
+  {
+   "h": 0.0667,
+   "id": "ifx-bd-cables-1",
+   "label": "",
+   "layer": "cables",
+   "n": 1,
+   "note": "My reading of the iFixit step 15 photo, not stated by iFixit. Confirm on your board.",
+   "value": "Flat flex ribbon",
+   "verified": false,
+   "w": 0.075,
+   "x": 0.36,
+   "y": 0.375
+  },
+  {
+   "h": 0.0667,
+   "id": "ifx-bd-cables-2",
+   "label": "",
+   "layer": "cables",
+   "n": 2,
+   "note": "My reading of the iFixit step 15 photo, not stated by iFixit. Confirm on your board. Held in the hand while the drive lifts out.",
+   "value": "Flat flex ribbon",
+   "verified": false,
+   "w": 0.075,
+   "x": 0.25,
+   "y": 0.53
+  },
+  {
+   "h": 0.1,
+   "id": "ifx-bd-other-2",
+   "label": "",
+   "layer": "other",
+   "n": 2,
+   "note": "My reading of the iFixit step 15 photo, not stated by iFixit. Confirm on your board.",
+   "value": "Laser warning label",
+   "verified": false,
+   "w": 0.1125,
+   "x": 0.25,
+   "y": 0.27
+  },
+  {
+   "h": 0.25,
+   "id": "ifx-bd-other-3",
+   "label": "",
+   "layer": "other",
+   "n": 3,
+   "note": "My reading of the iFixit step 15 photo, not stated by iFixit. Confirm on your board.",
+   "value": "Fan",
+   "verified": false,
+   "w": 0.1875,
+   "x": 0.66,
+   "y": 0.28
+  }
+ ],
+ "photo": "518a662b8476f87224e7469f244fd14c"
+}
