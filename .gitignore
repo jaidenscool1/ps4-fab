@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.egg-info/
+out/
+*.stl
+*.pdf
+# photos and anything made from them stay local (they show people's rooms)
+*.jpg
+*.jpeg
+*.JPG
+*.HEIC
+*.heic
+*.png
+*.mat.json

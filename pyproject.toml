@@ -1,0 +1,24 @@
+[project]
+name = "ps4fab"
+version = "0.1.0"
+description = "Measure console parts from phone photos (printed marker mat) and build printable replacement parts"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "build123d>=0.9",
+  "manifold3d",
+  "numpy",
+  "opencv-contrib-python-headless>=4.7",
+  "matplotlib",
+  "pillow",
+  "pillow-heif",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+ps4fab = "ps4fab.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
